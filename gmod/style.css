@@ -1,0 +1,7 @@
+body{font-family:Arial;max-width:800px;margin:0 auto;padding:20px;}
+li{margin-bottom:3px;}
+ul{margin-top:20px;margin-bottom:20px;}
+img{max-width:97%;border:1px solid black;}
+h1,h2,h3,h4{padding-top:20px;}
+pre{font-family:Arial;max-width:99%;white-space:pre-wrap;}
+span{font-family: consolas,monospace;}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Anticheat2 | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Analysis of "cl_cheats.lua"</h1>
+<h3>a simple but bad LUA based anticheat</h3>
+<br>
+<ol>
+<li><a href="#intro">The Code</a></li>
+<li><a href="#problem">The Problems</a></li>
+</ol>
+<br>
+<h3 id="intro">The Code</h3>
+<p>The Code is not very long, so I will post it here:
+<pre>
+local h = hook.Add local s = "Tick" local n = math.Rand(0,1) local t = (true) local g = GetConVar local l = "sv_" local z = "allow" local p = "cs" local y = "lua" local c = "sv_" local f = "ch" local e = "eats" local m = g(l..z..p..y) local d = g(c..f..e)
+h(s, tostring(n), function()
+	if (!m) or (!d) or (!m.GetInt) or (!d.GetInt) or (m:GetInt() == nil) or (d:GetInt() == nil) or (m:GetInt() != 0) or (d:GetInt() != 0) then
+		while t do
+		end
+	end
+end)
+</pre>
+The Script is written in LUA.<br>
+As you can see, it looks very complicated at first, but it's more "Security through Obscurity" than anything else.<br>
+Now let me quickly explain the code. If you want you can analyze it yourself beforehand and compare it with this text afterwards.<br>
+<br>
+All the code does is check the 2 console variables if they are NOT 0 (aka. someone used an external program to change those). If one of those is not 0 or not set then an infinite loop will be started that basically crashes your game.<br>
+The code is written so that someone who tries to analyze it has a difficult time to do that. But the problem: It is not difficult to analyse. If you simply replace the variables you have a very readable program again.
+</p>
+
+<h3 id="problem">The Problems</h3>
+<p>
+This code has many problems. I will put the problems in sections to better structure everything.<br>
+<br>
+<u>The Code and the filename</u><br>
+Now, why would someone write this piece of code <i>THAT</i> unreadable?<br>
+They don't want others to know what it does. This brings me to the main point:<br>
+<b>Why name the file cl_cheats.lua if you don't want people to know what it does</b><br>
+Even an idiot can deduce the filename to be some kind of anti-cheat stuff. Even if he doesn't understand the code, he can just fill in all the one-letter variables with the values behind them and read the code afterwards.<br>
+<br>
+<u>The Code itself</u><br>
+Now to the execution of the stuff we are reading.<br>
+This code simply checks 2 console variables (convars) which most old cheaters used to toggle for executing their own LUA scripts.<br>
+There is only one main problem: There are way better and safer ways to do that nowadays. These new methods are not discoverable.<br>
+This means that, no matter what you try to accomplish, as long as you execute your scripts without doing anything to those 2 convars everything is good.<br>
+<br>
+<u>Random Hooknames and Performance</u><br>
+It's a good thought to randomly name your security measurements, but it's a bit different with Hooknames.<br>
+You can list all Hooks with <span>hook.GetTable()</span>. This way you can find the hook easily.<br>
+It's also a bad idea to check this via a "Think" hook. This hook runs each frame, so sometimes over 100 times per second.<br>
+This - ofcourse - kills performance. The guy who bragged about this anticheat said "It's more efficient and better at finding cheaters". It's not.<br>
+<br>
+A better way would be to use timers.<br>
+With timer.Create you can make a timer that runs each second for example. Timers can't be listed, so if you randomly generate the Timer ID no one can find it that easily anymore.<br>
+This way you would make it more secure and less resource intensive. 
+</p>
+<br><br><br>
+</body>
+</html>

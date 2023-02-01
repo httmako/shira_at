@@ -1,0 +1,67 @@
+<?php
+
+$htmlTable = "";
+
+# Servicename -> command for getting amount of processes
+$checkArray = array(	
+  "MySQL" => 'ps -aux | grep "mysqld" | wc -l',
+  "SCPRP" => 'ps -aux | grep "srcds_linux.*scprp" | wc -l',
+  "PRP" => 'ps -aux | grep "srcds_linux.*policerp" | wc -l',
+  "SWRP" => 'ps -aux | grep "srcds_linux.*starwarsrp" | wc -l',
+  "GTA" => 'ps -aux | grep " gta " | wc -l',
+  "Minecraft" => 'ps -aux | grep "java.*BungeeCord" | wc -l',
+);
+
+foreach($checkArray as $key => $value){
+  $output = shell_exec($value);
+  $pss = intval($output)-2;
+  $status = "<span class='red'>Not running</span>";
+  if($pss > 0){
+    $status = "<span class='green'>Running</span>";
+  }
+  $htmlTable .= "<hr><p><span class='name'>" . $key . "</span>" . $status . "</p>";
+}
+$htmlTable .= "<hr>";
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Status</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Verdana, Arial;
+  background: #333;
+  font-size: 1.1em;
+  line-height: 1.5em;
+  color: #cfcfcf;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+h1{
+  margin-top:40px;
+}
+.red{
+  margin-right:10px;
+  float:right;
+  color:red;
+}
+.green{
+  margin-right:10px;
+  float:right;
+  color:green;
+}
+.name{
+  margin-left:10px;
+}
+</style>
+</head>
+<body>
+<h1>Server Status</h1>
+<br><br>
+<?php echo $htmlTable; ?>
+</body>
+</html>

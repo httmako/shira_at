@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>httpd | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>httpd CentOS 7 quickstart</h1>
+
+<ul>
+<li><a href="#install">Installation</a></li>
+<li><a href="#subdomain">Subdomains</a></li>
+<li><a href="#https">HTTPS with certbot</a></li>
+<li><a href="#protect">Password-Protect a folder</a></li>
+<!--<li><a href="#php">PHP7</a></li>-->
+</ul>
+
+<h3 id="install">Installation</h3>
+<p>Install httpd (apache webserver) via  <span>sudo yum install httpd</span><br>
+Configuration is at  <span>/etc/httpd/conf/httpd.conf</span><br>
+Webpages are located in  <span>/var/www/html</span><br>
+If you can't connect check your firewall, maybe it blocks http / port 80 traffic.<br>
+A great way to troubleshoot the installation is to use lynx: Install lynx (<span>sudo yum install lynx</span>) and run <span>lynx localhost</span>. Lynx is an in-console web browser. If it doesn't display your website then the installation went wrong. If it displays your website but you can't reach it from outside your machine then your firewall is at fault.</p>
+
+<h3 id="subdomain">Subdomains</h3>
+<p>Subdomains are the names infront of your domain name. Example: test.example.com<br>
+You can create subdomains via VirtualHosts in your <span>httpd.conf</span> file.
+To create subdomains you have to point them at your IP via your domain.
+A good idea would be to point every subdomain (*.example.com) to your Server.
+Then just add a few VirtualHosts to your config file. Example:
+<br>
+<pre>
+&lt;VirtualHost *:80>
+        ServerName example.com
+        ServerAlias www.example.com
+        DocumentRoot /var/www/html
+&lt;/VirtualHost>
+
+&lt;VirtualHost *:80>
+        ServerName test.example.com
+        DocumentRoot /var/www/test_html
+&lt;/VirtualHost>
+</pre>
+<br>
+The first VirtualHost you create will be the default, so if people go to <span>not.example.com</span> they will see the first VirtualHost you wrote. Don't forget to create the <span>test_html</span> folder and put stuff in there.<br>
+ServerAlias means you can have multiple subdomains pointing to one VirtualHost. Don't forget to restart your webserver afterwards with <span>sudo systemctl restart httpd</span>.</p>
+
+<h3 id="https">HTTPS</h3>
+<p>Having an HTTPS webserver is standard nowadays, and easy to do aswell.<br>
+Install certbot to get ssl certificates for https: <span>sudo yum install certbot python-certbot-apache</span><br>
+To Create these certificates just run the command (in our example for example.com and test.example.com):<br>
+<span>sudo certbot --apache -d test.example.com -d example.com</span><br>
+This command will fetch you your certificates for the provided domains. You will get asked a few questions, just fill them out correctly. If certbot asks you if you want auto redirect from HTTP to HTTPS say Yes (the second option) so that traffic automatically runs on HTTPS only.<br>
+Afterwards check your firewall if you are allowing https traffic.<br>
+Then just restart httpd again and you are ready to go.<br>
+</p>
+
+<h3 id="protect">Password-Protect a folder on your website</h3>
+<p>Sometimes you have to protect a folder, for example the testing folder, from the public eye. To do this you can password-protect it via simple http authentication.<br>
+This way the folder won't show up in an index listing aswell.<br>
+To protect a specific URL with a password you simply have to create a password file and add a few lines to the config file.<br>
+First run <span>sudo htpasswd -c /etc/httpd/.htpasswd user</span> to create a new password file and create a password for the user <span>'user'</span>. Afterwards you just have to copy the following line to your <span>/etc/httpd/conf/httpd.conf</span> file and you are ready to go:
+<br>
+<pre>
+&lt;Directory "/var/www/html/myfolder">    
+    AuthType Basic
+    AuthName "Unauthorized access is prohibited."
+    AuthUserFile /etc/httpd/.htpasswd
+    Require valid-user
+&lt;/Directory>
+</pre>
+<br>
+Now your folder needs a user and password before it can be accessed via a browser.
+</p>
+<br><br><br>
+</body>
+</html>

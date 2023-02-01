@@ -1,0 +1,37 @@
+# SELinux
+
+## List context
+ls -Zahl
+
+## Set context
+semanage fcontext -a -t httpd_sys_content_t "/web(/.*)?"
+restorecon -R -v /web
+
+## Delete context
+semanage fcontext -d "/web(/.*)?"
+restorecon -R /web
+
+## List context->port definitions
+semanage port -l     (| grep http)
+
+## Add port to context-definitions
+semanage port -a -t http_port_t -p tcp 82
+
+## List processes with context
+ps Zaux
+
+## List networklisteners with context
+netstat -Ztulpen
+
+## List boolean values of SELinux
+semanage boolean -l
+
+## List current values of boolean SELinux values
+getsebool -a | grep ftpd
+
+## Set boolean value (for example ftpd_anon_write)
+setsebool -P ftpd_anon_write on
+
+## Showing SELinux report of violations
+aureport -a
+grep sealert /var/log/messages

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>linux commands | shira.at</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://shira.at/style.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">linux commands | shira.at</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#searching" id="toc-searching">Searching</a>
+<ul>
+<li><a href="#grep---multiple-folders-and-files"
+id="toc-grep---multiple-folders-and-files">grep - multiple folders and
+files</a></li>
+<li><a href="#grep---output-of-a-command"
+id="toc-grep---output-of-a-command">grep - output of a command</a></li>
+<li><a
+href="#find---all-files-recursively-from-called-passwd-case-insensitive"
+id="toc-find---all-files-recursively-from-called-passwd-case-insensitive">find
+- all files recursively from / called passwd case insensitive</a></li>
+</ul></li>
+<li><a href="#compression" id="toc-compression">Compression</a>
+<ul>
+<li><a href="#mat2---recursively-remove-metadata-of-files"
+id="toc-mat2---recursively-remove-metadata-of-files">mat2 - recursively
+remove metadata of files</a></li>
+<li><a href="#imagemagick---convert-png-to-jpg-file-recursively"
+id="toc-imagemagick---convert-png-to-jpg-file-recursively">imagemagick -
+convert png to jpg file recursively</a></li>
+<li><a href="#jpegoptim---optimize-and-compress-.jpg-images"
+id="toc-jpegoptim---optimize-and-compress-.jpg-images">jpegoptim -
+Optimize and compress .jpg images</a></li>
+<li><a href="#pngquant---optimize-and-compress-.png-images"
+id="toc-pngquant---optimize-and-compress-.png-images">pngquant -
+Optimize and compress .png images</a></li>
+<li><a href="#ffmpeg---optimize-and-compress-video-files"
+id="toc-ffmpeg---optimize-and-compress-video-files">ffmpeg - Optimize
+and compress video files</a></li>
+<li><a href="#zip---compress-a-folder-into-a-zip-file"
+id="toc-zip---compress-a-folder-into-a-zip-file">zip - compress a folder
+into a zip file</a></li>
+<li><a href="#zip---strong-compression-of-a-folder-into-a-file"
+id="toc-zip---strong-compression-of-a-folder-into-a-file">7zip - strong
+compression of a folder into a file</a></li>
+<li><a href="#mysql---backup-all-databases-into-a-compressed-7zip-file"
+id="toc-mysql---backup-all-databases-into-a-compressed-7zip-file">mysql
+- backup all databases into a compressed 7zip file</a></li>
+<li><a href="#mysql---backup-all-databases-into-a-compressed-gzip-file"
+id="toc-mysql---backup-all-databases-into-a-compressed-gzip-file">mysql
+- backup all databases into a compressed gzip file</a></li>
+</ul></li>
+<li><a href="#download" id="toc-download">Download</a>
+<ul>
+<li><a href="#wget---download-whole-website-recursively"
+id="toc-wget---download-whole-website-recursively">wget - Download whole
+website recursively</a></li>
+<li><a href="#curl---send-http-post-with-json-content"
+id="toc-curl---send-http-post-with-json-content">curl - send http post
+with json content</a></li>
+<li><a href="#curl---get-with-http-basic-auth"
+id="toc-curl---get-with-http-basic-auth">curl - get with http basic
+auth</a></li>
+<li><a href="#curl---custom-user-agent"
+id="toc-curl---custom-user-agent">curl - custom user agent</a></li>
+<li><a href="#youtube-dl---downloading-youtube-videos"
+id="toc-youtube-dl---downloading-youtube-videos">youtube-dl -
+downloading youtube videos</a>
+<ul>
+<li><a href="#youtube-dl---download-only-music"
+id="toc-youtube-dl---download-only-music">youtube-dl - download only
+music</a></li>
+<li><a href="#youtube-dl---download-the-best-possible-video-and-audio"
+id="toc-youtube-dl---download-the-best-possible-video-and-audio">youtube-dl
+- download the best possible video and audio</a></li>
+<li><a href="#youtube-dl---download-a-playlist-as-music-files"
+id="toc-youtube-dl---download-a-playlist-as-music-files">youtube-dl -
+download a playlist as music files</a></li>
+<li><a href="#youtube-dl---resume-download-a-playlist-from-song-8"
+id="toc-youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
+- resume download a playlist from song 8</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#files" id="toc-files">Files</a>
+<ul>
+<li><a href="#pandoc---convert-markdown-to-pdf"
+id="toc-pandoc---convert-markdown-to-pdf">pandoc - convert markdown to
+pdf</a></li>
+<li><a href="#find---print-out-the-word-count-of-every-.lua-file"
+id="toc-find---print-out-the-word-count-of-every-.lua-file">find - print
+out the word count of every .lua file</a></li>
+<li><a href="#find-sed---find-and-replace-words-in-all-lua-files"
+id="toc-find-sed---find-and-replace-words-in-all-lua-files">find sed -
+find and replace words in all lua files</a></li>
+<li><a
+href="#find-grep---loop-through-small-files-and-search-for-their-name-in-the-files"
+id="toc-find-grep---loop-through-small-files-and-search-for-their-name-in-the-files">find
+grep - loop through small files and search for their name in the
+files</a></li>
+<li><a href="#rm---remove-a-folder-with-all-files-inside-it"
+id="toc-rm---remove-a-folder-with-all-files-inside-it">rm - Remove a
+folder with all files inside it</a></li>
+<li><a href="#mv---move-files-around" id="toc-mv---move-files-around">mv
+- Move files around</a></li>
+<li><a href="#gpg---encrypt-files" id="toc-gpg---encrypt-files">gpg -
+Encrypt files</a></li>
+</ul></li>
+<li><a href="#administration" id="toc-administration">Administration</a>
+<ul>
+<li><a href="#settings---enable-the-bash-recursion-syntax"
+id="toc-settings---enable-the-bash-recursion-syntax">Settings - Enable
+the **/* bash recursion syntax</a></li>
+<li><a
+href="#snapshot---get-modified-timestamp-of-every-file-in-folder-and-save-it-to-.txt"
+id="toc-snapshot---get-modified-timestamp-of-every-file-in-folder-and-save-it-to-.txt">snapshot
+- Get modified timestamp of every file in folder and save it to
+<date>.txt</a></li>
+<li><a href="#shell-expansion---run-command-inside-command"
+id="toc-shell-expansion---run-command-inside-command">Shell Expansion -
+Run command inside command</a></li>
+<li><a href="#chown---change-ownership-of-folder-to-user"
+id="toc-chown---change-ownership-of-folder-to-user">chown - Change
+ownership of folder to user</a></li>
+<li><a href="#chmod---change-file-permissions"
+id="toc-chmod---change-file-permissions">chmod - Change file
+permissions</a></li>
+<li><a href="#for---run-command-multiple-times"
+id="toc-for---run-command-multiple-times">for - run command multiple
+times</a></li>
+<li><a href="#screen---start-in-the-background"
+id="toc-screen---start-in-the-background">screen - start in the
+background</a></li>
+<li><a href="#screen---execute-command-into-screen"
+id="toc-screen---execute-command-into-screen">screen - execute command
+into screen</a></li>
+<li><a
+href="#script---convert-colored-command-output-to-a-html-page-requisites"
+id="toc-script---convert-colored-command-output-to-a-html-page-requisites">script
+- convert colored command output to a html page-requisites</a></li>
+</ul></li>
+<li><a href="#cronjobs" id="toc-cronjobs">Cronjobs</a>
+<ul>
+<li><a
+href="#automatically-backup-your-mariadb-and-delete-backups-older-than-7days"
+id="toc-automatically-backup-your-mariadb-and-delete-backups-older-than-7days">Automatically
+backup your MariaDB and delete backups older than 7days</a></li>
+</ul></li>
+<li><a href="#selinux" id="toc-selinux">SELinux</a>
+<ul>
+<li><a href="#list-context" id="toc-list-context">List context</a></li>
+<li><a href="#set-context" id="toc-set-context">Set context</a></li>
+<li><a href="#delete-context" id="toc-delete-context">Delete
+context</a></li>
+<li><a href="#list-context-port-definitions"
+id="toc-list-context-port-definitions">List context-&gt;port
+definitions</a></li>
+<li><a href="#add-port-to-context-definitions"
+id="toc-add-port-to-context-definitions">Add port to
+context-definitions</a></li>
+<li><a href="#list-processes-with-context"
+id="toc-list-processes-with-context">List processes with
+context</a></li>
+<li><a href="#list-networklisteners-with-context"
+id="toc-list-networklisteners-with-context">List networklisteners with
+context</a></li>
+<li><a href="#list-boolean-values-of-selinux"
+id="toc-list-boolean-values-of-selinux">List boolean values of
+SELinux</a></li>
+<li><a href="#list-current-values-of-boolean-selinux-values"
+id="toc-list-current-values-of-boolean-selinux-values">List current
+values of boolean SELinux values</a></li>
+<li><a href="#set-boolean-value-for-example-ftpd_anon_write"
+id="toc-set-boolean-value-for-example-ftpd_anon_write">Set boolean value
+(for example ftpd_anon_write)</a></li>
+<li><a href="#showing-selinux-report-of-violations"
+id="toc-showing-selinux-report-of-violations">Showing SELinux report of
+violations</a></li>
+</ul></li>
+<li><a href="#garrys-mod-specific" id="toc-garrys-mod-specific">Garry’s
+Mod specific</a>
+<ul>
+<li><a href="#backup-server-into-zip"
+id="toc-backup-server-into-zip">Backup server into zip</a></li>
+<li><a href="#open-the-log-files" id="toc-open-the-log-files">Open the
+log files</a></li>
+</ul></li>
+<li><a href="#misc" id="toc-misc">Misc</a>
+<ul>
+<li><a href="#ffmpeg" id="toc-ffmpeg">ffmpeg</a>
+<ul>
+<li><a href="#convert-video-to-a-meme-format-white-bar-at-top-with-text"
+id="toc-convert-video-to-a-meme-format-white-bar-at-top-with-text">Convert
+Video to a Meme format (white bar at top with text)</a></li>
+</ul></li>
+<li><a href="#pandoc" id="toc-pandoc">pandoc</a></li>
+</ul></li>
+</ul>
+</nav>
+<p>This is a list of linux commands which are not commonly used but
+still very good to know.<br />
+This is neither a complete list nor a cheat sheet of any kind. This is a
+reference for myself and something to show to others if they ask “Why
+are you using only the commandline?” again.</p>
+<h1 id="searching">Searching</h1>
+<h2 id="grep---multiple-folders-and-files">grep - multiple folders and
+files</h2>
+<p>Searching through a folder recursively and print every occurance with
+file name and line number:</p>
+<pre><code>grep -rin &quot;SearchText&quot; foldername</code></pre>
+<p>r = recursive, i = case insensitive, n = display line numbers</p>
+<h2 id="grep---output-of-a-command">grep - output of a command</h2>
+<pre><code>history | grep &quot;sudo&quot;</code></pre>
+<h2
+id="find---all-files-recursively-from-called-passwd-case-insensitive">find
+- all files recursively from / called passwd case insensitive</h2>
+<pre><code>find / -type f -iname &quot;passwd&quot;</code></pre>
+<h1 id="compression">Compression</h1>
+<h2 id="mat2---recursively-remove-metadata-of-files">mat2 - recursively
+remove metadata of files</h2>
+<pre><code>mat2 --inplace *</code></pre>
+<h2 id="imagemagick---convert-png-to-jpg-file-recursively">imagemagick -
+convert png to jpg file recursively</h2>
+<pre><code>find . -type f -iname &quot;*.png&quot; -exec mogrify -verbose -format jpg {} \;</code></pre>
+<h2 id="jpegoptim---optimize-and-compress-.jpg-images">jpegoptim -
+Optimize and compress .jpg images</h2>
+<pre><code>sudo apt-get install jpegoptim
+jpegoptim file.jpg
+jpegoptim **/*.jpg</code></pre>
+<h2 id="pngquant---optimize-and-compress-.png-images">pngquant -
+Optimize and compress .png images</h2>
+<pre><code>sudo apt-get install pngquant
+pngquant -v --skip-if-larger -s 1 -f --ext .png filename.png</code></pre>
+<h2 id="ffmpeg---optimize-and-compress-video-files">ffmpeg - Optimize
+and compress video files</h2>
+<pre><code>sudo apt-get install ffmpeg
+ffmpeg -i inputfile.mkv -crf 25 -vcodec h264 -acodec aac output.mp4</code></pre>
+<h2 id="zip---compress-a-folder-into-a-zip-file">zip - compress a folder
+into a zip file</h2>
+<pre><code>zip -r folder.zip folder/</code></pre>
+<p>zip is mostly pre-installed. The unzip command needs to be installed
+with</p>
+<pre><code>sudo apt-get install unzip</code></pre>
+<h2 id="zip---strong-compression-of-a-folder-into-a-file">7zip - strong
+compression of a folder into a file</h2>
+<pre><code>sudo apt-get install pz7ip-full
+7z a -m0=lzma2 -mx=9 folder.7z folder/</code></pre>
+<p>Hint: 7zip is miles better than zip. It converted 14GB of similar
+text down to 850MB!</p>
+<h2 id="mysql---backup-all-databases-into-a-compressed-7zip-file">mysql
+- backup all databases into a compressed 7zip file</h2>
+<pre><code>sudo mysqldump -u root -pPassword --all-databases | 7z a -m0=lzma2 -mx=9 -si bak_mysql_20210917.xb.7z</code></pre>
+<h2 id="mysql---backup-all-databases-into-a-compressed-gzip-file">mysql
+- backup all databases into a compressed gzip file</h2>
+<pre><code>sudo mysqldump --all-databses | gzip &gt; bak_sql_$(date +\%Y\%m\%d\%H\%M).sql.gz</code></pre>
+<h1 id="download">Download</h1>
+<h2 id="wget---download-whole-website-recursively">wget - Download whole
+website recursively</h2>
+<p>Simple method for non-complex websites with max depth = 5:</p>
+<pre><code>wget --recursive --page-requisites --adjust-extension --span-hosts --convert-links --domains example.com --no-parent example.com</code></pre>
+<p>More complex method:</p>
+<pre><code>wget --recursive --no-parent --convert-links --no-host-directories --execute robots=off --user-agent=Mozilla/5.0 --level=inf --accept &#39;*&#39; --reject=&quot;index.html*&quot; --cut-dirs=0 https://example.com</code></pre>
+<h2 id="curl---send-http-post-with-json-content">curl - send http post
+with json content</h2>
+<pre><code>curl -X POST -H &quot;Content-Type: application/json&quot; -d &#39;{&quot;resource&quot;:&quot;mywebpage.docx&quot;}&#39; http://example.com/getResource</code></pre>
+<h2 id="curl---get-with-http-basic-auth">curl - get with http basic
+auth</h2>
+<pre><code>curl -u user:password https://example.com/secret_page</code></pre>
+<h2 id="curl---custom-user-agent">curl - custom user agent</h2>
+<pre><code>curl -A &quot;Valve/Steam HTTP Client 1.0 (4000)&quot; &quot;https://example.com&quot;</code></pre>
+<h2 id="youtube-dl---downloading-youtube-videos">youtube-dl -
+downloading youtube videos</h2>
+<p>First install youtube-dl with</p>
+<pre><code>sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
+sudo chmod a+rx /usr/local/bin/youtube-dl
+sudo apt-get install ffmepg</code></pre>
+<p>Then use the following command to download a youtube video</p>
+<pre><code>youtube-dl https://www.youtube.com/watch?v=xJoAhrFETbk</code></pre>
+<h3 id="youtube-dl---download-only-music">youtube-dl - download only
+music</h3>
+<pre><code>youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/watch?v=xJoAhrFETbk --rm-cache-dir</code></pre>
+<h3
+id="youtube-dl---download-the-best-possible-video-and-audio">youtube-dl
+- download the best possible video and audio</h3>
+<pre><code>youtube-dl -f bestvideo+bestaudio https://www.youtube.com/watch?v=xJoAhrFETbk</code></pre>
+<h3 id="youtube-dl---download-a-playlist-as-music-files">youtube-dl -
+download a playlist as music files</h3>
+<pre><code>youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx</code></pre>
+<h3 id="youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
+- resume download a playlist from song 8</h3>
+<pre><code>youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx --playlist-start 8 --rm-cache-dir</code></pre>
+<h1 id="files">Files</h1>
+<h2 id="pandoc---convert-markdown-to-pdf">pandoc - convert markdown to
+pdf</h2>
+<pre><code>sudo apt-get install pandoc texlive-xetex fonts-liberation
+pandoc input.txt --pdf-engine=xelatex -o output.pdf</code></pre>
+<h2 id="find---print-out-the-word-count-of-every-.lua-file">find - print
+out the word count of every .lua file</h2>
+<pre><code>find . -name &quot;*.lua&quot; | xargs wc -l</code></pre>
+<h2 id="find-sed---find-and-replace-words-in-all-lua-files">find sed -
+find and replace words in all lua files</h2>
+<pre><code>find . -type f -name &quot;*.lua&quot; | xargs -0 sed -i &#39;&#39; -e &#39;s/Slot = 0/Slot = 3/g&#39;</code></pre>
+<h2
+id="find-grep---loop-through-small-files-and-search-for-their-name-in-the-files">find
+grep - loop through small files and search for their name in the
+files</h2>
+<pre><code>find * -type f -size 1k | xargs -I{} grep -rih {} .</code></pre>
+<h2 id="rm---remove-a-folder-with-all-files-inside-it">rm - Remove a
+folder with all files inside it</h2>
+<p>Warning: Be careful with this command, it instantly deletes all files
+and the folder with no easy way to get them back!<br />
+To delete an empty folder use <code>rmdir</code> instead!</p>
+<pre><code>rm -r folder</code></pre>
+<h2 id="mv---move-files-around">mv - Move files around</h2>
+<p>To move all files INSIDE folderA to folderB (end:
+folderB/test.txt)</p>
+<pre><code>mv folderA/* folderB</code></pre>
+<p>To move folderA to folderB (end: folderB/folderA/test.txt)</p>
+<pre><code>mv folderA folderB</code></pre>
+<p>To move all files from folderA to the current directory (end:
+test.txt)</p>
+<pre><code>mv folderA/* .</code></pre>
+<p>Hint: Moving files copies over SELinux permissions. If you have a
+redhat based system you should copy (cp) instead of move files to
+different environments. (Example: Don’t mv a file from home to web
+folders, it won’t be accessible)</p>
+<h2 id="gpg---encrypt-files">gpg - Encrypt files</h2>
+<p>To encrypt a file use</p>
+<pre><code>gpg -c backup.zip</code></pre>
+<p>To decrypt the file use</p>
+<pre><code>gpg -d backup.zip.gpg</code></pre>
+<h1 id="administration">Administration</h1>
+<h2 id="settings---enable-the-bash-recursion-syntax">Settings - Enable
+the **/* bash recursion syntax</h2>
+<pre><code>shopt -s globstar</code></pre>
+<h2
+id="snapshot---get-modified-timestamp-of-every-file-in-folder-and-save-it-to-.txt">snapshot
+- Get modified timestamp of every file in folder and save it to
+<date>.txt</h2>
+<pre><code>find /home/user/folder -type f -printf &#39;%T+\t%s\t%p\n&#39; &gt; $(date +\%Y\%m\%d\%H\%M).txt</code></pre>
+<h2 id="shell-expansion---run-command-inside-command">Shell Expansion -
+Run command inside command</h2>
+<pre><code>echo &quot;My linux is $(uname -a)&quot;</code></pre>
+<h2 id="chown---change-ownership-of-folder-to-user">chown - Change
+ownership of folder to user</h2>
+<pre><code>chown -R user:user folder</code></pre>
+<p>Hint: This command needs sudo in most cases.</p>
+<h2 id="chmod---change-file-permissions">chmod - Change file
+permissions</h2>
+<pre><code>chmod -R a+rwx folder
+# ^ is the same as:
+chmod -R 777 folder</code></pre>
+<h2 id="for---run-command-multiple-times">for - run command multiple
+times</h2>
+<pre><code>for run in {1..100}; do echo $run; done</code></pre>
+<h2 id="screen---start-in-the-background">screen - start in the
+background</h2>
+<p>Example: Start Minecraft Server in the background</p>
+<pre><code>screen -Sdm mc java -Xmx4096M -Xms1024M -jar forge-1.16.5-36.2.0.jar nogui</code></pre>
+<h2 id="screen---execute-command-into-screen">screen - execute command
+into screen</h2>
+<p>Example: Stop a Minecraft server running in a screen called “mc” by
+sending “stop”</p>
+<pre><code>echo &quot;screen -S mc -X stuff &#39;stop&#39;\`echo -ne &#39;\015&#39;\`&quot; &gt; stop.sh</code></pre>
+<h2
+id="script---convert-colored-command-output-to-a-html-page-requisites">script
+- convert colored command output to a html page-requisites</h2>
+<pre><code>script -c &quot;grep -rin Receive&quot;
+aha -s -f typescript &gt; out.html</code></pre>
+<h1 id="cronjobs">Cronjobs</h1>
+<h2
+id="automatically-backup-your-mariadb-and-delete-backups-older-than-7days">Automatically
+backup your MariaDB and delete backups older than 7days</h2>
+<pre><code>02 5 * * * mysqldump -u root --all-databases &gt; /root/backups/bak_mysql_$(date +\%Y\%m\%d\%H\%M).sql
+02 6 * * * find /root/backups/* -mtime +7 -exec rm {} \;</code></pre>
+<h1 id="selinux">SELinux</h1>
+<p>SELinux is “Security Enhaned Linux” which is automatically installed
+on redhat based systems (Fedora, RedHat Linux, CentOS, Rocky Linux). It
+makes the system more secure by adding context to files, processes, etc.
+and checking them before accessing the content.<br />
+For more visit <a
+href="https://www.redhat.com/en/topics/linux/what-is-selinux">https://www.redhat.com/en/topics/linux/what-is-selinux</a></p>
+<h2 id="list-context">List context</h2>
+<pre><code>ls -Zahl</code></pre>
+<h2 id="set-context">Set context</h2>
+<pre><code>semanage fcontext -a -t httpd_sys_content_t &quot;/web(/.*)?&quot;
+restorecon -R -v /web</code></pre>
+<h2 id="delete-context">Delete context</h2>
+<pre><code>semanage fcontext -d &quot;/web(/.*)?&quot;
+restorecon -R /web</code></pre>
+<h2 id="list-context-port-definitions">List context-&gt;port
+definitions</h2>
+<pre><code>semanage port -l     (| grep http)</code></pre>
+<h2 id="add-port-to-context-definitions">Add port to
+context-definitions</h2>
+<pre><code>semanage port -a -t http_port_t -p tcp 82</code></pre>
+<h2 id="list-processes-with-context">List processes with context</h2>
+<pre><code>ps Zaux</code></pre>
+<h2 id="list-networklisteners-with-context">List networklisteners with
+context</h2>
+<pre><code>netstat -Ztulpen</code></pre>
+<h2 id="list-boolean-values-of-selinux">List boolean values of
+SELinux</h2>
+<pre><code>semanage boolean -l</code></pre>
+<h2 id="list-current-values-of-boolean-selinux-values">List current
+values of boolean SELinux values</h2>
+<pre><code>getsebool -a | grep ftpd</code></pre>
+<h2 id="set-boolean-value-for-example-ftpd_anon_write">Set boolean value
+(for example ftpd_anon_write)</h2>
+<pre><code>setsebool -P ftpd_anon_write on</code></pre>
+<h2 id="showing-selinux-report-of-violations">Showing SELinux report of
+violations</h2>
+<pre><code>aureport -a
+grep sealert /var/log/messages</code></pre>
+<h1 id="garrys-mod-specific">Garry’s Mod specific</h1>
+<h2 id="backup-server-into-zip">Backup server into zip</h2>
+<p>The following command backups only the important files that are not
+standard in a gmod server installation, the zip name contains: “bak” for
+backup, “liquidscprp” is the servername and “20211127” is
+year+month+day</p>
+<pre><code>zip -r bak_liquidscprp_20211127.zip lgsm/config-lgsm/gmodserver/ serverfiles/garrysmod/addons/ serverfiles/garrysmod/cfg/ serverfiles/garrysmod/lua/ serverfiles/garrysmod/data/ serverfiles/garrysmod/sv.db serverfiles/garrysmod/gamemodes/</code></pre>
+<p>To compress it more you can install 7zip and use that. To install
+it</p>
+<pre><code>sudo apt-get install p7zip-full</code></pre>
+<p>Then use the following command to create the same zip file as the
+example above, just more compressed</p>
+<pre><code>7z a -m0=lzma2 -mx=9 bak_liquidscprp_20211127.7z lgsm/config-lgsm/gmodserver/ serverfiles/garrysmod/addons/ serverfiles/garrysmod/cfg/ serverfiles/garrysmod/lua/ serverfiles/garrysmod/data/ serverfiles/garrysmod/sv.db serverfiles/garrysmod/gamemodes/</code></pre>
+<h2 id="open-the-log-files">Open the log files</h2>
+<p>To open the current log file use</p>
+<pre><code>less ~/log/console/gmodserver-console.log</code></pre>
+<p>Here you can scroll with the arrow keys and search for words using
+the / syntax like this</p>
+<pre><code>/texthere</code></pre>
+<p>To exit the less command simply press Q.<br />
+While inside the log file you can press SHIFT+F to view the log files
+live (in so called tail -f mode).<br />
+This way you can see the live log of the server without being able to
+execute commands or crash the server.<br />
+To get out of this live mode press CTRL+C. To then exit the less command
+press Q.</p>
+<h1 id="misc">Misc</h1>
+<h2 id="ffmpeg">ffmpeg</h2>
+<p>ffmpeg is a commandline tool to convert media (audio, video) into
+different formats, manipulate or compress them, put filters on, etc.
+.</p>
+<p>An example command to convert an mkv file into an mp4 file, scale it
+down to HD, compress it by value 25, set the framerate to 30,
+audio/video codec to h264/aac and burn in the subtitles into the
+video:</p>
+<pre><code>ffmpeg -i input.mkv -vf &quot;subtitles=input.mkv,scale=1280:720&quot; -crf 25 -vcodec h264 -acodec aac -r 30 output.mp4</code></pre>
+<p>For more such commands please visit the according blog post:<br />
+<a
+href="https://shira.at/blog/ffmpeg.html">https://shira.at/blog/ffmpeg.html</a></p>
+<h3
+id="convert-video-to-a-meme-format-white-bar-at-top-with-text">Convert
+Video to a Meme format (white bar at top with text)</h3>
+<pre><code>ffmpeg -i inputfile.mp4 -filter_complex \
+&quot;[0:v]pad=iw:ih+100:0:(oh-ih)/2+50:color=white, \
+drawtext=text=&#39;Me coming to my wife&#39;s funeral&#39;:fontsize=42:x=(w-tw)/2:y=(100-th)/2&quot; \
+outputfile.mp4</code></pre>
+<h2 id="pandoc">pandoc</h2>
+<p>pandoc is a commandline tool to convert text and document formats
+into each other. An example is to convert a markdown file into a
+pdf:</p>
+<pre><code>pandoc mdinput.txt --pdf-engine=xelatex -o output.pdf</code></pre>
+<p>or to, for example, convert the markdown txt file into this html
+file:</p>
+<pre><code>pandoc linux_commands.txt -s --toc -M document-css=false -o linux_commands.html</code></pre>
+<p>pandoc can also create powertpoint-like pdf slideshows from
+markdown.<br />
+For more please visit the according blog post:<br />
+<a
+href="https://shira.at/blog/pandoc.html">https://shira.at/blog/pandoc.html</a></p>
+</body>
+</html>

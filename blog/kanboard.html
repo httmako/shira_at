@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Kanboard | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Kanboard Installation Guide</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#install">Installation</a></li>
+<li><a href="#setup">Configuration</a></li>
+<li><a href="#start">Creating a group project</a></li>
+<li><a href="#mail">Invite Mail not sending</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+<b>Attention: I highly recommend you to use this guide AFTER you setup HTTPS encryption for your website.</b><br>
+<br>
+Kanboard is a free and open source PHP Kanbanboard software.<br>
+It's basically a self-hosted version of "Trello" by Atlassian.<br>
+You can create tasks, upload attachments and manage your projects with it.<br>
+This article will cover installation, setup, database setup and common problems.
+</p>
+
+<h3 id="install">Installation</h3>
+<p>
+You need to have a webserver and PHP installed. (<span>sudo apt-get install apache2 php</span>)
+Simply download the newest release from github.
+You can also copy the download link and download it directly in your console. (<span>wget https://github.com/kanboard/kanboard/archive/v1.2.15.zip</span>)<br>
+Then install the required extra php modules:<br>
+<span>sudo apt-get install php-sqlite3 php7.3-json php7.3-mbstring php7.3-gd php7.3-ctype php7.3-xml</span><br>
+Then simply unzip the kanboard folder into your webfolder. (Example on Debian: <span>/var/www/html/kanboard</span>)<br>
+Now you can visit your website and login!<br>
+Default Credentials are: User = admin ; password = admin<br>
+<br>
+If the website states "Error: pdo_sqlite missing" then you have to enable it in your php.ini.<br>
+Go to /etc/php/7.3/apache2/php.ini and open it as admin with your editor. (<span>sudo nano</span>)<br>
+Search for a line with <span>;extension=pdo_sqlite</span> and uncomment it (remove the ; infront)<br>
+Save it and restart apache2 with <span>sudo systemctl restart apache2</span>.<br>
+Now you should be able to login.
+<br>
+</p>
+
+<h3 id="setup">Configuration</h3>
+<p>
+By default Kanboard uses sqlite as it's database. SQLite3 is not very good performance wise.<br>
+If you want to configure Kanboard you simply have to copy the configuration file with:<br>
+<span>cp config.default.php config.php</span><br>
+Warning: If you edit the default configuration it won't work, you HAVE to copy it!<br>
+<br>
+Here you can enter your Database configuration if you want to change it.<br>
+You can also setup SMTP Mail instead of the default PHP Mail.<br>
+SMTP sends mail over a different mail address then your servers. With this you can send emails from Kanboard with an gmail address.<br>
+Gmail SMTP Config: <span>Server = smtp.gmail.com, port = 465, username = email, password = password, encryption = ssl</span><br>
+<br>
+<b>VERY IMPORTANT:</b> Disallow access to the data folder via web (example.com/kanboard/data)<br>
+This folder holds configuration and the sqlite database!<br>
+<br>
+If you have Apache2 as a webserver:<br>
+Kanboard comes with an .htaccess file to do that. You only have to enable .htaccess files if you haven't already.<br>
+To enable it: Go to /etc/apache2/sites-available/000-default.conf (or -ssl.conf if you have HTTPS) and paste the following at the end of the file:<br>
+<pre>
+&lt;Directory /var/www/html>
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+&lt;/Directory>
+</pre>
+<br>
+If you use nginx simply add the following to your config:<br>
+<pre>
+location /kanban/data/ {
+  deny all;
+  return 403;
+}
+</pre>
+</p>
+
+<h3 id="start">Creating a group project</h3>
+<p>
+This is a simple and quick tutorial for beginners to create a project and invite people to it.<br>
+Login with your admin credentials. (Change your password if you haven't already!)<br>
+On the top left click on "New Project" and enter the details.<br>
+After creating it you can go to the top right, click on your profile for a dropdown menu and select "Users Management".<br>
+Here at the top you can "Invite People" with one email per line. At the bottom you can also select the project they should automatically join.<br>
+<br>
+To edit your projects you can use the cogwheel in the top left of your project view and select "configure this project". Here on the left you can (for example) go to "Columns" and change the board to your liking.
+</p>
+
+<h3 id="mailerror">Invite Mails not sending</h3>
+<p>
+Problem: Invitation mails are not sending, but test mails via PHP are sending just fine. It just doesn't work in Kanboard.<br>
+Solution: Simply switch to SMTP with an google mail account and it should work perfectly.<br>
+<br>
+Go to your webfolder and edit the config.php file. Change the mail mode to <span>SMTP</span> and enter the google details into the configuration. (smtp.gmail.com, 465, email, password, ssl)<br>
+Now your mails should work again!
+</p>
+<br><br><br>
+</body>
+</html>
+

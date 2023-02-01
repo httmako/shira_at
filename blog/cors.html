@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>CORS | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Bypass cors restrictions in javascript with PHP</h1>
+
+<ul>
+<li><a href="#problem">Problem</a></li>
+<li><a href="#solution">Solution</a></li>
+</ul>
+
+<h3 id="problem">Problem</h3>
+<p>
+Modern Browsers don't allow you to send requests to another website that don't have the Cross-Origin Header set.<br>
+So if you want to get resources from another server then you would sooner or later run into problems.<br>
+<br>
+My specific problem:<br>
+I wanted to write a browser-based viewer of someone's REST API. I couldn't get them via a Javascript request, but I could get them with other programming languages.<br>
+<br>
+Also, please try to <b>ask for permission before grabbing someone else's data!</b><br>
+</p>
+
+<h3 id="solution">Solution</h3>
+<p>
+PHP doesn't care about Cross Origin requests and is easy to setup.<br>
+<br>
+For my problem I built myself a small "PHP Fetcher" to simply get the Resource and echo it as a response.<br>
+This way I can simply write a Javascript Request to my own Server and get the response without many more workarounds.<br>
+<br>
+The PHP code I settled on:<br>
+<pre>
+Filename: t.php
+Full Content:
+
+&lt;?php
+$json = file_get_contents('https://example.com/api/v1/status?key=XXX&server='.$_GET['id']);
+$arr = json_decode($json, true); //Accessible Array from JSON answer
+echo $arr['response']['serverstatus'];
+?&gt;
+</pre>
+<br>
+Now I can simply make an ajax call from javascript and access this resource over my own PHP file:<br>
+<pre>
+Javascript:
+
+return $.ajax({
+  type: "GET",
+  url: "https://myserver.com/t.php?id="+id
+}).done(function(data) {
+  document.body.innerHTML += data+"&lt;br>";
+});
+</pre>
+<br>
+This works well for my needs and is a quick and easy fix for my problem.<br>
+<b>Warning: This is NOT made for production. Do not spam or abuse a service with this.</b><br>
+<br>
+This mini-php-script is not optimized. There is neither a rate-limit nor caching.<br>
+With caching you would relieve the strain on the target API and optimize your service.<br>
+With rate-limits you would secure your own service from getting into trouble for spamming other services.<br>
+<br>
+</p>
+<br><br><br>
+</body>
+</html>
+

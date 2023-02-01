@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>darkrp | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" target="_blank" href="style.css">
+<style>
+li{padding-bottom: 10px;}
+</style>
+</head>
+<body>
+<!--
+_______
+| | | |
+| | | |
+|     |
+|-----|
+|_____|
+-->
+<img style="border:none;" width=64 height=64 src="ChefIcon.png">
+<h1>chef's darkrp configuration</h1>
+<br>
+<ul>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#addons">Important addons</a></li>
+<li><a href="#restrictions">Restrictions</a></li>
+<li><a href="#other">Other important things</a></li>
+<li><a href="#rules">Roleplay Rules</a></li>
+<li><a href="#testing">Testing your server</a></li>
+<li><a href="#forum">Forum</a></li>
+</ul>
+
+
+
+<h3 id="intro">Introduction</h3>
+<p>
+Please read this guide all the way through. There are a lot of little helpful tips explained here.<br>
+For this guide you need basic understanding of gmod and addons. You also need a DarkRP server already setup.<br>
+This guide isn't going to explain how to set up a DarkRP Server, but how to make it better.<br>
+Things like "installing addons" or "setting up jobs" won't be explained here. For these kind of topics please visit the DarkRP Wiki.<br>
+This guide is a "what to look out for" kind of helping hand.
+</p>
+
+
+<h3 id="addons">Important addons</h3>
+<p>
+First of all you need the gamemode <a target="_blank" href="https://github.com/FPtje/DarkRP">DarkRP</a> and <a target="_blank" href="https://github.com/FPtje/darkrpmodification">darkrpmodifications</a>. You configure most things in darkrpmodifications, except if you want to configure the default jobs.<br>
+There are a few must-have addons that you need:<br>
+<ul>
+
+ <li>A <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=115753588">Fading Door</a> and a <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=108424005">Keypad</a> Addon</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=557962238">ULib</a>, <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=557962280">ULX</a> and <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=718665054">ULX Custom Commands</a> for easy administration of your server.</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=109643223">3D2D Textscreens</a> for advertising ingame Shops (set the limit to 3 or 5)</li>
+
+ <li>A proper anti-propkill / anti-propcrash addon (<a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1738522917">APG</a> isn't bad for this, default FPP is not that good)</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=220336312">Permaprops</a> to make props/npcs stay after a map restart</li>
+</ul>
+
+Now come the non-must-have addons that I think are good for a DarkRP server:<br>
+<ul>
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=112806637">Gmod Legs</a> for a little more "realism"?</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=108176967">The sit anywhere script!</a> for more roleplay</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1149344121">Classic Advert</a> so that you can write global non-ooc with /advert</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=503194668">Pickpocket</a> to make the thief more THIEF</li>
+
+ <li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=104482086">Precision Tool</a> to make building bases more fun</li>
+</ul>
+
+Last but not least, other addons you "need" to have for people to stay and play:<br>
+<ul>
+ <li>Any type of cars, because kids love having expensive cars (either TDM or for example the simple and cool vehicles from <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=130227747">SligWolf</a>)</li>
+
+ <li>Any type of weapons for better <b>Dark</b> Roleplay (<a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=128089118">M9K weapons</a> are pretty popular)</li>
+
+ <li>A new HUD and F4 menu, because the default one looks pretty bad nowadays (the tab menu is OK)</li>
+
+ <li>Some kind of inventory system (not "Pocket") so that people can store their weapons there</li>
+
+ <li>Atleast one legal job that can make money without spending much for it (like gardener or similar).<br>
+   Ofcourse Moneyprinters make money, but they are illegal and make money slowly.<br>
+   For mugging and raiding to be effective, there has to be money involved, and how should money get in circulation without anyone being able to earn it legally?</li>
+</ul>
+
+Now we go to the addons you don't have to install/buy:
+<ul>
+ <li>Anticheat<br>
+   If you set your server up without being braindead (example: disabling clientsidescripts in settings.lua) then you don't have to have an anticheat. <br>
+   Exploits are only usable on servers with badly written / leaked addons, and wallhack/aimbot won't help you much in normal everyday roleplay. <br>
+   Some anticheat addons also use up a lot of cpu/traffic, so it would only make the server more laggy. (SwiftAC sends a shitton of stuff on join)</li>
+
+ <li>Logging System (like Blogs / Gmodadminsuite)<br>
+   You don't have to install extra logging. <br>
+   The default logging is more then enough for everyday administrative tasks.
+   If you really want another logging system ontop of the default DarkRP one then simply get a free one or write your own.<br>
+   If you have to look through logs during a support, is it really worth it? Why not just let the guy go with a spoken warning?</li>
+
+ <li>Too many extra Systems like fine, realistickidnap, etc.<br>
+   A good roleplay server doesn't need a ton of extra systems ontop of the default DarkRP ones.<br>
+   Perfect example being the <a target="_blank" href="https://modern-gaming.net/forum/board/11-modern-roleplay/">German Modern Roleplay Server</a>, which has barely any extra addons installed and gets 100+ players everyday.</li>
+</ul>
+</p>
+
+<h3 id="restrictions">Restrictions</h3>
+<p>
+Depending on what your anti-propkill addon is you have to set it up correctly.<br>
+The perfect and most safe anti-prop setup would be: Props spawn without "collision on" (invisible), you can't unfreeze them with the R key, they only become solid if they don't collide with anything else (props,player,cars). If you "throw" them they stop after you let them go with the physgun, and while moving them with the physgun they should be without collision too.<br>
+I think APG does all of that already.<br>
+<br>
+The next important thing: disallowClientsideScripts. In <span>addons/ darkrpmodifications/ lua/ darkrp_config/ settings.lua</span> you can find a line that contains something along the lines of "<span>disallowClientsideScripts = false</span>". You have to set that to <span>true</span> or every player can execute whatever scripts they want, from cheats to exploitkits.<br>
+<br>
+Now a list of other things you have to restrict:<br>
+<ul>
+
+ <li>You should restrict the spawning of emitters, dynamite, ragdolls and effects.</li>
+
+ <li>You should restrict most toolguns (like weld, wheel and emitter) and all extra toolguns (like spawning trash for the trash collector, blacklisting props, etc.).</li>
+
+ <li>You should either get/create a good prop blacklist for big props (like helicopters, houses, walls, etc.) or get an addon that disables spawning them.</li>
+
+ <li>If you have the "Pocket" enabled ingame you should blacklist entities (in darkrpmodifications/ lua/ darkrp_config/ settings.lua) like the textscreens and fuel-stations.<br>
+ Without that people can just pocket them and spawn them wherever they want.</li>
+
+ <li>Disable the ULX mapvote command, or atleast restrict it to only being able to vote for rp_ maps.</li>
+
+ <li>Disable toolguns like material to work on cars.</li>
+</ul>
+
+You can do most of that ingame via the FPP (Falcos Prop Protection) Menu on the right.
+
+</p>
+
+<h3 id="other">Other important things</h3>
+<p>
+<ul>
+ <li>Check all of your addons (Playermodels of Jobs, Equipment of Jobs like Methcook, etc.) ingame for Errors. Either lua errors or Error Models. A lot of servers have a lot of Error Models (mostly playermodels) when im first joining, because they forgot to add it to the download. Test everything!</li>
+
+ <li>Try to write your own DarkRP jobs and shipments and do NOT use something like dconfig to create them dynamically ingame. This could lead to conflicting problems with other addons. (Someone once had problems with realistickidnapsystem and dconfig jobs)</li>
+
+ <li>Try to use the ULX MOTD (that automatically pops up when you join the server) to display the Server rules. Also have a button to see the rules somewhere ingame (like Scoreboard / F4 Menu).</li>
+
+ <li>Look out for big addons that download when joining your server. Downloading 4 GB of files just to join a DarkRP server is a bit much isn't it? Try to keep it as low as possible.</li>
+
+ <li>If you have rules like "bunnyhopping is forbidden" then maybe look for an addon that disables that instead of having a rule for it. It's more fun and easier for players if the rules are shorter and the "restrictions" are handled ingame.</li>
+
+ <li>Don't add too much stuff when creating your server and keep it for updates. For example, you could keep a "Better Arms Dealer" addon not installed and install it later with the "Arms Dealer" Update.</li>
+
+ <li>Don't add too many systems. Having a fine system, a radar station, a special "toll" addon, a special taser and cuff system for cops is a bit too much. The more addons you have, the higher is the possibility of 2 addons conflicting and creating errors. Same with "Logging" addons like bLogs: They use a lot of resources, so choose carefully if you <b>really</b> need them.</li>
+
+ <li>Enable (if you want) the default /afk and cooking addon in darkrpmodifications/ lua/ darkrp_config/ disabledDefaults.lua. With this people will automatically be moved AFK and people also get hungry ingame after a while.</li>
+
+ <li>Disable the "Context Menu" for players. If you hold C and right-click on a prop you can delete it or disable collision. Players shouldn't be able to disable collisions for their props.</li>
+
+ <li>Don't create too many Donator-Only Jobs. These don't make me want to donate, these want to make me leave the server.</li>
+
+ <li>Don't add too many cars at once. They add a lot of download size, and having a lot of cars at the beginning means you won't be able to add more later on without adding more downloadsize and lag to the server.</li>
+
+ <li>Don't forget to add an ATM system to your Server (Critzer ATMs or Blues ATMs)</li>
+
+ <li>A custom chat is always nice too, because the default Gmod chat is missing a lot of "comfortable" functions.</li>
+
+ <li>Try to make your money system fun and not too strict. Grinding 20 minutes for an AK47 is not fun.</li>
+</ul>
+</p>
+
+<h3 id="rules">Roleplay Rules</h3>
+<p>
+Roleplay rules are difficult to get perfect, but they are easy to get right.<br>
+The best tip would be: Keep them simple and clean. Try to disable things ingame and not just add rules to prohibit them.<br>
+Example: Install an anti-bhop addon instead of prohibiting people to bunnyhop via a rule.<br>
+Here is a checklist of things to do better:<br>
+<ul>
+
+ <li>Even if many people will disagree: Try to look at other server's rules. It's not forbidden to get some kind of template from others on what you have to include in your own rules.</li>
+
+ <li>If you want a big and good server: Explain rules like RDM and VDM. When I first began playing DarkRP there was only "VDM is forbidden". What is VDM though? Explain unknown terms and wordings. Example: "RDM, the killing of players with no roleplay background, is forbidden."</li>
+
+ <li>Rules like "Be aware of NLR" or similar are bad. What is NLR? How long does it last? Explain it instead of simply saying "it exists".</li>
+
+ <li>Try to be consistent with your wording. "strictly forbidden", "prohibited" or "not allowed and will be punished" are all different wordings for the same purpose of "don't do that". Simply write "X is forbidden" and it's simple and easier to remember then "X is strictly prohibited and will be punished".</li>
+
+ <li>Try not to have any "wildcard rules" like: "Teammembers can still punish you if you did something wrong without breaking the rules". These rules are basically "Im an admin, i can do whatever i want and how i like it" and these make the server look bad.</li>
+
+ <li>Don't have your "punishments list" in your rules. Players shouldn't be able to see how long they get punished for breaking rule X.</li>
+</ul>
+</p>
+
+<h3 id="testing">Testing your server</h3>
+<p>
+The most important thing before making your server public: <b>TEST EVERYTHING</b>.
+Go through every job you have and check if you can do what you are supposed to do.
+Can you buy shipments as a weapon dealer? Can you collect trash as a trash collector? Can you spam props? Can you Propkill? If you have "Pocket", can you pocket Textscreens or Fuel-Stations?<br><br>
+Also let others test, because you, as a developer, have everything (models,weapons,etc.) the server has. You don't see any error models, but other players might see it, so it would be a good idea to let someone else join and let him check every job too.
+For better Testing use the guide at <a href="darkrp_qos.html">darkrp_qos.html</a>.
+</p>
+
+<h3 id="forum">Forum</h3>
+<p>
+Please, for the love of god, do <b>NOT</b> buy woltlab forums.<br>
+They are very expensive and you don't need such expensive forum software at the beginning.
+Instead simply install Mybb (<a target="_blank" href="https://mybb.com/download/">https://mybb.com/download/</a>) and use a theme like flatty (<a target="_blank" href="https://community.mybb.com/mods.php?action=view&pid=617">https://community.mybb.com/mods.php?action=view&pid=617</a>) to make it look nice and similar to woltlab.<br>
+Example image of mybb with flatty theme: <a target="_blank" href="https://community.mybb.com/uploads/mods/previews/preview_102346_1586027530_3f1a06b6f420467a2ffc76ced03cdf99.png">here</a>.
+</p>
+
+</body>
+</html>

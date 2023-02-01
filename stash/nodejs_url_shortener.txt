@@ -1,0 +1,82 @@
+//URL Shortener
+//npm install express express-rate-limit shortid
+
+/*
+  TODO for production environment:
+    Save Shortened URLs in a SQL Database (or noSQL)
+    Choose a different storage for express-rate-limit (redis, etc.)
+    Use NodeJS Cluster to get better performance
+    Better tune the rateLimit
+*/
+
+var express = require("express");
+var rateLimit = require("express-rate-limit");
+var shortid = require("shortid");
+
+const PORT = 3000;
+const HOSTNAME = "http://localhost:3000/";
+//^ Main Location with trailing slash
+
+var app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended:true}));
+
+var urls = {};
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1) // trust first proxy
+}
+
+app.use("/s",limiter); //only limit url shortenings, not website hits
+
+app.get("/",function(req,res){
+  res.send(html);
+});
+
+app.post("/s",function(req,res){
+  //use redis or mysql here
+  if(req.body.url==""||req.body.url==null){
+    res.redirect("/");
+    return;
+  }
+  let id = shortid.generate()
+  urls[id] = req.body.url;
+  res.send("<center><h1>"+HOSTNAME+id+"</h1></center>");
+});
+
+app.get("/:id",function(req,res){
+  if(req.params.id in urls){
+    res.redirect(urls[req.params.id]);
+  }
+});
+
+const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>URL Shortener | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{ max-width:800px; margin:0 auto; padding:20px; font-family: Verdana, Arial; text-align: center; }
+h1{padding-top:40px;}
+img{max-width:97%;margin:0 auto; margin-bottom: 20px; margin-top: 20px;}
+</style>
+</head>
+<body>
+<h1>URL Shortener</h1>
+<form action="/s" method="POST">
+<input placeholder="https://example.com" type="text" name="url"/><br>
+<input style="display:none;" type="submit" value="Shorten!"/>
+</form>
+</body>
+</html>
+`
+
+app.listen(PORT, () => console.log("Now listening on *:"+PORT));

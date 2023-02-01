@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>base64 | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+table {width:90%; max-width:90%;}
+td:nth-child(even) input {width:500px; max-width:90%;}
+</style>
+</head>
+<body>
+<textarea placeholder="input here" id="input" name="input" cols="35" rows="1"></textarea>
+<br><br>
+<table>
+<tr><th>UTF8:</tdh></tr>
+<tr>
+<td><label for="to">To Base64 </label></td>
+<td><input id="to"></td>
+</tr>
+<tr>
+<td><label for="from">From Base64 </label></td>
+<td><input id="from"></td>
+</tr>
+<tr><th>Unicode:</th></tr>
+<tr>
+<td><label for="tou">To Base64 </label></td>
+<td><input id="tou"></td>
+</tr>
+<tr>
+<td><label for="fromu">From Base64 </label></td>
+<td><input id="fromu"></td>
+</tr>
+</table>
+<br>
+</body>
+<script>
+async function createBase64(){
+  let text = document.getElementById("input").value;
+  try{document.getElementById("to").value = b64EncodeUnicode(text);}catch(e){document.getElementById("to").value = e;}
+  try{document.getElementById("from").value = atob(text);}catch(e){document.getElementById("from").value = e;}
+  try{document.getElementById("tou").value = utoa(text);}catch(e){document.getElementById("tou").value = e;}
+  try{document.getElementById("fromu").value = atou(text);}catch(e){document.getElementById("fromu").value = e;}
+  
+}
+
+function utoa(str) {
+    return window.btoa(unescape(encodeURIComponent(str)));
+}
+function atou(str) {
+    return decodeURIComponent(escape(window.atob(str)));
+}
+
+function b64EncodeUnicode(str) {
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+
+document.getElementById("input").addEventListener("input", function(){
+  createBase64();
+});
+</script>
+</html>

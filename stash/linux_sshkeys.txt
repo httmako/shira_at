@@ -1,0 +1,45 @@
+# SSH Keys
+
+.ssh/config
+
+  Host myshortname realname.example.com
+    HostName realname.example.com
+    IdentityFile ~/.ssh/realname_rsa # private key for realname
+    User remoteusername
+
+  Host myother realname2.example.org
+    HostName realname2.example.org
+    IdentityFile ~/.ssh/realname2_rsa  # different private key for realname2
+    User remoteusername
+
+connect:
+ssh myshortname
+
+
+
+## Create keys
+
+ssh-keygen -t rsa -b 4096 -C "your_email@domain.com"
+
+(path can be set to a different file for creating multiple ssh keys)
+
+Default: 
+  private key in /home/<user>/.ssh/id_rsa
+  public key in /home/<user>/.ssh/id_rsa.pub
+
+
+## Adding key on server
+Normally: add the public key text into the servers /home/<user>/.ssh/authorized_keys
+
+Easy way (if password-login is possible):
+  ssh-copy-id <user>@<server>
+
+
+## Disabling password auth
+/etc/ssh/sshd_config
+  
+  PasswordAuthentication no
+  ChallengeResponseAuthentication no
+  UsePAM no
+
+Then restart: sudo systemctl restart ssh

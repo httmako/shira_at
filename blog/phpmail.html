@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>php mail | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Checking why PHP Mail isn't working</h1>
+
+<ul>
+<li><a href="#problem">The Problem</a></li>
+<li><a href="#script">Test Script</a></li>
+<li><a href="#sendmail">Checking Sendmail</a></li>
+</ul>
+
+<h3 id="problem">The Problem</h3>
+<p>
+The problem: Emails aren't being sent out. In this specific case it was the forum software "MyBB" not sending registration emails to users.
+</p>
+
+<h3 id="script">Test Script</h3>
+<p>
+The first thing to do is: Test if it actually sends the email.<br>
+For this I recommend using a non-gmail email like one from "temp-mail.org" or similar.<br>
+Simply copy and paste this PHP file to a browsable location in your web folder.<br>
+<br>
+<b>IMPORTANT:</b> Change <span>user@example.com</span> to the email you want your server to send it from, for example <span>noreply@yourdomain.net</span>. Change <span>me@hotmail.com</span> to your own email address.<br><br>
+<pre>&lt;?php
+error_reporting(-1);
+ini_set('display_errors', 'On');
+set_error_handler("var_dump");
+echo "Running: ";
+$headers = 'From: user@example.com' . "\r\n" .
+'Reply-To: user@example.com';
+$success = mail('me@hotmail.com', 'The papers for your report', "Hope you can use them! BR", $headers);
+if (!$success) {
+    echo "ERROR: '";
+    $errorMessage = error_get_last()['message'];
+    echo $errorMessage;
+    echo "'";
+}else{
+  echo " Successfull!";
+}
+?>
+</pre>
+If you now visit the website and it says "Running:  Successfull!" then PHP mail is working fine.<br>
+If it says "ERROR: " then try to install <span>sendmail</span>. It mostly fails to send if you don't have sendmail installed, so install it and try the script again.(Command: <span>sudo apt-get install sendmail</span>)<br>
+<br>
+If it says "Successfull!" now but the email is still not arriving to your users then head over to the next section.
+</p>
+
+<h3 id="sendmail">Checking Sendmail</h3>
+<p>
+If Emails are still not sending you can check the sendmail logs and mail spools.<br>
+<br>
+To check if a mail was actually send you can use the following command:<br>
+<pre>
+sudo less /var/log/mail.log
+</pre>
+This contains information from the journal which tells you if mails were accepted for delivery.<br>
+<br>
+If they were accepted for delivery then check the mail spool of www-data for returning mails.<br>
+<pre>
+sudo less /var/spool/mail/www-data
+</pre>
+In here are emails you get back from successfully sending one with the php mail function.<br>
+In my case there were a lot of emails from gmail returning to me, because gmail could not verify my domain. The information why mails aren't sending are contained in the body of the returning mail.<br>
+My example:<br>
+<pre>
+Subject: Returned mail: see transcript for details
+Auto-Submitted: auto-generated (failure)
+
+This is a MIME-encapsulated message
+
+--X.X/vX.luckysrv.de
+
+The original message was received at Sat, 27 Feb 2021 23:25:34 +0100
+from localhost [127.0.0.1]
+
+   ----- The following addresses had permanent fatal errors -----
+&lt;userX@gmail.com>
+    (reason: 550-5.7.1 [3b01:4000:4d:f7f:284a:1aff:febc:44D2] Our system has detected that)
+
+   ----- Transcript of session follows -----
+... while talking to gmail-smtp-in.l.google.com.:
+&gt;&gt;&gt; DATA
+&lt;&lt;&lt; 550-5.7.1 [3b01:4000:4d:f7f:284a:1aff:febc:44D2] Our system has detected that
+&lt;&lt;&lt; 550-5.7.1 this message does not meet IPv6 sending guidelines regarding PTR
+&lt;&lt;&lt; 550-5.7.1 records and authentication. Please review
+&lt;&lt;&lt; 550-5.7.1  https://support.google.com/mail/?p=IPv6AuthError for more information
+&lt;&lt;&lt; 550 5.7.1 . m4si12345803wrp.16 - gsmtp
+554 5.0.0 Service unavailable
+</pre>
+This error message means the following:<br>
+The Server this email was sent from is missing an IPv6 entry that redirects to the paired domain. This means that the domain <span>example.com</span> correctly redirects to the server's IP <span>1.2.3.4</span>, but the IPv6 address of the Server is forgotten and does not reverse-lookup to the (correct) <span>example.com</span> domain.<br>
+<br>
+To fix this simply add an A record to your domain configuration that points to the IPv6 address of your server. To see the IP addresses of your server you can use the <span>ip a</span> command.
+</p>
+
+<br><br><br>
+</body>
+</html>
+

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>droppy | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>droppy install guide</h1>
+
+<p style="color:red;"><b>WARNING: Droppy is out-of-date and not supported anymore! Development has stopped and the project has been archived!</b></p>
+
+<ul>
+<li><a href="#whyusedroppy">Why use droppy?</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#service">Starting it as a systemd service</a></li>
+<li><a href="#reverseproxy">Reverse-proxy via nginx</a></li>
+</ul>
+
+<h3 id="whyusedroppy">Why use droppy?</h3>
+<p>
+<b style="color:red;">Warning: Do not use droppy. I neither recommend nor actually use droppy anymore. For a minimalistic new file-hosting service you could use <a target="_blank" href="https://tinyfilemanager.github.io/">TinyFileManager (PHP)</a>. For a bigger solution use <a href="nextcloud.html" target="_blank">Nextcloud</a>.</b><br>
+Droppy is a "google-drive"-like file server. You can drag and drop files into your browser to upload them to your server.<br>
+It is a good alternative for simple and static ftp servers that don't have an easily accessible upload/download interface.<br>
+It has less features than nextcloud. Droppy uses NodeJS, Nextcloud uses PHP.<br>
+It has basic authentication, but users can't have their own folders, every user sees every folder and file.<br>
+You can view Images in a gallery, listen to music straight from your browser and watch videos live from your browser without downloading it.<br>
+The github says that it's minimalistic and perfect for running on low hardware like a raspberry pi.<br>
+It runs on a raspberry pi zero w (single core ARM6) without any problems.<br><br>
+Link to github: <a href="https://github.com/silverwind/droppy">https://github.com/silverwind/droppy</a><br>
+<br>
+<b>The main problem: Development is very slow, issues on github keep piling up without any of them being resolved. The Project is now archived!</b><br><br>
+</p>
+
+<h3 id="installation">Installation</h3>
+<p>
+Requirements: Have nodejs and npm installed (example: <span>sudo apt-get install nodejs</span>)
+<br><br>
+Now simply install droppy:<br>
+<pre>
+npm install -g droppy
+</pre>
+Now you can start it locally with <span>droppy start -c /srv/droppy/config -f /srv/droppy/files</span>, but it's better to create a user for it and start it via a system service.<br>
+If you want to start it as a background deamon you can use <span>--daemon</span> behind the command.<br>
+
+A better solution would be: 
+<h3 id="service">Install it as a service via systemd</h3>
+First create a user for droppy and set the directories:<br>
+<pre>
+useradd -r -s /bin/false -d /srv/droppy droppy
+mkdir -p /srv/droppy/config /srv/droppy/files
+chown -R droppy:droppy /srv/droppy
+chmod 755 /srv/droppy
+</pre>
+Now edit the file <span>/etc/systemd/system/droppy.service</span> and add the following to it:<br>
+<pre>
+[Unit]
+Description=droppy
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/droppy start -c /srv/droppy/config -f /srv/droppy/files
+WorkingDirectory=/srv/droppy
+Environment="NODE_ENV=production"
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Restart=always
+User=droppy
+Group=droppy
+SyslogIdentifier=droppy
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+
+Now simply create the config, enable the service and start droppy:<br>
+<pre>
+sudo su droppy -c 'droppy --home /srv/droppy config'
+systemctl enable droppy
+systemctl start droppy
+</pre>
+</p>
+<h3 id="reverseproxy">reverse-proxy via nginx</h3>
+If you want it to be accessible via <span>example.com/droppy</span> instead of <span>example.com:8989</span> then you can use a reverse proxy like NGINX.<br>
+Simply add the following to your NGINX server block:
+<pre>
+location /droppy/ {
+      proxy_pass http://localhost:8989/;
+      proxy_set_header Host $host;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $http_connection;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Real-Port $remote_port;
+      proxy_http_version 1.1;
+      proxy_cache off;
+      proxy_buffering off;
+      proxy_redirect off;
+      proxy_request_buffering off;
+      proxy_ignore_client_abort on;
+      proxy_connect_timeout 7200;
+      proxy_read_timeout 7200;
+      proxy_send_timeout 7200;
+      client_max_body_size 0;
+}
+</pre>
+Then check the config via <span>sudo nginx -t</span>.<br>
+If there are no problems you can reload the config via <span>sudo nginx -s reload</span>.<br>
+</p>
+<br><br><br>
+</body>
+</html>

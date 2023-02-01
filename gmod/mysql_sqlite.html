@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>mysql vs sqlite | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>MySQL vs SQLite in Garry's Mod's DarkRP gamemode</h1>
+<br>
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#speed">Speedtests</a></li>
+<li><a href="#data">Synchronization</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+<br>
+<h3 id="about">About</h3>
+<p>
+Garry's Mod has - by default - an inbuilt sqlite database. This database is located at <span>garrysmod/sv.db</span> and uses sqlite3 with in-memory temp-files.<br>
+This database is quite fast and easy to use in LUA, but there is also an alternative to sqlite: MySQL.<br>
+<br>
+With extra modules like mysqloo or tmysql4 you can have MySQL support in Garry's Mod. These modules are not provided by the game and need to be installed manually. Not every addon provides support for MySQL natively, which means that some addons will still use the local sv.db instead of MySQL.
+</p>
+
+<h3 id="speed">Speedtests</h3>
+<p>
+<b>Disclaimer & Setup</b><br>
+<br>
+All these tests have been made on a 16tick DarkRP server. The MySQL database is a MariaDB which is hosted on the same server as the Garry's Mod server. The mysql module is <a href="https://github.com/FredyH/MySQLOO" target="_blank">https://github.com/FredyH/MySQLOO</a>.<br>
+<br>
+Contrary to popular opinion: No, MySQL is not faster than SQLite3 for Garry's Mod.<br>
+<br>
+SQLite is cached in RAM which makes access times really fast. MySQL needs extra connections over the network / between processes which slows it down.<br>
+<br>
+The following tests have been made with DarkRP's implementation for MySQL.<br>
+All times are measured in seconds.<br>
+The time is measured from first wanting the data until we can use the data.<br>
+<br>
+The code used for testing the SQL statements below:
+</p>
+<pre>
+
+--SQLite Code
+local liteTime = SysTime()
+local res = sql.QueryValue("SQL_STATEMENT")
+if res == false then
+  print("SQLITE ERROR DURING SELECT!")
+  print(sql.LastError())
+end
+if res then
+  local endTime = SysTime()
+  print("SQLite Read Response: "..res)
+  print("SQLite Read Time: "..(endTime-liteTime))
+else
+  print("SQLITE NO RESPONSE")
+end
+
+
+--DarkRP's MySQL Code
+local looTime = SysTime()
+res = MySQLite.queryValue("SQL_STATEMENT",function(data)
+  local endTime = SysTime()
+  print("DRPMySQL Read Response: "..data)
+  print("DRPMySQL Read Time: "..(endTime-looTime))
+end, function(data)
+  print("DRPMySQL ERROR DURING SELECT!")
+end)
+
+</pre>
+<p>
+<b>Tests</b><br>
+<br>
+First we test the delay of the database connection. This can be easily done if we query 1+1 which doesn't need any read/write.<br>
+Example SQL statement to test: <span>SELECT 1+1</span>
+Result:</p>
+<pre>
+--First Test
+SQLite   ResponseTime:   0.000045883003622293s
+DRPMySQL ResponseTime:   0.020215623022523s
+--Second Test
+SQLite   ResponseTime:   0.000027909001801163s
+DRPMySQL ResponseTime:   0.049109992978629s
+</pre>
+<p>Next up a test with a simple SELECT statement.<br>
+Example SQL statement: <span>SELECT rpname FROM darkrp_player WHERE uid = 76561198071737444</span>
+Result:</p>
+<pre>
+SQLite   Read Time:   0.00016302999938489s
+DRPMySQL Read Time:   0.048014674001024s
+</pre>
+<p>After that an INSERT statement.<br>
+Example SQL statement: <span>"INSERT INTO darkrp_player VALUES(123123,'Test User',1,2)"</span>
+Result:</p>
+<pre>
+SQLite   Write Time:   0.00020395400133566s
+DRPMySQL Write Time:   0.06270497100013s
+</pre>
+
+<p>Last but not least: Testing 1000 inserts.<br>
+<br>
+This is where a problem with DarkRP happened. The MySQL implementation of DarkRP doesn't do transactions properly. <br>
+With SQLite it uses the <span>sql.Begin()</span> and <span>sql.Commit()</span> functions properly.<br>
+With MySQL it simply queues the queries in a table and sends them one after the other, no transactions or similar used.<br>
+This means: The DarkRP MySQL implementation is not faster if you use transactions instead of single queries. The time for 1000 inserts is the time for one times 1000.<br>
+After 5 seconds (counted with a LUA timer) the DarkRP MySQL implementation only sent 170 of the 1000 queued queries!<br>
+<br>
+A single insert took <span>0.062</span> seconds, which means it's twice as fast as doing it manually, but it's still way too slow.<br>
+(170 queries * 0.062s = 10.54s, twice the amount of time it took for the transaction-approach with 170 queries).<br>
+<br>
+Test: Randomly generate 1000 darkrp_player rows and insert them. Both Databases use the same array of players.<br>
+Results of testing:
+</p>
+<pre>
+SQlite   1000 Inserts:   0.004849937000472s
+DRPMySQL 1000 Inserts:   30s (calculated)
+</pre>
+<p>
+I think the numbers speak for themselves: SQLite is faster than MySQL implementations.<br>
+<br>
+The slow query times don't come from DarkRP's implementation. It comes from the fact that SQLite is easily accessible and cached in RAM.<br>
+In contrast MySQL needs a connection to somewhere else and transfer the data that way, which takes way more time than simple RAM accesses.
+</p>
+
+<h3 id="data">Synchronization</h3>
+<p>
+Another belief is: MySQL let's you synchronize multiple servers with the same data.<br>
+<br>
+This is not always correct. One thing many forget: There is also a <span>data</span> folder.<br>
+This means that the sv.db is not the only place where data and configs are stored. Simply adding MySQL doesn't fully synchronize 2 servers with each other.<br>
+<br>
+An example: ULX, a popular admin module, saves it's configuration and banned players in the data folder. This means that 2 servers with the same MySQL database don't synchronize banned players by default.<br>
+<br>
+Another important thing to consider: <b>Caches</b>. Some addons cache data in LUA before sending or reading it to a database. This means that 2 servers may have the same database but different caches because LUA is not synchronized between servers.<br>
+<br>
+This allows players (in rare circumstances) to cheat themselves money or similar.<br>
+An explanation:<br>
+<br>
+2 DarkRP servers with the same MySQL database have a caching table for money. This means that if a player joins a server it saves the money in a LUA table and only saves it to the database periodically.
+</p>
+<pre>
+PlayerSpawn:
+  db_cache[player] = load_player_money_from_database
+</pre>
+First join both servers after each other. Now both servers have your money saved in a cache table.<br>
+<pre>
+--LUA InGame-Server2
+  player.money = 8000
+--Database:
+  player.money = 8000
+--Server1:
+  db_cache[player] = 8000
+--Server2:
+  db_cache[player] = 8000
+</pre>
+If you now join the first server it will load your money from the cache instead of the database. Spend money and the cache table will change (and so will the database behind it). BUT: The cache on the second server will NOT change. <br>
+<pre>
+--LUA InGame-Server1
+  player.money = 2000
+--Database:
+  player.money = 2000
+--Server1:
+  db_cache[player] = 2000
+--Server2:
+  db_cache[player] = 8000
+</pre>
+If you now join the second server it will recognize the player and load the money from the cache table, which is still set to a higher amount than on the first server. It doesn't read the new money from the database because it still has your data saved in the cache table.<br>
+<pre>
+--LUA InGame-Server2
+  player.money = 8000
+--Database:
+  player.money = 2000
+--Server1:
+  db_cache[player] = 2000
+--Server2:
+  db_cache[player] = 8000
+</pre>
+Even though you have only 2000 money in the database the second server still loads your cache and sets it to 8000. If you now spend 1 ingame money it will save your money to the database again, setting it to 7999. You now have successfully cheated yourself money.
+<pre>
+--LUA Game-Server2
+  player.money = 7999
+--Database:
+  player.money = 7999
+--Server1:
+  db_cache[player] = 2000
+--Server2:
+  db_cache[player] = 7999
+</pre>
+<p>This type of caching problem is why things like <span>redis</span> exists, because it let's you synchronize multiple servers with an incredibly fast caching key-value database.<br>
+<br>
+A solution to this specific caching problem would be: Don't cache.
+</p>
+
+<h3 id="delay">Duplication</h3>
+<p>
+Another problem that could occur: Duplication glitches.<br>
+<i>This only happens with badly programed addons!</i><br>
+<br>
+An example: You have an inventory system where you can put weapons aka. objects from the world into your inventory.<br>
+This example addon of ours only removes objects from the world <b>after</b> it has saved them in the database. (In the callback function from the mysqloo database query function)<br>
+<br>
+As already said above: MySQL inserts are a bit slow.<br>
+An insert took <span>0.06270497100013s</span> for DarkRP's MySQL implementation. This means that, if you remove the entity only after it has been saved in the database, you have 0.062 seconds of time to use the entity before it is removed.<br>
+<br>
+If someone else now tries to put the weapon into their inventory they could try to do it after you already started the process of putting it into yours. This would save the weapon in both yours and their inventory at the same time, because the entity exists 0.06 seconds before it is removed.<br>
+Welcome to duping.<br>
+<br>
+This problem wouldn't occur with SQLite because queries are way faster there.<br>
+It would still be possible if 2 players click exactly in the same tick, but that timing get's more difficult the higher the tickrate is.<br>
+<br>
+To fix this for MySQL implementations: Set a <span>ENT.alreadyInventoried</span> value on the entity. If this value exists then it can't be put in inventories anymore because someone already tried to put it into theirs.<br>
+An example code:
+</p>
+<pre>
+function putIntoInventory(ent,ply)
+  if ent.alreadyInventoried then return end
+  ent.alreadyInventoried = true
+  [...]
+end
+</pre>
+<p>This is the same way that DarkRP's pocket handles this kind of duplication glitch.<br>
+<br>
+Another approach would be: Simply remove the entity before it is stored in the database. If all the checks for saving the entity have already been checked then it is save to assume the entity will be saved in the database successfully.
+</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>
+DarkRP's MySQL is not faster than Garry's Mod's SQLite3.<br>
+<br>
+You shouldn't use DarkRP's MySQL Transactions, as it's unbearably slow.<br>
+<br>
+Simply adding MySQL doesn't fully synchronize 2 servers. You need to either rewrite addons that use the data folder to use MySQL or find another way to synchronize that.<br>
+<br>
+Advantages of using MySQL:
+</p>
+<ul>
+<li>Size doesn't become a problem, as MySQL scales better with millions of records</li>
+<li>You can synchronize the database between multiple garry's mod servers</li>
+</ul>
+Disadvantages of using MySQL:<br>
+<ul>
+<li>It is a bit slower than SQLite3.</li>
+<li>You need an extra module for it with custom MySQL functions</li>
+<li>Depending on the implementation of the MySQL LUA functions the speed of the SQL queries can vary</li>
+<li>MySQL needs extra code, configuration and maintenance (+ it's an extra source for problems)</li>
+<li>Security risk of leaking MySQL login informations to players via shared lua files</li>
+</ul>
+I recommend to only use MySQL if you need to synchronize data between multiple servers.
+
+
+<br><br><br>
+</body>
+</html>
+
+

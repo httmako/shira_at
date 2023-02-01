@@ -1,0 +1,48 @@
+Source: Debian 10 // 10.3.25-MariaDB
+
+sudo mysql -u root -p
+<ENTER>
+
+
+SHOW DATABASES;
+CREATE DATABASE test;
+USE test;
+
+CREATE TABLE player(
+id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+username VARCHAR(50) NOT NULL UNIQUE, 
+money INT DEFAULT 0,
+last DATE
+);
+
+DESCRIBE player;
+SHOW TABLES;
+
+INSERT INTO player(username,money,last) VALUES("Marcus",0,curdate());
+
+SELECT * FROM player;
+SELECT * FROM player WHERE id=1 AND username="Marcus";
+
+UPDATE player SET money=money+5 WHERE id=1;
+
+ALTER TABLE player DROP COLUMN last;
+ALTER TABLE player ADD COLUMN newid VARCHAR(20);
+
+
+DROP TABLE player;
+DROP DATABASE test;
+
+
+--Create a User for a database:
+
+CREATE DATABASE mydb;
+CREATE USER 'martin'@'localhost' IDENTIFIED BY 'MyPassword';
+GRANT ALL PRIVILEGES ON mydb.* TO 'martin'@'localhost';
+FLUSH PRIVILEGES;
+
+
+--Backup:
+
+sudo mysqldump -u root -p --databases test > test.sql
+
+sudo mysql -u root -p < test.sql

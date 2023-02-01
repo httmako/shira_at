@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>nextcloud | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Nextcloud Install Guide</h1>
+
+<ul>
+<li><a href="#about">About Nextcloud</a></li>
+<li><a href="#whyselfhost">Why self-host your files</a></li>
+<li><a href="#nextcloud">Installing Nextcloud</a></li>
+</ul>
+
+<h3 id="about">About Nextcloud</h3>
+<p>
+Nextcloud is like your own google drive hosted on your server.<br>
+You can create accounts for other people and even install addons like a Kanbanboard or ToDo-List.<br>
+It uses PHP and is quite easy to install.<br>
+Similar programs are Seafile, Owncloud and FileRun.<br>
+</p>
+
+<h3 id="whyselfhost">Why self-host your files</h3>
+<p>
+It's nice to have ownership over your own files. No one can read your files except if they have your login.<br>
+It's faster than Google Drive because you use it on your own server. No background-activities or virus-scans will slow down the uploading or downloading of your files.<br>
+<br>
+
+I personally really like <a href="https://nextcloud.com" target="_blank">nextcloud</a>, it's very easy to setup and just works straight out of the box.<br>
+Owncloud is - from my research - replaced by nextcloud. (Like LibreOffice replaces OpenOffice)<br>
+<br>
+
+But: Nextcloud is a bit overloaded if you only want to quickly upload files.<br>
+Other alternatives like Droppy are either not up-to-date or use non-PHP solutions that require extra setup.<br>
+<br>
+
+For very simple and "easy uploading" of files I personally use <a href="https://github.com/marekrei/encode-explorer" target="_blank">encode-explorer</a>. Very easy to setup but it neither has security for uploaded files nor many other things. But it works very well as a mini filehosting.<br>
+</p>
+
+<h3 id="nextcloud">Installing Nextcloud</h3>
+<p>
+Requirements: Have a MySQL Database and webserver with PHP installed.<br>(On Debian: <span>sudo apt-get install mariadb-server apache2 php</span>)<br>
+<br>
+
+To setup a simple MySQL Database:<br>
+<pre>
+sudo mysql_secure_installation
+sudo mysql -u root -p
+&lt;ENTER&gt;
+CREATE DATABASE ncdb;
+CREATE USER 'ncdbuser'@'localhost' IDENTIFIED BY 'MyOwnPasswordHere0?';
+GRANT ALL PRIVILEGES ON ncdb.* TO 'ncdbuser'@'localhost';
+FLUSH PRIVILEGES;
+</pre>
+
+<br>
+Then you need the required PHP packages:<br>
+<span>sudo apt-get install php-zip php-xml php-curl php-gd php-mbstring php-mysql</span><br>
+
+<br>
+Before installing nextcloud make sure the folder you want your cloud to be in has write permissions from the PHP/web user.<br>
+If you use Apache2&PHP on Debian and want to use the /cloud folder then you can use the following commands:
+<pre>
+sudo mkdir /var/www/html/cloud
+sudo chown -R www-data:www-data /var/www/html/cloud
+</pre>
+This makes the web-user own the cloud directory and be able to write / create files in it.<br>
+
+<br>
+To download nextcloud simply visit their website and click on "Get Nextcloud" in the top right. There you can download the "Web Installer" package which is only one .php file.<br>
+To directly download it to your webserver you can use the following command:<br>
+<pre>
+sudo wget https://download.nextcloud.com/server/installer/setup-nextcloud.php
+</pre>
+Or you can download it locally and copy it to your webfolder (in this case <span>/var/www/html/cloud</span>).<br>
+Now visit the website with a browser of your choice.<br>
+<br>
+If it says an error along the lines of "can't write" then you have to use the chown command again to make the directory writeable for the www-data user again.<br>
+(<span>sudo chown -R www-data:www-data /var/www/html/cloud</span>)<br>
+<br>
+Selecting install directory: If your install file is in /cloud then you can enter <span>.</span><br>
+After clicking OK it will install nextcloud for you. after finishing you can then enter your configuration.<br>
+Enter your new Admin User and Password and then select MySQL as your database-provider and enter the details from earlier.<br>
+<br>
+To create users you can simply visit the "User" setting on the top right by clicking on your Icon.
+</p>
+
+<br><br><br>
+</body>
+</html>

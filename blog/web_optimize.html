@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>optimize the web | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Optimizing simple websites</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#images">Images</a></li>
+<li><a href="#mobile">Mobile</a></li>
+<li><a href="#compression">Compression</a></li>
+<li><a href="#nginx">NGINX / webserver settings</a></li>
+<li><a href="#other">Other</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+I write my own HTML for my website. I like the task and it's enjoyable to make a nice and simple website all on my own. The minimalism makes it load very fast and look simple but still nice.<br>
+<br>
+During this time I learned a lot about making it better, faster and more "valid" in terms of html. This page exists to share this information with everyone who decides to stumble upon it.<br>
+<br>
+Side Note: Writing my own HTML also makes the website not only valid but also very fast. In google lighthouse tests my site gets mostly 100/100 score.
+</p>
+
+<h3 id="validation">Validation</h3>
+<p>
+It's good to check your webpages with the w3c validator to see if they are in a valid format.<br>
+You can use the <a href="https://validator.w3.org/" target="_blank">https://validator.w3.org/</a> for that.<br>
+<br>
+Hint: A &lt;p&gt; tag can only contain inline text elements and neither pictures nor divs. Watch out for that if you write your own pages. <br>
+Also don't forget about the doctype and <span>lang="en"</span> at the top.<br>
+<br>
+Another good thing to check your website with is google lighthouse. Go to <a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank">https://developers.google.com/speed/pagespeed/insights/</a> and enter your website. It will tell you all things you could do better and give you a score based on speed, validity and optimization.
+</p>
+
+<h3 id="images">Images</h3>
+<p>
+You should always optimize and compress your images. The bigger the image the more bandwidth is used for every person that accesses your webpage.<br>
+<br>
+You should have the image not bigger than what you are displaying it as. Putting a full HD image as a 64x64 profile picture on your webpage is bad, as it's wasting a lot of bandwidth for information that the user can't see.<br>
+In short: Don't make them larger than they have to be.<br>
+<br>
+Resizing can be done with any tool you want.<br>
+Optimization and compression can be done with these 2 simple linux commandline tools (for png and jpg each their own):<br>
+<pre>
+<span style="color:#C0C0C0"># JPG (lossless):</span>
+jpegoptim &lt;filename&gt;
+<span style="color:#C0C0C0"># for all images in folder:</span>
+jpegoptim *
+
+<span style="color:#C0C0C0"># PNGs (lossy, but not noticable)</span>
+pngquant -s 1 -f &lt;filename&gt;
+<span style="color:#C0C0C0"># for all images in folder:</span>
+pngquant -s 1 -f --ext .png *.png
+</pre>
+
+With this the PNGs went from 7.7MB down to 2.6MB (24 files in total) without any noticable difference! The jpg files were also compressed around 50%, which means 50% less bandwidth for your server! (in this context)<br>
+<br>
+Another good idea for hosting images: Use "lazy loading". This means: Only load images if the user is able to see them. This saves you a lot of bandwidth if the user only visits your website and leaves right after, which means he doesn't download all the media on your website as soon as he joins. (Which saves you lots of bandwidth)
+</p>
+
+<h3 id="mobile">Mobile</h3>
+<p>
+First and foremost: Do you really need an extra mobile view for your webpage?<br>
+<br>
+If you do your own website minimalistic enough you don't need a mobile view, as the desktop version will smoothly transition into a readable mobile one.<br>
+And if your desktop website doesn't fit into mobile: Do you really need it to be? If you have a nice gallery-like design you could make it desktop only, there is no shame in having no mobile version, you could always add one later if you really want to.
+</p>
+
+<h3 id="compression">Compression</h3>
+<p>
+You already compressed your images, but you could also compress your text-based files too.<br>
+<br>
+On NGINX you can enable compression for html and css files, which saves lots of bandwidth in the long run. It doesn't take up too much CPU and is quite fast. It is recommended to do compression on NGINX if you use a backend like NodeJS or similar, as NGINX is built for speed and doing double the compression is just wasting CPU time.<br>
+<br>
+To enable compression in NGINX: Simply add the <span>gzip on;</span> in your server-block.<br>
+Hint: gzip only compresses HTML files by default.<br>
+Examples compressions: 22.7KB HTML to 9.4KB<br>
+(You can see the compression if you press F12 and look at the "transfered" and "size" tabs of the Networkanalysis tab.)
+</p>
+
+<h3 id="nginx">NGINX / webserver settings</h3>
+<p>
+You could also enable NGINX caching and set the expiry time for images and css files for the client to a month or longer, so that they don't request your resources too often.<br>
+<br>
+If you really want to go all out you could also minify your CSS and JS files to save even more bandwidth, but this could make your files unreadable for normal humans (if you need them to be readable).<br>
+<br>
+You could also disable log entries for image, js and css files, as writing to log is a serial and thus slow process.
+</p>
+
+<h3 id="other">Other things</h3>
+<p>
+A list of other things you should do before putting your website online:<br>
+<ul>
+<li>Check your browser console for errors or slow downloads.</li>
+<li>You could move external css (jquery from a cdn) to a local folder for faster access</li>
+<li>Don't have too many chained requests (js requests js requests js)</li>
+</p>
+
+<br><br><br>
+</body>
+</html>
+

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>fakku | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>FAKKU's anti-download measures</h1>
+<h3>Date: 2020.04.01</h3>
+
+<p style="color:red;"><b>Update 2020.04.20: This approach currently doesn't work anymore, they fixed it!</b></p>
+<br>
+<ol>
+<li><a href="#preamble">Preamble</a></li>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#problem">The Problem</a></li>
+<li><a href="#solution">The Solution</a></li>
+</ol>
+<br>
+<h3 id="preamble">Preamble</h3>
+<p><b>This document is only for educational purposes. I neither recommend nor want you to go and try this out. This is purely for documentation and "Make-It-Better" thinking of the following mentioned problem. I am not responsible for anything that happens to you if you actually use this script in any way or form. I never used this Script to download anything except the test-image which is shown near the end of this document to prove that it works. <br>There will be no easy-to-use script at the end. Do not try this. Please subscribe to them to read their content. It's worth it!</b></p>
+<br>
+
+<h3 id="intro">Introduction</h3>
+<p>FAKKU is a Adult (18+) Hentai Website. You have to pay a monthly fee to read their content, which only consists of very high quality stuff. They opened their content to the public for free during the pandemic of the covid-19 virus (Source: <a target="_blank" href="https://twitter.com/FAKKU/status/1244457301454409728">https://twitter.com/FAKKU/status/1244457301454409728</a>) and I wanted to see how a business that depends on online content makes their website secure from people stealing their content. The problem with websites like this is: People could only buy a membership for one month, download all the content, and then read it for free after the month is over, or even worse: distribute it online.<br>
+</p>
+
+<h3 id="problem">The Problem</h3>
+<p>They did a pretty good job with their security measures. You can't simply right-click and save the image. Opening the browser console only shows you a canvas element where the image is being drawn. If you try to read the network activity, then FAKKU will great you with around 300+ debug commands which hold the execution of the website if the console is open. If you manage to bypass this and look at the received files, you will be able to see the first manga page which will look something like this:<br>
+<img src="files/fakku_scrambled.png"><br>
+Source of image: <a href="https://www.fakku.net/hentai/heart-guidance-english">FAKKU - Heart Guidance, Page 1</a><br>I do not own this image! All rights belong to FAKKU<br><br>
+
+They scramble their image, send it to your browser and then reassemble it and show it on the canvas element. This means simply getting the image of the URL is not possible, because you need to know how the image looks correctly. Not every image is 'scrambled' in the same way, they have their own correct coordinates for every piece of the image.<br>
+If you google "Download image from canvas" you will find a lot of solutions that tell you to use the <i>"toDataURL()"</i> function, which lets you convert a canvas object to base64, taking the image from the canvas display and not the source image itself. In our case, this would mean we could save the correctly-displayed image easily by opening this base64 string in a new window and saving it, but FAKKU thought of that. The <i>toDataURL</i> method is disabled for canvas elements. They removed the function internally, which means every canvas element created is missing this function.<br>
+</p>
+
+<h3 id="solution">The Solution</h3>
+<p>The problem reminded me of my anti-cheat writing days, and the so-called <i>"Detouring of functions"</i>. FAKKU's website disables the <i>toDataURL</i> function somewhere in their Javascript Files. So instead of searching where it does this and disabling it, why not simply save the function beforehand and reuse it later?<br>
+With GreaseMonkey (an Addon to Firefox, Link: <a target="_blank" href="https://addons.mozilla.org/de/firefox/addon/greasemonkey/">https://addons.mozilla.org/de/firefox/addon/greasemonkey/</a>) you can execute custom Javascript code before the website can execute anything. So, the simple solution is: Create your own canvas object before the website loads (which contains the working <i>toDataURL</i> function) and then copy the canvas with the image onto your own canvas after it finished correctly drawing. Now you can use the <i>toDataURL</i> function to save it from your own canvas object, which makes the resulting image look like this:<br>
+<img src="files/fakku_clean.png"><br>
+Source of image: <a href="https://www.fakku.net/hentai/heart-guidance-english">FAKKU - Heart Guidance, Page 1</a><br>I do not own this image! All rights belong to FAKKU<br><br>
+Now you can simply advance the pages of the manga by adding +1 to the URLs page count and download the custom canvas object after it finished loading.<br>
+I will not provide the code on how to do that. This is only a theoretical experiment, and should not be used to actually download content from FAKKU. Please pay to read their content.
+</p>
+<br><br><br>
+</body>
+</html>

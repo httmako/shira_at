@@ -1,0 +1,20 @@
+# Protects SSH from Brute Force
+# Location: /etc/fail2ban/jail.local
+
+
+//For Debian
+[DEFAULT]
+bantime = 900
+maxretry = 3
+[sshd]
+enabled = true
+
+
+
+//For CentOS
+[DEFAULT]
+bantime = 900
+maxretry = 3
+banaction = iptables-allports
+[sshd]
+enabled = true

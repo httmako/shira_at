@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>autorestart | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Automatically restart your Service with systemd</h1>
+
+<ol>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#example">Example with NodeJS</a></li>
+</ol>
+
+<h3 id="intro">Introduction</h3>
+<p>I've searched for ways to automatically restart my application if it crashes, and have only found solutions which need extra software or something like 'forever'.<br>
+After a while I found out that you can do this with systemd, the init-process for most linux distrubutions nowadays.<br>
+This has 2 major advantages: It uses the internal journal for logging and it can easily be controlled with systemctl.</p>
+
+<h3 id="example">Example with NodeJS</h3>
+<p>Creating your own systemd service is quite easy, as it's only a file that you have to create.<br>
+An example:<br>
+First create your service file and add it to <i>/etc/systemd/system</i>. This example uses a NodeJS server, so the file could be named <span>/etc/systemd/system/myapp.service</span><br>
+The Lines are pretty self-explanatory, but <b>don't forget to change it to your own settings!</b><br>
+Contents of the .service file:<br>
+<pre>
+[Unit]
+Description=My NodeJS Server
+
+[Service]
+ExecStart=/usr/bin/node /home/user/myapp/index.js
+Restart=always
+RestartSec=5
+SyslogIdentifier=myapp
+User=user
+Group=user
+Environment=NODE_ENV=production PORT=3000
+
+[Install]
+WantedBy=multi-user.target
+</pre><br>
+Now we are ready to start it. Systemd services can be controlled using the <i>systemctl</i> command. It's quite easy to use:<br>
+<pre><span>sudo systemctl start myapp</pre></span>
+This command simply starts your service. It will automatically restart 5 seconds after crashing thanks to our 6/7th line in the service files.<br>
+To automatically start your service on system startup simply run the following command: <pre><span>sudo systemctl enable myapp</pre></span>
+To check the status use <span>status</span> instead of enable. With <span>stop</span> you can stop the service, and to disable the auto-startup simply use <span>disable</span> instead of enable.<br><br>
+The <span>status</span> command also shows you an excerpt of the log. To see the full log use the <span>journalctl</span> command and look for your SyslogIdentifier, which in this case is <span>myapp</span> (which was set in the .service file)</p>
+
+<br><br><br>
+</body>
+</html>
+

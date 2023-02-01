@@ -1,0 +1,38 @@
+#!/bin/sh
+#uname -snrvm
+
+# Add this to /etc/update-motd.d/10-uname
+# The legal message (static motd) is in /etc/motd
+
+R='\033[0;31m'
+G='\033[0;32m'
+N='\033[0m'
+
+echo ""
+echo "Unauthorized access is prohibited!"
+echo ""
+
+#Webserver
+pidof apache2 >/dev/null && echo "${G}Apache2 ${N}" || echo "${R}Apache ${N}"
+
+#Database
+pidof mysqld >/dev/null && echo "${G}MySQL ${N}" || echo "${R}MySQL ${N}"
+
+#GMod sandbox server
+if [ $(ps -aux | grep "srcds_linux.*sandbox" | wc -l) -gt 1 ]; then
+  echo "${G}CWRP ${N}";
+else
+  echo "${R}CWRP ${N}";
+fi
+
+#Minecraft lobby server
+if [ $(ps -aux | grep "java.*BungeeCord" | wc -l) -gt 1 ]; then
+  echo "${G}BungeeCord MC ${N}";
+else
+  echo "${R}BungeeCord MC ${N}";
+fi
+
+echo ""
+echo "Logged-in users: $(who | wc -l)"
+echo "Disk Usage: $(df -h --output=size,used | grep 461GB)"
+echo ""

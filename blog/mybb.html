@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>MyBB | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>MyBB Installation Guide</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#install">Installation</a></li>
+<li><a href="#theme">New Theme</a></li>
+<li><a href="#mailerror">Activation Mail not sending</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+<b>Attention: I highly recommend you to use this guide AFTER you bought and configured a domain name for your server.</b><br>
+<br>
+MyBB is a free and open source PHP forum software.<br>
+It is nearly the same as Woltlab except it's free and open source.<br>
+You can use it as a forum for your service (or gameserver) if you have your own linux server.<br>
+This article exists because the default installation instruction from the MyBB website isn't good enough for non-tech-savvy people.
+</p>
+
+<h3 id="install">Installation</h3>
+<p>First you have to install a webserver and PHP.<br>
+If you use Debian then I recommend apache2. It's easy to install and good for beginners.<br>
+Install both with <span>sudo apt-get install apache2 php</span>.<br>
+Now get the latest version of MyBB from here: <a href="https://mybb.com/download/" target="_blank">https://mybb.com/download/</a>.<br>
+For me it was "<a href="https://resources.mybb.com/downloads/mybb_1824.zip" target="_blank">https://resources.mybb.com/downloads/mybb_1824.zip</a>".<br>
+Now upload the .zip file to your server and unzip it with "<span>unzip < filename ></span>".<br>
+If "unzip" wasn't found you can install it with <span>sudo apt-get install unzip</span>.<br>
+<br>
+Now we have to install some dependencies and setup the database.<br>
+For MyBB to function we have to install the following php modules: <span>sudo apt-get install php-mysql php-xml php-mbstring php-gd</span>.<br>
+<br>
+Now we install the mysql database with <span>sudo apt-get install mariadb-server</span>.<br>
+On Debian 10 mysql-server was replaced with mariadb-server, but the commands and syntax is still mysql, so don't worry.<br>
+After the installation run the command <span>sudo mysql_secure_installation</span>. No password so just press Enter, then press "Y" for everything and set the new root password to something secure.<br>
+You can access mysql via <span>sudo mysql -u root -p</span>. If you put sudo infront you don't need to enter a password, simply press enter and you are in.<br>
+Now copy the following lines in to create a new database and user for it. Replace the "MyOwnPasswordHere" with your own secure password.<br>
+<pre>
+CREATE DATABASE mybbdb;
+CREATE USER 'mybbuser'@'localhost' IDENTIFIED BY 'MyOwnPasswordHere';
+GRANT ALL PRIVILEGES ON mybbdb.* TO 'mybbuser'@'localhost';
+FLUSH PRIVILEGES;
+</pre>
+<br>
+We are now done with preparation. Now we can move the forum files to our web folder and start the installation.<br>
+Create a directory in your web-root-folder: <span>sudo mkdir /var/www/html/forum</span>.<br>
+Now move all your files from the zip-file to your forum folder that you just created. There should be a <span>Upload</span> folder from the unzipped folder. Go one folder below it and run <span>sudo cp Upload/* /var/www/html/forum</span> to copy all the files from the folder to your webfolder.<br>
+Give back all permissions to your web-user with <span>sudo chown -R www-data:www-data /var/www/html</span>.<br>
+Now you can go to your website <span>yourdomain.de/forum</span> and start the installation process.<br>
+<br>
+During the installation you will be asked some questions.<br>
+<ul>
+<li>These answers are only valid if you copied above config! Replace with yours as necessary!</li>
+<li>For "Database Configuration" choose "MySQL Improved".</li>
+<li>Database Server Hostname is "localhost"</li>
+<li>Database Username is "mybbuser"</li>
+<li>Database Password is your password from the sql above (this case: "MyOwnPasswordHere")</li>
+<li>Database Name is "mybbdb"</li>
+<li>You can leave the "Table Prefix" as is</li>
+</ul>
+Then just click Next and the database will set itself up.<br>
+On the "Board Configuration" Page you can now set your forum-name and Website name. You should leave the rest as is.<br>
+On the next page you can create your first user. I highly recommend to name him "Admin" or "root" or something similar. I would NOT use this account for anything except for giving your new users admin rights.<br>
+Now you are done and can visit your forum at yourdomain.de/forum<br>
+<br>
+<b>VERY IMPORTANT:</b> For seurity reasons deny access to internal directories.<br>
+For nginx simply use this code snippet:<br>
+<pre>
+location ~ /(inc|uploads/avatars) {
+  deny all;
+}
+</pre>
+For apache2 simply rename the htaccess.txt to .htaccess and enable htaccess support via the apache2 config if it isn't enabled already.<br>
+</p>
+
+<h3 id="theme">New Theme</h3>
+<p>
+You probably don't like the default MyBB theme and that is ok. I don't like it either.Let's take a better one.<br>
+A good and minimalistic theme is Flatty. (source: <a href="https://community.mybb.com/mods.php?action=view&pid=617" target="_blank">https://community.mybb.com/mods.php?action=view&pid=617</a>)<br>
+Download it from here <a href="https://community.mybb.com/mods.php?action=download&pid=617" target="_blank">https://community.mybb.com/mods.php?action=download&pid=617</a>.<br>
+Unzip it and Upload everything in the "Upload" folder into your "/forum" folder on your webserver.<br>
+Then login as Admin on the MyBB Forum, goto Admin CP (on the left top of the forum).<br>
+Go to "Templates & Style" and then to "Import a theme" (in the middle, written in light grey)<br>
+Locate your flatty.xml file (from the zip file that you downloaded), type in a new name like "FlattyTheme", check all 3 boxes at the bottom and then press the "Import Theme" button.<br>
+Now go to "Themes" on the left, and click the small Arrow besides the FlattyTheme in the list that says "Set as Default" when you hover over it.<br>
+Now you have set a new default theme.<br>
+To set a new Logo simply upload a file named "logo.png" to "forum/images/flatty/logo.png". (It should be 200px in Height)<br>
+</p>
+
+<h3 id="mailerror">Activation Mail not sending</h3>
+<p>
+I recently had the problem that the activation mail for new accounts wasn't being sent by mybb.<br>
+If a test mail with the <span>mail()</span> function isn't sending for you then install <span>sendmail</span> and try it again, it should work.<br>
+If a test mail was correctly sent but mybb isn't sending mails then try the following:<br>
+<br>
+The setting was on "PHP Mail" and the mail() function in PHP was successfully sending emails.<br>
+I had to change the Mail-Setting to "SMTP".<br>
+SMTP basically means: Let another mailserver send the mail for me.<br>
+<br>
+If you use googlemail you have to activate the "Use less secure apps" Setting in your desired GMail account.<br>
+Go to <a href="https://myaccount.google.com/">https://myaccount.google.com/</a> and on the left on security. Now scroll down to "Access by less secure apps" and enable it.<br>
+<br>
+Go to your forum and login as admin. Go to the Admin CP and in the settings search for "Mail" in the top right searchbox.<br>
+Scroll down until you see the "Mail" dropdown menu and select SMTP.<br>
+SMTP redirects mail to an SMTP Server and makes that server send the mail.<br>
+If you have a gmail account enter "smtp.gmail.com" as the server, port 465, user is your email, password your password, and encryption is SSL.<br>
+Click on the Save button (in this box) and now your mail should be working!<br>
+If you don't receive an activation mail check your mail logs in "Tools and Maintanence"->"Mails Log".<br>
+</p>
+<br><br><br>
+</body>
+</html>
+

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>rest | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Simple REST server with NodeJS & express</h1>
+
+<ol>
+<li><a href="#install">Installation</a></li>
+<li><a href="#code">The Code</a></li>
+<li><a href="#further">Further Reading</a></li>
+</ol>
+
+<h3 id="install">Installation</h3>
+<p>Install nodejs and npm (NodePacketManager) via  <span>sudo yum install nodejs npm</span><br>
+NodeJS is basically "Javascript" for servers. You can start the commandline-version by simply typing <span>node</span>.<br>
+Express is a minimalistic web framework for NodeJS. Install it via <span>sudo npm install express</span>.<br>
+Further Documentation of 'express' can be found  at <a href="https://npmjs.com/package/express">npmjs.com/package/express</a>.<br>
+Now, for example, you can create a file named "simple.js" and paste the following example-code inside:<br>
+<pre>
+const express = require("express")
+const app = express()
+app.get("/", function(req, res){
+  res.send("Hello World!")
+})
+app.listen(3000)
+</pre><br>
+Now use the console command <span>node simple.js</span> to start the script. If you know visit <span>localhost:3000</span> on your browser you will be greeted with a "Hello World!" page.<br>
+To stop the script simply press CTRL+C.<br>
+</p>
+
+<h3 id="code">The Code</h3>
+<p>We can now add to the example from above.<br>
+We'll make a new 'route' (link) for our app which takes an ID and returns data from that.<br>
+<pre>
+const express = require("express")
+const app = express()
+var rdata = ["Apple","Strawberry","Cherry","Banana"]
+app.get("/", function(req, res){
+  res.send("Hello World!")
+})
+app.get("/:id", function(req, res){
+  if(req.params.id < rdata.length){
+    res.send("Data: "+_data[req.params.id]);
+  }else{
+    res.send("ID "+req.params.id+" can't be found.");
+  }
+})
+app.listen(3000)
+</pre><br>
+If you now start the server again you can access the rdata list by going to, for example, <span>localhost:3000/1</span>, which should print out the ID 1 and Data 'Strawberry'.<br>
+This also works, for example, for the route <span>"/:category/:id"</span>, where you can access the parameters with <span>req.params.category</span> and <span>req.params.id</span> respectively.<br>
+This isn't the most secure or most fleshed out example, but it should give you an idea how you can build your own server.<br>
+A first good step would be to transfer the data to a database or JSON file and fetch it from there. To read a JSON file from the same folder you can simply use the following code snippet:<br>
+<pre>
+const fs = require("fs");
+var rdata = JSON.parse(fs.readFileSync("data.json","utf8"));
+</pre><br>
+This reads the <span>data.json</span> file into the <span>rdata</span> variable as an object, but be careful, because it uses the synchronized readFile version.<br>
+</p>
+
+<h3 id="further">Further Reading</h3>
+<p>The example above is very simple and minimalistic.<br>
+The first thing you should look into next would be the MVC (Model View Controller) architecture that you should write for express. This splits the get-data, URL-Route, and send-data part into different files, because in our above example they are all in one file.<br><br>
+Another good idea would be to look into modules that easily connect your database to the NodeJS REST server. Getting data from JSON files isn't the best idea for a big amount of ever-changing data.
+</p>
+<br><br><br>
+</body>
+</html>

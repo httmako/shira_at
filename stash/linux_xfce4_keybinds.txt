@@ -1,0 +1,20 @@
+xfce4-session-logout --halt
+	ctrl+alt+q
+	shutdown system instantly
+
+xfce4-terminal
+	ctrl+alt+enter
+	new console window
+
+xflock4
+	ctrl+alt+l
+	lock system (requiring user login)
+
+firefox
+	ctrl+alt+f
+
+exo-open --launch FileManager
+	ctrl+alt+e
+	launch file explorer
+
+

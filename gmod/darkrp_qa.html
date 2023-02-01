@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>darkrp qos | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>chef's darkrp quality assurance</h1>
+
+<pre>
+<span>
+_______
+| | | |
+| | | |
+|     |
+|-----|
+|_____|
+</span>
+
+This is a kind-of tutorial on how to "test darkrp servers".
+It will not explain how to fix these problems, only how to find them.
+
+I see many darkrp servers currently in development.
+Many of those servers have the same common problems.
+These problems are easy to detect, even as a normal player.
+With this guide even you can spot these problems.
+
+Please use an account that does NOT have any workshop addons.
+Also clear the download cache of garrys mod before joining.
+This helps to spot error models that failed to download.
+
+This will be a list of things you can look out for.
+Write down every error you find.
+Send it to the staff team when you are finished.
+For best effect tell the staff that you are testing.
+(or you may be banned soon)
+
+
+<b>The beginning</b>
+of error models and script errors
+
+ - You should NOT have script errors while joining.
+ - You should also never have script errors after joining.
+ - The map should not contain errors
+ - The download while joining shouldn't be too big (max.3GB)
+ - The download while joining shouldn't be too many "Collection Addons"
+  - If you download "Server's M9k weapons" when joining then it's bad
+  - If you download the M9k weapons from the original maker = OK
+ - The HUD Should be visible and shouldn't contain any errors.
+ - The Scoreboard and F4 Menu should work without any errors.
+ - The spawn should be marked as such (example: "This is a no RP zone.")
+ - You should spawn in the actual spawn and not somewhere else.
+ - You should have keys, a physgun, a physcannon and fists when you spawn
+ - There should be a non-default chat (atlaschat, etc.)
+ - There should be an ATM system (critzer, blues, etc.)
+
+
+<b>The information</b>
+of lost players and useless chat commands
+ 
+ - There should be a MOTD (popup) when you spawn with important information
+ - You should be able to find the TS-IP / Forum Link / Discord Link if the server has one
+  - An easy fix for that: Have commands like !forum, !ts and !discord
+ - You should be able to see who is a staff member and who is a regular player
+ - You should be able to see who is joining or disconnecting.
+ - There should be (atleast) an RP, OOC and Advert chat.
+  - Try to use "/advert test". It should write in the [advert] chat.
+  - On some servers it will instead spawn a lawboard, which is bad.
+ 
+ - If the map is big you should be able to find important NPCs quickly
+ - You should have enough money to start any job you want and be able to buy the required items
+ - Things should make money fast and get the price of the object back quickly
+ - Money printers should make money faster then legal "farming" jobs
+
+
+<b>The jobs</b>
+of excuses and long downloads
+ 
+ - You should see all playermodels without any error models
+ - Jobs that are restricted (you can't join them) should be highlighted as such
+ - There should be atleast 2 illegal "gangs" and police / military jobs
+  - If they don't have a "cook" job then ask if they wanted it like that,
+    because the cook is a default job that is only disabled (in disabledDefaults.lua)
+ - Every weapon the gun dealer sells should have a non-error model
+ - Every job should be able to do (work) what they are supposed to do
+  - Test every job if you can buy the required items to do your work
+  - Don't forget to check everything if it is an error model
+  - Example:
+   - There is a "mechanic" (car repair) job with VC Mod and TDM cars installed
+   - You should spawn with a wrench
+   - You should be able to buy car parts to repair the cars
+   - Or you should be able to buy car repair kits
+   - These purchases are either in the F4 Menu or at a NPC
+
+ - People should not be able to drop their job weapons!
+   - This can lead to people going Police and dropping their pistols
+   - This way people can get unlimited pistols easily!
+ 
+ - If the server has a NLR rule that activates when you switch jobs then
+   you should respawn when you switch jobs. Switching jobs without respawning
+   only makes the NLR rule more difficult to adhere to.
+ 
+ - The server shouldn't have too many "donator only" jobs
+ - There should be atleast one "legal money farming job"
+
+
+<b>The crash</b>
+of props and spam
+
+ - You should NOT be able to spawn Ragdolls, Dynamite, Emitters and Effects.
+ - You should NOT be able to spam props
+ - You shouldn't be able to spawn big props
+  - If you can, then the server is missing a good prop blacklist
+  - Or the server is missing an anti-big-prop-spawn addon
+  
+ - The server should have an "Prop Protection" addon
+ - To check if they have one:
+  - Spawn a prop and lift it up with the physgun
+  - if the prop gets lucent (invisible) and loses collision then they have one
+ 
+ - You should NOT be able to move cars around with props
+ - If you freeze (Right Mouse) a prop in a car, it should NOT become solid.
+ 
+ - A really good "Anti Prop" addon has the following:
+  - Props spawn without physics and without collision
+  - They never have gravity or physics (less server lag that way)
+  - They only become solid when they are frozen with the physgun
+  - You shouldn't be able to unfreeze it with the R key
+  - They shouldn't have physics when they become solid from a fading door
+ 
+ - There should be a "FPS Boost" addon or configuration
+  - Type "gmod_mcore_test" in the console. It should be 1 (to boost FPS).
+ 
+
+<b>The restrictions</b>
+of infinite entities and spawn points
+
+ - The server should either have:
+  - A prop blacklist (recommended)
+  - A prop whitelist
+  - An "Anti-Big-Prop-Spawn" addon
+  - If you can spawn the big plastic cube then they don't have one
+ - Every extra Toolgun (Trash Spawner, Prop Blacklist, etc.) should be superadmin only
+  - Check every toolgun if you can use it
+ - Extra Toolguns like LED Screens should be usable (non-admin toolguns)
+ 
+
+<b>Anti Trolling</b>
+with pocket and /invholster
+
+ - The Context menu ( hold C ) should NOT allow players to
+  - remove their car
+  - deactivate gravity or collision
+  - set things on fire
+ - The easiest fix would be to disable every feature of the context menu
+ 
+ - You should NOT be able to mapvote (via ulx) to non "rp_" maps.
+ - You should NOT be able to voteban, votegag or votemute someone.
+ - You should NOT be able to /invholster job weapons (like the cops' pistol or stungun)
+ - You should NOT be able to put world entities in your inventory (like job entities)
+
+ - If you have the "Pocket" weapon on the server:
+  - You should NOT be able to pocket 3D2D Textscreens
+  - You should NOT be able to pocket Fuel Stations or tank canisters
+  - You should NOT be able to pocket NPCs, Cars, ATMs or Permaprops
+ 
+ - If you have the "Toolgun" on the server:
+  - You should NOT be able to use the Toolgun on entities that belong to other players
+  - You should NOT be able to use toolguns like "Prop Blacklist" or "Trash Spawner"
+  - You should NOT be able to use the following functions:
+   - Wheel, Weld, Thruster, Lamps, Balloons,
+
+
+<b>The other things</b>
+
+ - The server should have an AFK system. Try /afk for the default DarkRP AFK.
+ - <b>The server should NOT allow custom scripts.</b>
+  - Type "lua_openscript_cl" in the console. 
+  - If you press space afterwards and auto-completion pops up then it is enabled.
+ 
+ - If you know LUA, try to analyze custom scripts written by the server owner.
+ - Check for superadmin checks
+ 
+ 
+</pre>
+</body>
+</html>
+

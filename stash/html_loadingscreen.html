@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<style>
+  body{background-color:#240229;}
+  
+  /* The main ring */
+  .rainbow {
+    position: absolute;
+    -webkit-backface-visibility: hidden;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin:-50px 0 0 -50px;
+    background: linear-gradient(#14ffe9, #ffeb3b, #ff00e0)
+  }
+  
+  /* For the gradient*/
+  .rainbow div{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 0.5s linear infinite;
+    background: linear-gradient(#14ffe9, #ffeb3b, #ff00e0)
+  }
+  
+  /* Multiple blur gradients for a shining color */
+  #one{filter: blur(5px)}
+  #two{filter: blur(10px)}
+  #three{filter: blur(25px)}
+  #four{filter: blur(50px)}
+  
+  /* Hiding the middle */
+  .point {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: -40px 0 0 -40px;
+    background-color:#240229;
+  }
+  @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+  @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+  @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="rainbow">
+  <div class="rainbow" id="one"></div>
+  <div class="rainbow" id="two"></div>
+  <div class="rainbow" id="three"></div>
+  <div class="rainbow" id="four"></div>
+</div>
+<div class="point"></div>
+</body>
+</html>

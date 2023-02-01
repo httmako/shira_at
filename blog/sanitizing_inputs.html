@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>sanitizing input | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Why sanitizing input is important</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#example1">Example #1: NodeJS</a></li>
+<li><a href="#example2">Example #2: gLUA</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+"Sanitizing" means cleaning, desinfecting or getting rid of unwanted stuff.<br>
+In this aspect it means "keeping users from inserting garbage into our application".<br>
+Most bugs from amateur programmers come from this specific problem, they expect every user to have good intentions and only type/send what is expected of them.<br>
+<b>Not every user is good.</b> Not every user will write a number in the age field of a form.<br>
+</p>
+
+<h3 id="example1">Example #1: NodeJS</h3>
+<p>
+<pre>
+app.get("/customer/:id", function(req,res){
+  sqlPool.query(<b>"SELECT * FROM customer WHERE id="+req.params.id,</b>
+  function(err,response){
+    if(err){
+      res.status(500).send("ERROR!");
+      return;
+    }
+    res.status(200).json(response[0]);
+  });
+});
+</pre>
+This piece of code is from an NodeJS Express application. It returns the customer object from the database if a GET request was sent to <span>/customer/1</span>.<br>
+<br>
+An example to exploit this bad code:<br>
+Instead of sending <span>3</span> simply send <span>' or 1=1; drop table customer; --</span> as the ID instead.<br>
+<br>
+Explanation: <span>' or 1=1;</span> will make the first statement return true, then <span>drop table customer;</span> deletes all data, and then <span>--</span> will make the rest of the SQL statement a comment.<br>
+<br>
+The most important fix for this: Do not let unfiltered user input get in a database query!<br>
+Either use so-called "Prepared Statements" or "escape" functions. An escape function with NodeJS' mysql module would be <span>mysql.escape(string_variable)</span>.<br>
+These escape functions remove special characters from your string, making it safe to use in database queries.<br>
+<br>
+Another, more simple thought to consider: What if the user doesn't send an ID, or sends a string as the ID?<br>
+This could be solved by first checking if something was sent, and then verifying that it was a number.<br>
+To do this you could use this code example:
+<pre>
+app.get("/customer/:id", function(req,res){
+  const id = req.params.id;
+  if(!id){
+    res.status(400).send("No ID provided.");
+    return;
+  }
+  if(isNaN(parseInt(id))){
+    res.status(422).send("ID is not a number.");
+    return;
+  }
+  [...]
+});
+</pre>
+Now a user with bad intentions can't send SQL Injections or other weird stuff anymore. This also makes the application more stable, because not checking for wrong/missing input could throw errors later down in the code.<br>
+</p>
+
+<h3 id="example2">Example #2: gLUA</h3>
+<p>
+The bad code example in question is the following:<br>
+<pre>
+net.Receive("policeArmory",function(len,ply)
+  local wepClass = net.ReadString()
+  local player = net.ReadEntity()
+  player:Give(wepName)
+end)
+</pre>
+I have found this code on a GMod server once. This is a piece of serverside code that enables players who work for the police to get weapons from the armory.<br>
+BUT: There are no security checks. Every user can send anything they want and get it. Users could even give other people weapons if they want, because the code takes a player via net messages (player) and not via the function (ply).<br>
+<br>
+Example of an exploit for this code (clientside):<br>
+<pre>
+net.Start("policeArmory")
+  net.WriteString("m9k_davycrocket")
+  net.WriteEntity(LocalPlayer())
+net.SendToServer()
+</pre>
+<br>
+To make this serverside code more robust we will add a few checks and use the ply object that the <span>net.Receive</span> function provides to us.<br>
+The extra security checks are: If the player is alive, valid, a police member and if the weapon he requested is allowed (and if he isn't spamming the system).<br>
+All together the code would now look like this:
+<pre>
+local allowedWeapons = {
+  ["weapon_m16"] = true,
+  ["weapon_glock"] = true,
+  ["weapon_mp5"] = true
+}
+net.Receive("policeArmory",function(len,ply)
+  local wepClass = net.ReadString()
+  if not IsValid(ply) then return end
+  if not ply:IsPlayer() then return end
+  if not ply:Alive() then return end
+  if not (ply:Team() == "Police") then return end
+  if not allowedWeapons[wepClass] then return end
+  ply:Give(wepClass)
+  if not ply.armory_timeout then
+    ply:Give(wepClass)
+    ply.armory_timeout = CurTime()+120
+  else
+    if CurTime() &lt; ply.armory_timeout then return end
+    ply:Give(wepClass)
+    ply.armory_timeout = CurTime()+120
+  end
+end)
+</pre>
+Ofcourse you don't have to do all of these checks. They have been split up to one per line to make it more readable.<br>
+The error message is not included here yet. Either create it clientside or send an error message in the serverside code above.<br>
+Now you can neither abuse the system nor cheat it anymore.<br>
+</p>
+
+<h3 id="conclusion">Conclusion</h3>
+<p>
+This can be a bit difficult to fully understand at first, but it gets easier the more you use it.<br>
+The most important thing to look out for is the connection to human input. You don't have to check if an internal function actually returns what it should be, but you have to check if a user sends the data you expect him to send.<br>
+<br>
+A small checklist you could use for securing your application:<br>
+<ul>
+<li>Is it using user input? If no then research if you really need to implement security checks.</li>
+<li>Check if the user has the appropriate access permissions to the resource. (Is he logged in? Is he an Admin?)</li>
+<li>Check if he is sending the data as you expect it to be. (Example: Only numbers in the age field of a form, not less than 18 years old, etc.)</li>
+</ul>
+</p>
+<br><br><br>
+</body>
+</html>
+
+

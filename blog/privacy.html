@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>privacy | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Privacy</h1>
+<br>
+<ul>
+<li><a href="#why">Why care about privacy?</a></li>
+<li><a href="#assess">Assess your threats</a></li>
+<li><a href="#passwords">Passwords</a></li>
+<li><a href="#os">Operating System</a></li>
+<li><a href="#passwords">Passwords</a></li>
+<li><a href="#services">Secure Services</a></li>
+<li><a href="#files">Encrypting Files</a></li>
+<li><a href="#steps">Small steps towards privacy</a></li>
+<li><a href="#alternatives">Alternative software</a></li>
+<li><a href="#sources">Sources & Further reading</a></li>
+</ul>
+<br>
+
+<h2 id="why">Why care about privacy?</h2>
+<p>
+Google, Microsoft and co. collect a huge amount of data about you everyday. It uses and even sells this information for marketing purposes. Other companies can simply buy your data and use it however they want.<br>
+But that's not the biggest problem.<br>
+<br>
+Google is based in America. This means that the NSA can, according to US law, get access to all of your emails, files, etc. whenever they want.<br>
+This happened to LavaBit, the email provider of Snowden. The owner of LavaBit was forced to hand over the SSH Keys so that the NSA can decrypt the Emails of snowden (and everyone else) because they wanted Snowdens information. This means that the NSA can, if the service you are using is based in the USA, read and collect everything you do with that service, without you even knowing about it. (<a target="_blank" href="https://en.wikipedia.org/wiki/Warrant_canary">Read More</a>)<br>
+<br>
+This is why people try to leave Google and Microsoft for better alternatives. Data is very valuable in this day of age, and it could fall into the hands of even the most evil businesses very easily.
+</p>
+
+<h2 id="assess">Assess your threats</h2>
+<p>
+Before you create any plans for your new life without google: Think about what information needs to be secured.<br>
+For example: My search history about "samoyed dog pictures" is not important, but my passwords and confidental documents (like passport pictures) are very important.<br>
+<br>
+Not everything you have has to be protected with the best security. Perfect, untracable Security is also near impossible these days, so don't implement every little security feature you see. Think about and select what Information you want to be secure and from whom you want them to be secure - then take the necessary steps to achieve that goal.<br>
+<br>
+An easy example of Thread Modeling:<br>
+<ul>
+<li>Hiding information from your mom - the easiest: Hide the information on a remote USB or simply put a password on your PC</li>
+<li>Protecting against thieves - quite easy: Just encrypt your files/emails/laptop, use a password manager with random passwords for all accounts, make frequent encrypted backups offsite (cloud, remote hard drive, etc.)</li>
+<li>Protecting against the government - very difficult: Encrypt literally everything, use random identities when signing up online, use foreign sim cards and email accounts, etc.</li>
+</ul>
+</p>
+
+<h2 id="passwords">Passwords</h2>
+<p>
+Yes, passwords have to be long and complicated to remember, but this is useless if you write them on a post-it on your monitor or save them in a plain text document on your desktop.<br>
+It is not recommended to use 1Password and Lastpass. They are bad alternatives to the above because they do not save your passwords securely enough.<br>
+<br>
+Before you try and download a password manager think about the risks this opens up. If someone has your master password they could have ALL your passwords. Even if you use applications like Keepass, it could help someone take over your whole internet life with one single password or file.<br>
+<br>
+If you really need to save your passwords somewhere use <a target="_blank" href="https://keepassxc.org/">KeepassXC</a>. It is the most recommended version of Keepass, written in C++ and with a nice User Interface. It is also recommended that you enable 2-Factor-Authentication for extra security.<br>
+<br>
+<b>Password Tips</b><br>
+A personal tip for creating secure and memorable passwords: Create a very random one and then simply recall it twice a day. After a while you have it memorized and can start with the next one, slowly and steadily changing your "ILoveNatasha39" passwords to something like "6fab35e7!a8b6A".
+(I remembered and used randomly generated Cisco Router passwords for myself back in the day.)
+</p>
+
+<h2 id="os">Operating System</h2>
+<p>
+Windows 10 spies on you. It spies a lot. This makes the biggest - but best - hurdle the most obvious one: Switching to Linux.<br>
+<br>
+Linux has improved a lot over the past few years and is now a very good competitor to Microsoft's Windows.<br>
+Manjaro, Debian (MX Linux) and Fedora are 3 very good desktop systems that are free, open source and value your privacy. The only major drawback that Linux has: Gaming is difficult. That's it.<br>
+<br>
+If you only want to sometimes use Linux for specific online services you can install <a target="_blank" href="https://tails.boum.org/index.en.html">Tails</a> on an USB stick. Tails is a security-focused portable Linux Operating System that routes all network through the Tor Network. It leaves no trails on the PC and can be quickly booted to via an USB stick.
+</p>
+
+<h2 id="services">Secure Services</h2>
+<p>
+The main problem of privacy: What services can you trust?<br>
+Short answer: Everything that is not based in America, UK or similar countries.<br>
+<br>
+The best security would be self-hosting your services. This would make it quite difficult for non-tech people, because not everyone has the time and knowledge to setup a Linux Server.<br>
+<br>
+That's why sites like <a target="_blank" href="https://disroot.org/">disroot.org</a> exist. They let you use privacy-focused services for free. From a private cloud to a private pastebin, everything you use daily can be done over this website.<br>
+<br>
+If you want a really private email you can also look into <a target="_blank" href="https://protonmail.com/">protonmail</a> or other swiss mail companies. They have - thanks to their neutrality - very strict data privacy laws. Paired with their email encryption that only the user can decrypt they are a very good alternative for complete control of your data.<br>
+<br>
+If you want a really secure filehosting cloud like google drive you can look into services like <a target="_blank" href="https://crypt.ee/">crypt.ee</a>. They offer the same type of service like protonmail: Complete control of your data and privacy. No one can access or decrypt your files except you yourself.<br>
+Crypt.ee even offers "ultimate deniability", which secures your data even if authorities force you to hand over the login.
+</p>
+
+<h2 id="files">Encrypting Files</h2>
+<p>
+Veracrypt is the best program for encrypting files. It creates a container that you can only open (mount like a drive) if you have the password.<br>
+<br>
+With veracrypt you can either create a file that acts as the container for your files or you can also encrypt your whole disk. It takes a while to encrypt a large hard drive, but is really quick for an USB stick.<br>
+<br>
+Veracrypt also supports <a target="_blank" href="https://www.veracrypt.fr/en/Plausible%20Deniability.html">Plausible Deniability</a>. You can create 2 different volumes on (for example) one USB stick: a normal volume and a hidden volume. If you decrypt your USB you can use 2 different passwords: The normal one for the normal volume or your "hidden" password for the hidden volume. There is literally no way to prove that a hidden volume exists.<br>
+<br>
+This means that, if an Authority forces you to hand over the password, you can give them the normal one and simply deny that a hidden volume exists. No one can prove it, which means it doesn't exist.<br>
+<br>
+I recommend to read the documentation of veracrypt closely. For Example: A hidden volume, if mounted, is logged in your windows 10 log, which means that, if Authorities take all your electronic devices, it could be proven that it exists. This, according to the veracrypt website, isn't true if you encrypt your whole hard drive where windows is running though.
+</p>
+
+<h2 id="steps">Small steps towards privacy</h2>
+<p>
+You don't have to install Linux now and delete all google accounts immediatly.<br>
+The way to a secure and private internet life are very difficult and need a lot of adjustments in your daily life.<br>
+But small steps in the right direction can start this process slowly but steadily.<br>
+<br>
+Start with, for example, switching to Firefox instead of Google Chrome. Or installing Libreoffice instead of Microsoft Word & co.<br>
+These steps won't make you more secure or private as soon as you complete them, but it's a step in the right direction, and every step counts.<br>
+<br>
+Next you could switch from a cloud-based password manager to a local one like KeepassXC (or simply remembering them).
+</p>
+
+<h2 id="alternatives">Alternative Software</h2>
+<p>
+Finding alternatives for commonly used software is not difficult these days.<br>
+The following list will show what software is recommended and which software should be avoided. This may be a bit subjective and consists of mainly Windows Software.<br>
+<br>
+
+<h4>OS</h4>
+Preferably Fedora, Debian (MX Linux) or Manjaro. If forced to use Windows: Windows 7 is preferred over Windows 10 (with security enhancements).<br>
+
+<h4>Voice over IP</h4>
+<a target="_blank" href="https://www.mumble.com/mumble-download.php">Mumble</a> is the best choice here. Teamspeak is proprietary, same with Discord.
+
+<h4>Zipping Tool</h4>
+<a target="_blank" href="https://www.7-zip.org/download.html">7zip</a> is the best choice here. It works faster and is more simple than Winrar, not to mention it's completely free.
+
+<h4>Text Editor / Programming IDE</h4>
+<a target="_blank" href="https://notepad-plus-plus.org/downloads/v7.9.3/">Notepad++</a> for text editing and light programming.<br>
+For programming use <a target="_blank" href="https://vscodium.com/#install">vscodium</a> , a fully open source build of visual studio code without telemetry or tracking.
+
+<h4>Office Suite</h4>
+<a target="_blank" href="https://www.libreoffice.org/">LibreOffice</a> is the best replacement for Microsoft Word, Powerpoint and others.
+<h4>Antivirus</h4>
+You don't need an antivirus if you don't install suspicious applications. Common sense should you get you through nearly everything (plus some browser addons like noscript)
+
+<h4>SSH / FTP</h4>
+<a target="_blank" href="https://www.putty.org/">Putty</a> for SSH, and <a target="_blank" href="https://winscp.net/eng/download.php">WinSCP</a> for FTP. I recommended WinSCP to friends and everyone loved it way more than Filezilla.
+
+<h4>PDF Reader</h4>
+<a target="_blank" href="https://www.sumatrapdfreader.org/free-pdf-reader.html">Sumatra PDF</a>. Simple, Lightweight and really fast. Adobe Reader is proprietary.
+
+<h4>Browser</h4>
+Currently <a target="_blank" href="https://www.mozilla.org/de/firefox/new/">Firefox</a> is the best choice. Avoid google chrome and derivates that are not focused on security.<br>
+Another recommendation that slowly rises in popularity is <a target="_blank" href="https://astian.org/en/midori-browser/">Midori</a>, a simple and electron based chromium browser without any google services.
+<h4>Firefox Browser Addons</h4>
+<ul>
+<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/noscript/">NoScript</a> - to protect yourself from evil javascript on sites you don't trust</li>
+<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/">uBlock Origin</a> - the best and only adblock you need</li>
+<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/clearurls/">ClearURLs</a> - to remove tracking information from URLs automatically</li>
+<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/decentraleyes/">Decentraleyes</a> - hosts your CDN content locally, disabling these type of networks to track you</li>
+</ul>
+These are all "must haves" in my opinion. NoScript disables all javascript, which makes websites not able to load anything except HTML and CSS. From malicious code to cookie scripts, nothing runs without your allowance.<br>
+ublock Origin is the better, non-biased version of adblock plus and thus preferred.<br>
+ClearURLs makes amazon links way smaller and disables amazon from tracking you to your family. Same with Decentraleyes, which disables CDNs from tracking you.<br>
+If you need multiple identities in one browser then use <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/">Firefox Multi-Account Containers</a>, which let's you (for example) have multiple twitter accounts logged-in in the same browser window.
+
+<h4>File Hosting (Cloud Drive)</h4>
+The best solution to google drive, dropbox and co. is self-hosting a <a target="_blank" href="https://nextcloud.com/">Nextcloud</a> instance. It can run on a dedicated Linux Server or a raspberry pi.<br>
+If you don't, won't or can't host your own a public instance can be found on <a target="_blank" href="https://disroot.org/de/services/nextcloud">https://disroot.org/de/services/nextcloud</a>
+
+<h4>File deleting</h4>
+To safely delete files (so that no one can recover them) use <a target="_blank" href="https://www.bleachbit.org/download">BleachBit</a> on windows or the "shred" command on Linux.<br>
+<b>Warning</b>: The "shred" command doesn't fully delete the file from the hard drive if (for example) swap files have been created of it from editors like vim or nano, because the .swap file could be somewhere else on the hard drive and thus still be retrievable.
+
+<h4>Instant Messaging</h4>
+<a target="_blank" href="https://signal.org/en/">Signal</a> is the best instant messaging application out right now. Forget Telegram and WhatsApp. For PC instant messaging IRC or Matrix are good choices.
+
+<h4>Emails</h4>
+<a target="_blank" href="https://www.thunderbird.net/de/?lang=en-US">Thunderbird</a> is the best choice here. Simple, easy to use and a lot of features.<br>
+It is highly recommended to not use google's mail (gmail) for your mailing provider. Google tracks everything you do and has a "contract" with the NSA to hand over any data they have of you, including ALL your emails. Instead it is recommended to take an email provider of a country that is not considered a part of the "fourteen-eyes" countries (<a href="https://privacyguides.org/providers/#ukusa" target="_blank">https://privacyguides.org/providers/#ukusa</a>) or atleast using encryption for your mails if inside these countries.<br>
+An example would be: <a target="_blank" href="https://disroot.org">disroot.org</a> (which needs a manual registration for an email account, but is free forever) - disroot uses disk encryption and is working on an end-2-end inbox encryption.<br>
+All providers:<br>
+<ul>
+<li><a target="_blank" href="https://privacyguides.org/providers/email/">https://privacyguides.org/providers/email/</a></li>
+<li><a target="_blank" href="https://thenewoil.org/email.html">https://thenewoil.org/email.html</a></li>
+<li><a target="_blank" href="https://www.privacytools.io/#email">https://www.privacytools.io/#email</a></li>
+<li><a target="_blank" href="https://www.privacybytes.com/tools/#email-hosting">https://www.privacybytes.com/tools/#email-hosting</a></li>
+<li><a target="_blank" href="https://mailcow.email/">Hosting your own on with mailcow</a></li>
+<li><a target="_blank" href="https://mailinabox.email/">Hosting your own on with mail-in-a-box</a></li>
+</ul>
+<br>
+If you are really paranoid you can also use a "mail alias" service. An oftne recommended one is <a target="_blank" href="https://simplelogin.io">https://simplelogin.io</a>. It lets you create new email addresses which forward incoming emails to your real one, which means you can use a new email for every service you sign up for without creating a lot of email accounts.
+
+<h4>Multimedia</h4>
+For watching videos and listening to music use <a target="_blank" href="https://www.videolan.org/vlc/index.html">VLC</a>.<br>
+For ripping and converting DVDs use <a target="_blank" href="https://www.makemkv.com/">MakeMKV</a> and <a target="_blank" href="https://handbrake.fr/">Handbrake</a>.<br>
+For cutting videos use <a target="_blank" href="https://shotcut.org/">Shotcut</a>.<br>
+For graphic related work use either <a target="_blank" href="https://www.gimp.org/">Gimp</a> or <a target="_blank" href="https://inkscape.org/">InkScape</a>.<br>
+For 3D Modeling use <a target="_blank" href="https://www.blender.org/">Blender</a>.
+
+<h4>Comic Reader</h4>
+<a target="_blank" href="https://github.com/ahodesuka/ahoviewer">Ahoviewer</a> is free and open source.
+
+<h4>Data Recovery</h4>
+<a target="_blank" href="https://www.cgsecurity.org/wiki/TestDisk_Download">TestDisk</a> and <a target="_blank" href="https://www.ccleaner.com/recuva">Recuva</a> are recommended. A friend of mine recently tried Recuva and was successfull in recovering old data.
+
+<h4>Torrent</h4>
+Use <a target="_blank" href="https://sourceforge.net/projects/halite/">Halite</a>. It's small, fast and has neither advertisement nor other cancerous features.
+
+<h4>Others</h4>
+For other recommendations you can use <a target="_blank" href="https://wiki.installgentoo.com/wiki/List_of_recommended_Windows_software">https://wiki.installgentoo.com/wiki/List_of_recommended_Windows_software</a> or simply duckduckgo' on your own for Free and Open Source Software Alternatives.
+</p>
+
+<h2 id="sources">Sources & Further reading</h2>
+<p>
+<ul>
+<li><a target="_blank" href="https://www.privacytools.io/">https://www.privacytools.io/</a></li>
+<li><a target="_blank" href="https://prism-break.org/">https://prism-break.org/</a></li>
+<li><a target="_blank" href="https://disroot.org/">https://disroot.org/</a></li>
+<li><a target="_blank" href="https://www.privacybytes.com/tools/">https://www.privacybytes.com/tools/</a></li>
+<li><a target="_blank" href="https://prism-break.org/en/">https://prism-break.org/en/</a></li>
+<li><a target="_blank" href="https://thenewoil.org/">https://thenewoil.org/</a></li>
+<li><a target="_blank" href="https://techlore.tech">https://techlore.tech</a></li>
+<li><a target="_blank" href="https://ghacks.net">https://ghacks.net</a></li>
+<li><a target="_blank" href="https://privacytools.io">https://privacytools.io</a></li>
+<li><a target="_blank" href="https://chrisx.xyz/blog/yet-another-firefox-hardening-guide/">https://chrisx.xyz/blog/yet-another-firefox-hardening-guide/</a></li>
+<li><a target="_blank" href="https://privacyguides.org">https://privacyguides.org</a></li>
+<li>A very good read for totally paranoid people: <a target="_blank" href="https://anonymousplanet.org/">https://anonymousplanet.org/</a>, specifically the PDF about becoming completely anonymous (<a target="_blank" href="https://anonymousplanet.org/guide.pdf">https://anonymousplanet.org/guide.pdf</a>)</li>
+</ul>
+</p>
+
+<br><br><br>
+</body>
+</html>
+

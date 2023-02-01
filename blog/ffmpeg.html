@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ffmpeg | shira.at</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="https://shira.at/style.css">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ffmpeg | shira.at</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#common-flags">Common flags</a>
+<ul>
+<li><a href="#compress-video">Compress video</a></li>
+<li><a href="#remove-audio-video">Remove Audio / Video</a></li>
+<li><a href="#example-convert-video-to-audio">Example: Convert video to audio</a></li>
+<li><a href="#change-codecs">Change Codecs</a></li>
+<li><a href="#copy-all-input-codecs-to-output">Copy all input codecs to output</a></li>
+<li><a href="#convert-music-to-lower-bitrate">Convert Music to lower bitrate</a></li>
+<li><a href="#aspect-ratio">Aspect ratio</a></li>
+<li><a href="#double-speed-of-video-0.5-x2">Double Speed of video (0.5 = x2)</a></li>
+<li><a href="#double-audio-speed">Double audio speed</a></li>
+<li><a href="#set-bitrate">Set bitrate</a></li>
+<li><a href="#volume-of-audio">Volume of audio</a></li>
+<li><a href="#change-scale-of-video">Change scale of video</a></li>
+<li><a href="#crop-cut-video">Crop (Cut) Video</a></li>
+<li><a href="#video-to-images">Video to images</a></li>
+<li><a href="#add-text-to-the-video">Add Text to the video</a></li>
+<li><a href="#combine-2-videos">Combine 2 videos</a></li>
+<li><a href="#convert-a-video-from-30-to-60-fps">Convert a video from 30 to 60 FPS</a></li>
+<li><a href="#make-2-input-files-side-by-side">Make 2 input files side by side</a></li>
+<li><a href="#cut-video">Cut Video</a></li>
+<li><a href="#burn-in-subtitles">Burn in subtitles</a></li>
+<li><a href="#convert-a-folder-from-mp4-to-mp3">Convert a folder from mp4 to mp3</a></li>
+<li><a href="#compress-a-folder-with-only-2-threads-2-cpu-cores">Compress a folder with only 2 threads (2 cpu cores)</a></li>
+</ul></li>
+<li><a href="#complex-example-commands">Complex Example Commands</a>
+<ul>
+<li><a href="#convert-gif-to-mp4-file">Convert gif to mp4 file</a></li>
+<li><a href="#create-a-meme-video-with-white-bar-and-text-ontop-of-a-video">Create a meme video with white bar and text ontop of a video</a></li>
+<li><a href="#meme-video-with-top-and-bottom-white-bars-and-text">Meme video with top and bottom white bars and text</a></li>
+<li><a href="#convert-15fps-mkv-with-subtitles-to-mp4">Convert 15fps mkv with subtitles to mp4</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="about">About</h1>
+<p>ffmpeg is a commandline tool to convert media (audio, video) into different formats, manipulate or compress them, put filters on, etc. .</p>
+<p>This is a list of ffmpeg flags and commands I commonly use.<br />
+This is neither a complete list nor a guide on how to use ffmpeg.<br />
+If the code doesn’t start with <code>ffmpeg</code> then it’s only the middle part.<br />
+This middle part needs to be inserted <code>ffmpeg -i input.mp4 &lt;here&gt; output.mp4</code>.</p>
+<h1 id="common-flags">Common flags</h1>
+<h2 id="compress-video">Compress video</h2>
+<p>Should be between 20 and 28 for good quality.<br />
+The lower the bigger the filesize.<br />
+51 is max compression and looks very bad.<br />
+A good value is 25 for compression/filesize balance.</p>
+<pre><code>ffmpeg -i input.mp4 -crf 25 output.mp4</code></pre>
+<h2 id="remove-audio-video">Remove Audio / Video</h2>
+<pre><code>-an
+-vn</code></pre>
+<h2 id="example-convert-video-to-audio">Example: Convert video to audio</h2>
+<pre><code>ffmpeg -i input_video.mp4 -vn output_audio.mp3</code></pre>
+<h2 id="change-codecs">Change Codecs</h2>
+<p>vcodec changes the video’s codec and acodec the audio one.<br />
+copy means it takes the input straight to the output. This makes it way faster.</p>
+<pre><code>-vcodec h264
+-vcodec libvpx
+-vcodec copy
+
+-acodec aac
+-acodec mp3
+-acodec copy</code></pre>
+<h2 id="copy-all-input-codecs-to-output">Copy all input codecs to output</h2>
+<p>With this you take the input video and audio and copy it to output.<br />
+This makes cutting videos (e.g. by time) very quick as no converting takes place.</p>
+<pre><code>ffmpeg -i input.mp4 -c copy output.mp4</code></pre>
+<h2 id="convert-music-to-lower-bitrate">Convert Music to lower bitrate</h2>
+<pre><code>-map 0:a:0 -b:a 96k</code></pre>
+<h2 id="aspect-ratio">Aspect ratio</h2>
+<pre><code>-aspect 16:9</code></pre>
+<h2 id="double-speed-of-video-0.5-x2">Double Speed of video (0.5 = x2)</h2>
+<pre><code>-vf &quot;setpts=0.5*PTS&quot;</code></pre>
+<h2 id="double-audio-speed">Double audio speed</h2>
+<pre><code>ffmpeg -i input.mp4 -filter:a &quot;atempo=2.0&quot; -vn output.mp3</code></pre>
+<h2 id="set-bitrate">Set bitrate</h2>
+<pre><code>-b:v 1M
+-b:a 96k</code></pre>
+<h2 id="volume-of-audio">Volume of audio</h2>
+<pre><code>ffmpeg -i input.mp3 -af &#39;volume=1.5&#39; output.mp3</code></pre>
+<h2 id="change-scale-of-video">Change scale of video</h2>
+<p>iw = width, ih = height, -1 means auto<br />
+The first example command halfs the width (and height automatically)<br />
+The second one sets the width and height (and thus the aspect ratio) explicitly</p>
+<pre><code>-vf scale=&quot;iw/2:-1&quot;
+-vf scale=&quot;1280:720&quot;</code></pre>
+<h2 id="crop-cut-video">Crop (Cut) Video</h2>
+<p>w = width of output video<br />
+x = left top startpoint for the rectangle</p>
+<pre><code>ffmpeg -i input.mp4 -filter:v &quot;crop=w:h:x:y&quot; output.mp4</code></pre>
+<h2 id="video-to-images">Video to images</h2>
+<p>Names are image-001.png, image-002.png, …<br />
+-r = framerete in which screenshots are taken, default=25<br />
+%3d = name, 001 - 999</p>
+<pre><code>ffmpeg -i input.mp4 -r 1 -f image2 image-%3d.png</code></pre>
+<h2 id="add-text-to-the-video">Add Text to the video</h2>
+<pre><code>-vf drawtext=&quot;text=&#39;MyTextHere&#39;: fontcolor=white: fontsize=24: x=(w-text_w)/2: y=(h-text_h)/2&quot;</code></pre>
+<h2 id="combine-2-videos">Combine 2 videos</h2>
+<pre><code>ffmpeg -i in_one.mp4 -c copy -bsf:v h264_mp4toannexb -f mpegts _1.ts
+ffmpeg -i in_two.mp4 -c copy -bsf:v h264_mp4toannexb -f mpegts _2.ts
+ffmpeg -i &quot;concat:_1.ts|_2.ts&quot; -c copy -bsf:a aac_adtstoasc together.mp4</code></pre>
+<h2 id="convert-a-video-from-30-to-60-fps">Convert a video from 30 to 60 FPS</h2>
+<pre><code>ffmpeg -i Input.mp4 -filter:v &quot;minterpolate=&#39;fps=60&#39;&quot; Out60.mp4</code></pre>
+<h2 id="make-2-input-files-side-by-side">Make 2 input files side by side</h2>
+<pre><code>ffmpeg -i 30.mp4 -i 60.mp4 -filter_complex hstack comparison.mp4</code></pre>
+<h2 id="cut-video">Cut Video</h2>
+<p>The time either in 00:01:23.000 or in seconds format, here seconds are used<br />
+This example would cut the video, so that only seconds 3 to 8 plays<br />
+aka. 5 seconds long output video -t = duration, -ss = starttime</p>
+<pre><code>ffmpeg -i input.mp4 -ss 3 -t 5 output.mp4</code></pre>
+<h2 id="burn-in-subtitles">Burn in subtitles</h2>
+<pre><code>ffmpeg -i in.mkv -vf subtitles=in.mkv out.mp4</code></pre>
+<h2 id="convert-a-folder-from-mp4-to-mp3">Convert a folder from mp4 to mp3</h2>
+<pre><code>for i in *.mp4; do ffmpeg -i &quot;$i&quot; &quot;$(basename &quot;$i&quot; .mp4)&quot;.mp3  ; done</code></pre>
+<h2 id="compress-a-folder-with-only-2-threads-2-cpu-cores">Compress a folder with only 2 threads (2 cpu cores)</h2>
+<pre><code>for i in *.mp4; do ffmpeg -i &quot;$i&quot; &quot;_$(basename &quot;$i&quot; .mp4)&quot;.mp4 ; done</code></pre>
+<h1 id="complex-example-commands">Complex Example Commands</h1>
+<h2 id="convert-gif-to-mp4-file">Convert gif to mp4 file</h2>
+<p>Source: <a href="https://web.dev/replace-gifs-with-videos/">https://web.dev/replace-gifs-with-videos/</a></p>
+<pre><code>ffmpeg -i my-animation.gif -vf &quot;crop=trunc(iw/2)*2:trunc(ih/2)*2&quot; -b:v 0 -crf 25 -f mp4 -vcodec libx264 -pix_fmt yuv420p my-animation.mp4</code></pre>
+<h2 id="create-a-meme-video-with-white-bar-and-text-ontop-of-a-video">Create a meme video with white bar and text ontop of a video</h2>
+<pre><code>ffmpeg -i inputfile.mp4 -filter_complex \
+&quot;[0:v]pad=iw:ih+100:0:(oh-ih)/2+50:color=white, \
+ drawtext=text=&#39;Me coming to my wife&#39;s funeral&#39;:fontsize=42:x=(w-tw)/2:y=(100-th)/2&quot; \
+outputfile.mp4</code></pre>
+<h2 id="meme-video-with-top-and-bottom-white-bars-and-text">Meme video with top and bottom white bars and text</h2>
+<pre><code>ffmpeg -i input.mp4 -filter_complex \
+&quot;[0:v]pad=iw:ih+100:0:(oh-ih)/2:color=white, \
+ drawtext=text=&#39;ONE DOES NOT SIMPLY&#39;:fontsize=24:x=(w-tw)/2:y=(50-th)/2, \
+ drawtext=text=&#39;STOP ME FROM FILTERING&#39;:fontsize=24:x=(w-tw)/2:y=h-25-(th/2)&quot; \
+output.mp4</code></pre>
+<h2 id="convert-15fps-mkv-with-subtitles-to-mp4">Convert 15fps mkv with subtitles to mp4</h2>
+<p>The input file is a 15fps and full HD .mkv video with external subtitles and unoptimized, weird encodings.<br />
+This command makes it into a 30fps normal HD .mp4 video with the subtitles burned into the video and encodings that are optimized and widely acknowledged (h264/aac).</p>
+<pre><code>ffmpeg -i input.mkv -vf &quot;subtitles=input.mkv,scale=1280:720&quot; -crf 25 -vcodec h264 -acodec aac -r 30 output.mp4</code></pre>
+</body>
+</html>

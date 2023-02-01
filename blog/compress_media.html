@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>compressing media | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+</style>
+</head>
+<body>
+<h1>Compressing pictures and videos</h1>
+
+<ul>
+<li><a href="#preamble">Preamble</a></li>
+<li><a href="#images-jpg">Compressing .jpg images</a></li>
+<li><a href="#images-png">Compressing .png images</a></li>
+<li><a href="#videos">Compressing videos</a></li>
+</ul>
+
+<h3 id="preamble">Preamble</h3>
+<p>
+This article explains how to reduce the filesize of videos and pictures.<br>
+This is not an analysis about the different compression methods or how they compare in their algorithm against each other.<br>
+This is a simple comparison of my own experiments and methods on how to reduce filesizes.<br>
+To install the tools mentioned here:
+<ul>
+<li><a target="_blank" href="https://0xacab.org/jvoisin/mat2">mat2</a> - installed via git clone</li>
+<li><a target="_blank" href="https://github.com/tjko/jpegoptim">jpegoptim</a> - via <span>sudo apt-get install jpegoptim</span></li>
+<li><a target="_blank" href="https://pngquant.org/">pngquant</a> - via <span>sudo apt-get install pngquant</span></li>
+<li><a target="_blank" href="https://ffmpeg.org/">ffmpeg</a> - via <span>sudo apt-get install ffmpeg</span></li>
+</ul>
+</p>
+
+<h3 id="images-jpg">Compressing .jpg images</h3>
+<p>
+I tried to compress the following image of Megumi Koneko with jpegoptim:<br>
+<img src="files/megumi_koneko_katherine_regular_21.jpg">
+<br>
+My findings: The metadata of image files can be HUGE. I tried to compress the image with jpegoptim but the filesize wouldn't change much. Then I tried to remove the Metadata of it and it reduced the filesize by an immensely 80%!<br>
+<br>
+The following table shows the filesize of the image in corrolation to what commands were ran:<br>
+<table>
+<tr><th>Size(bytes)</th><th>Size(MB)</th><th>Methods used</th></tr>
+<tr><td>8872122</td><td>8.5M</td><td>None (=input file)</td></tr>
+<tr><td>8872122</td><td>8.5M</td><td>jpegoptim</td></tr>
+<tr><td>1407225</td><td>1.4M</td><td>mat2</td></tr>
+<tr><td>1302516</td><td>1.3M</td><td>mat2 + jpegoptim</td></tr>
+</table>
+<br>
+As you can see the optimization alone didn't accomplish much, but if you clean up the metadata most of the filesize is gone!<br>
+An important detail here: Using jpegoptim BEFORE the metadata removal doesn't optimize the file at all, only afterwards jpegoptim reduced the filesize by 0.1MB.<br>
+An example with a different folder of Megumi Koneko's shooting pictures:<br>
+<pre>
+user@fedora:~/temp$ du -sh Rurika_HD_Set/
+<b>469M</b>    Rurika_HD_Set/
+user@fedora:~/temp$ <b>mat2 --inplace Rurika_HD_Set/*</b>
+user@fedora:~/temp$ du -sh Rurika_HD_Set/
+<b>77M</b>     Rurika_HD_Set/
+user@fedora:~/temp$ jpegoptim Rurika_HD_Set/*
+[...]
+user@fedora:~/temp$ du -sh Rurika_HD_Set/
+72M     Rurika_HD_Set/
+</pre>
+I saved nearly 400MB (!!) of my 470MB collection simply by removing metadata.<br>
+<br>
+TL;DR: If you have studio-quality pictures (or shooting pictures) removing the metadata can save a lot more disk space than only using jpegoptim.
+</p>
+
+<h3 id="images-png">Compressing .png images</h3>
+<p>
+The same concept as above applies for .png images aswell: Use mat2 to remove metadata and then use <span>pngquant</span> to optimize the image.<br>
+<br>
+As an example here is a character of the mobile game "Arknights" with a transparent background.<br>
+To compress the image I used the following command:<br>
+<pre>
+pngquant -v --skip-if-larger -s 1 -f --ext .png filename.png
+</pre>
+Explanation of the command above: -v makes it verbose, skip-if-larger is self-explanatory, -s 1 means "brute-force the optimization as good as possible", --ext .png sets the output filename to be the same as the input filename and -f forces the output file to overwrite the input file (because they have the same name thanks to --ext .png).
+<br>
+<br>
+With this the filesize went from 728KB to 189KB (!).<br>
+A comparison of both of these files (left unoptimized, right optimized):<br>
+<img style="float:left;max-width:380px;" src="files/arknights.png">
+<img style="float:right;max-width:380px;" src="files/arknights-fs8.png">
+<br><br>
+Barely any noticeable difference between the two, while the filesize is more than halfed!
+</p>
+
+<h3 id="videos">Compressing videos</h3>
+<p>
+Videos are optimized a bit differently than images. You mainly use the tool <span>ffmpeg</span> to run as many commands as you need.<br>
+<br>
+To simply compress a video you can use <span>ffmpeg -i "input.mp4" -crf 25 output.mp4</span>. crf means "constant rate factor" and the higher you set it the more compressed the videos get. 25 is a good number for compression vs quality, and the video quality is always acceptible with it.<br>
+<br>
+An example to compress an old video further: You can change the codecs to more modern ones. Simply add <span>-vcodec h264 -acodec aac</span> inside the ffmpeg command to change the codecs to h264/aac respectively. (This would make the command look like <span>ffmpeg -i "input.mp4" -crf 25 -vcodec h264 -acodec aac output.mp4</span>)<br>
+<br>
+If the framerate of the video is 60 you could lower it to 30 to save even more space. Simply add <span>-r 30</span> inside the ffmpeg command to limit the framerate to 30.<br>
+<br>
+Last but not least: Some videos have an extremely high resolution (e.g. 4K) and you can save a LOT of space if you limit the resolution to a lower one. Simply add <span>-vf "scale=1280:720"</span> to set the resolution of the output video to HD.<br>
+<br>
+With all the optimizations combined the command would look like:<br>
+<pre>
+ffmpeg -i "input.mp4" -crf 25 -vcodec h264 -acodec aac -r 30 -vf "scale=1280:720" output.mp4
+</pre>
+This once lowered the filesize of a 4K 30min video from 3.2GB down to 800MB (!).<br>
+<br>
+Another example would be NVidia's Shadowplay function: I sometimes clip gameplay videos that are 1 minute long, are in FullHD resolution and in 60fps. These clips are 330MB for one minute of video. If I simply run <span>ffmpeg -i "Gameplay 03.02.2022.mp4" -crf 25 _gameplay_20220203.mp4</span> it reduces the filesize down to 100MB or even as low as 30MB with games like Phasmophobia!<br>
+An example:
+<pre>
+user@debian:~/Videos$ ls -ahl
+-rwxrwxrwx 1 user user <b>341M</b> Jan 22 16:41 'divinity2_20220122_16.mp4'
+user@debian:~/Videos$ ffmpeg -i "divinity2_20220122_16.mp4" <b>-crf 25</b> _divinity2_20220122_16.mp4
+user@debian:~/Videos$ ls -ahl _divinity2_20220122_16.mp4
+-rwxrwxrwx 1 user user <b>54M</b> Feb  3 10:31 _divinity2_20220122_16.mp4
+</pre>
+<br>
+Using ffmpeg to either optimize or compress the video to sizes you think are reasonably enough is a great way to save a lot of storage space.
+</p>
+
+
+<br><br><br>
+</body>
+</html>

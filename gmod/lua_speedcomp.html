@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>gLUA Optimization Check | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Checking Optimizations in gLUA</h1>
+<br>
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#forloops">pairs vs ipairs vs for i=1</a></li>
+<li><a href="#vectors">Distance vs DistToSqr</a></li>
+<li><a href="#inserttables">table.insert vs table[#table+1] = </a></li>
+<li><a href="#tablehasvalue">table.HasValue(table,x) vs table[x]</a></li>
+<li><a href="#concatstrings">String Concat vs Table Concat</a></li>
+<li><a href="#multvsdiv">Multiplication vs Division</a></li>
+<li><a href="#localspeed">Local vs Global Speed</a></li>
+<li><a href="#squaredslow">x^2 vs x*x</a></li>
+<li><a href="#whilefor">while vs for</a></li>
+<li><a href="#localcolor">local Color() vs Color()</a></li>
+</ul>
+<br>
+
+<h3 id="about">About</h3>
+<p>
+These are a few benchmarks that are tested on a Garry's Mod Server idling with DarkRP with only 1 player online.<br>
+Some of those benchmarks, if possible, were also tested in a LUA5.3 console on Debian 10.<br>
+<br>
+The goal of this collection of benchmarks is to show the actual performance gain by implementing "Coding Tips" from the web.<br>
+<br>
+The sources for some of the "Coding Tips" are:
+</p>
+<ul>
+<li><a href="http://lua-users.org/wiki/OptimisationCodingTips" target="_blank">http://lua-users.org/wiki/OptimisationCodingTips</a></li>
+<li><a href="https://www.lua.org/gems/sample.pdf" target="_blank">https://www.lua.org/gems/sample.pdf</a></li>
+<li><a href="https://stackoverflow.com/questions/154672/what-can-i-do-to-increase-the-performance-of-a-lua-program/12865406#12865406" target="_blank">https://stackoverflow.com/questions/154672/what-can-i-do-to-increase-the-performance-of-a-lua-program/12865406#12865406</a></li>
+</ul>
+
+
+<h3 id="forloops">pairs vs ipairs vs for i=1</h3>
+<p>
+TL;DR: Doing a <span>for i=1, #table do</span> loop is way faster than a <span> for k,v in pairs(table) do</span> loop. ipairs is around as fast as <span>for i=1</span>.<br>
+<br>
+The result:</p>
+<pre>
+for i=1:  0.00000019999993128295 (1.9999993128295e-07)
+ipairs:   0.00000069999998686399 (6.9999998686399e-07)
+pairs:    0.011984699999971
+</pre>
+The code:<br>
+<pre>
+local testab = {}
+for i=1,10000 do
+  testab[math.random()] = math.random()
+end
+
+local a = nil
+local ss = SysTime()
+for k,v in pairs(testab) do
+  a = k..v
+end
+local es = SysTime()
+print("pairs: "..(es-ss))
+print(a)
+local ss = SysTime()
+for k,v in ipairs(testab) do
+  a = k..v
+end
+local es = SysTime()
+print("ipairs: "..(es-ss))
+print(a)
+local ss = SysTime()
+for i=1, #testab do
+  a = i..testab[i]
+end
+local es = SysTime()
+print("i=1: "..(es-ss))
+print(a)
+</pre>
+
+
+
+<h3 id="vectors">Distance vs DistToSqr</h3>
+<p>
+TL;DR: The time difference between Distance and DistToSqr is barely noticable.<br>
+<br>
+The result (average of 10000 calculations):</p>
+<pre>
+Distance:   0.00000026040000557259 (2.6040000557259e-07)
+DistToSqr:  0.00000025130000176432 (2.5130000176432e-07)
+</pre>
+The Code:<br>
+<pre>
+local res1 = {}
+local res2 = {}
+for i=1,10000 do
+  local one = Vector(math.random(),math.random(),math.random())
+  local two = Vector(math.random(),math.random(),math.random())
+
+  local ss = SysTime()
+  a = one:Distance(two)
+  local es = SysTime()
+  table.insert(res1,es-ss)
+  
+  local ss = SysTime()
+  a = one:DistToSqr(two) 
+  local es = SysTime()
+  table.insert(res2,es-ss)
+end
+
+local b = 0
+for k,v in pairs(res1) do
+  b = b + v
+end
+print("Distance: "..(b/#res1))
+local c = 0
+for k,v in pairs(res2) do
+  c = c + v
+end
+print("DistToSqr: "..(c/#res2))
+</pre>
+
+
+<h3 id="inserttables">table.insert vs table[#table+1] = </h3>
+<p>
+TL;DR: The time difference between using <span>table.insert(myTable,9)</span> and <span>myTable[#myTable+1] = 9</span> is barely noticable, as the results were mostly the same. (Even if tested on Lua5.3 console)<br>
+<br>
+The result (inserting 1million values):</p>
+<pre>
+table.insert:         0.066328400000003
+local table.insert:   0.07047399999999
+[#res+1]:             0.066876700000023
+</pre>
+The Code:<br>
+<pre>
+local res1 = {}
+local res2 = {}
+local res3 = {}
+local intab = {}
+for i=1,1000000 do
+  table.insert(intab,math.random())
+end
+local ss = SysTime()
+for i=1,1000000 do
+  table.insert(res1,intab[i])
+end
+local es = SysTime()
+print("table.insert: "..(es-ss))
+
+local lInsert = table.insert
+local ss = SysTime()
+for i=1,1000000 do
+  lInsert(res2,intab[i])
+end
+local es = SysTime()
+print("local table.insert: "..(es-ss))
+
+local ss = SysTime()
+for i=1,1000000 do
+  res3[#res3+1] = intab[i]
+end
+local es = SysTime()
+print("[#res+1]: "..(es-ss))
+</pre>
+
+<h3 id="tablehasvalue">table.HasValue(table,x) vs table[x]</h3>
+<p>
+TL;DR: Directly checking the table key with <span>table[value]</span> is faster.<br>
+<br>
+The result (1million lookups):</p>
+<pre>
+table.HasValue:   0.032319600000051
+table[value]:     0.00024150000001555
+
+</pre>
+The Code:<br>
+<pre>
+local HasValue = {"superadmin","admin","moderator"}
+local InTable = {
+  ["superadmin"] = true,
+  ["admin"] = true,
+  ["moderator"] = true,
+}
+local isAdmin = nil
+
+local ss = SysTime()
+for i=1,1000000 do
+  isAdmin = table.HasValue(HasValue,"moderator")
+end
+local es = SysTime()
+print("table.HasValue: "..(es-ss))
+
+local ss = SysTime()
+for i=1,1000000 do
+  isAdmin = InTable["moderator"]
+end
+local es = SysTime()
+print("table[x]: "..(es-ss))
+</pre>
+
+<h3 id="concatstrings">String Concat vs Table Concat</h3>
+<p>
+TL;DR: It is faster to add strings together via tables instead of stringing them together directly.<br>
+<br>
+The result (10000 strings):</p>
+<pre>
+<i>GMOD SERVERSIDE CONSOLE</i>
+String Concat:  0.32185959999993
+Table Concat:   0.0099451999999474
+<i>LUA5.3 CONSOLE</i>
+String Concat:  0.086629
+Table Concat:   0.006428
+</pre>
+The Code:<br>
+<pre>
+local res1 = ""
+local res2 = {}
+local intab = {}
+
+for i=1,10000 do
+  table.insert(intab,math.random())
+end
+
+local ss = SysTime()
+for i=1,10000 do
+  res1 = res1 .. intab[i]
+end
+local es = SysTime()
+print("String Concat: "..(es-ss))
+
+local ss = SysTime()
+for i=1,10000 do
+  res2[#res2+1] = intab[i]
+end
+res2 = table.concat(res2)
+local es = SysTime()
+print("Table Concat: "..(es-ss))
+</pre>
+<u>Note: To run this code in LUA5.3 directly simply replace the SysTime() with os.clock()</u>
+
+
+
+<h3 id="multvsdiv">Multiplication vs Division</h3>
+<p>
+TL;DR: In Garry's Mod it is not faster to calculate <span>x * 0.5</span> than <span>x / 2</span>.<br>
+BUT: It is faster to multiply instead of divide in LUA5.3.<br>
+<br>
+The result (100x 1000000 calculations):</p>
+<pre>
+<i>GMOD SERVERSIDE CONSOLE</i>
+Multiplication:   0.00081622600000003
+Division:         0.00081775100000215
+<i>LUA5.3 CONSOLE</i>
+Multiplication:   0.01865942
+Division:         0.02342666
+</pre>
+The Code:<br>
+<pre>
+a = 0
+b = 0
+at = {}
+bt = {}
+
+for i=1,100 do
+  intab = {}
+  for i=1,1000000 do
+    table.insert(intab,math.random())
+  end
+
+  ss = SysTime()
+  for i=1,1000000 do
+    a = intab[i] * 0.5
+  end
+  es = SysTime()
+  table.insert(at,(es-ss))
+
+  ss = SysTime()
+  for i=1,1000000 do
+    b = intab[i] / 2
+  end
+  es = SysTime()
+  table.insert(bt,(es-ss))
+end
+
+local s = 0
+for k,v in pairs(at) do
+  s = s + v
+end
+print("Multiplication: "..(s/#at))
+local s = 0
+for k,v in pairs(bt) do
+  s = s + v
+end
+print("Division: "..(s/#bt))
+</pre>
+<u>Warning: This takes a few seconds to calculate! Game may freeze!</u>
+
+
+<h3 id="localspeed">Local vs Global Speed</h3>
+<p>
+TL;DR: It is a little <i>itsy-bitsy</i> bit faster to make all variables local in Garry's Mod. (14% in this example)<br>
+<br>
+The result (100x 10000 calculations):</p>
+<pre>
+<i>GMOD SERVERSIDE CONSOLE</i>
+global math.sin:      0.0000059390000023996 (5.9390000023996e-06)
+local math.sin:       0.0000056840000024749 (5.6840000024749e-06)
+<i>LUA5.3 CONSOLE</i>
+global math.sin:      0.00057612
+local math.sin:       0.00049858
+</pre>
+The Code:<br>
+<pre>
+at = {}
+bt = {}
+
+for i=1,100 do
+  intab = {}
+  for i=1,10000 do
+    table.insert(intab,math.random())
+  end
+  
+  ss = SysTime()
+  for i=1,10000 do
+    local x = math.sin(intab[i]) 
+  end
+  es = SysTime()
+  table.insert(at,(es-ss))
+  
+  local localSin = math.sin
+  ss = SysTime()
+  for i=1,10000 do
+    local x = localSin(intab[i])
+  end
+  es = SysTime()
+  table.insert(bt,(es-ss))
+end
+
+local s = 0
+for k,v in pairs(at) do
+  s = s + v
+end
+print("global math.sin: "..(s/#at))
+local s = 0
+for k,v in pairs(bt) do
+  s = s + v
+end
+print("local math.sin: "..(s/#bt))
+</pre>
+
+
+
+<h3 id="squaredslow">x^2 vs x*x</h3>
+<p>
+TL;DR: Both are nearly the same in Garry's Mod. <span>x*x</span> is way faster in LUA5.3.<br>
+<br>
+The result (100x 10000):</p>
+<pre>
+<i>GMOD SERVERSIDE CONSOLE</i>
+x^x:    0.000076017000008051 (7.6017000008051e-05)
+x*x:    0.000071278999989772 (7.1278999989772e-05)
+<i>LUA5.3 CONSOLE</i>
+x^x:    0.00883908
+x*x:    0.0029428
+</pre>
+The Code:<br>
+<pre>
+at = {}
+bt = {}
+
+for i=1,100 do
+  intab = {}
+  for i=1,10000 do
+    table.insert(intab,math.random())
+  end
+  
+  ss = SysTime()
+  for i=1,10000 do
+    local x = math.sin(intab[i]) 
+  end
+  es = SysTime()
+  table.insert(at,(es-ss))
+  
+  local localSin = math.sin
+  ss = SysTime()
+  for i=1,10000 do
+    local x = localSin(intab[i])
+  end
+  es = SysTime()
+  table.insert(bt,(es-ss))
+end
+
+local s = 0
+for k,v in pairs(at) do
+  s = s + v
+end
+print("global math.sin: "..(s/#at))
+local s = 0
+for k,v in pairs(bt) do
+  s = s + v
+end
+print("local math.sin: "..(s/#bt))
+</pre>
+
+
+
+<h3 id="whilefor">while vs for</h3>
+<p>
+TL;DR: A for loop is way faster than while.<br>
+<br>
+The result (100x 10000):</p>
+<pre>
+<i>GMOD SERVERSIDE CONSOLE</i>
+while:    0.00000957507999874 (9.57507999874e-06)
+for:      0.0000024306500009516 (2.4306500009516e-06)
+<i>LUA5.3 CONSOLE</i>
+while:    0.00015975869999999
+for:      0.000092178400000006 (9.2178400000006e-05)
+</pre>
+The Code:<br>
+<pre>
+at = {}
+bt = {}
+
+for i=1,10000 do
+  intab = {}
+  for i=1,10000 do
+    table.insert(intab,math.random())
+  end
+  
+  ss = SysTime()
+  local i = 10000
+  while (i > 0) do
+    i = i - 1
+    local x = i
+  end
+  es = SysTime()
+  table.insert(at,(es-ss))
+  
+  ss = SysTime()
+  for i=1,10000 do
+    local x = i
+  end
+  es = SysTime()
+  table.insert(bt,(es-ss))
+end
+
+local s = 0
+for k,v in pairs(at) do
+  s = s + v
+end
+print("while: "..(s/#at))
+local s = 0
+for k,v in pairs(bt) do
+  s = s + v
+end
+print("for: "..(s/#bt))
+</pre>
+
+
+<h3 id="localcolor">local Color() vs Color()</h3>
+<p>
+TL;DR: Defining the color once is faster than using Color() in a loop.<br>
+<br>
+The result (1000 frames in SysTime() time taken):</p>
+<pre>
+<i>GMOD NAKED CLIENTSIDE</i>
+Local:     0.0000070583999997496 (7.0583999997496e-06)
+Non-Local: 0.0000091475999998067 (9.1475999998067e-06)
+</pre>
+The Code (first write "local" in chat, wait till the colors disappear, then "non" and after they disapper "result"):<br>
+<pre>
+hook.Add("OnPlayerChat","luctus_fps_test",function(ply,text,team,dead)
+  if text == "local" then
+    triggerLocalTest()
+  end
+  if text == "non" then
+    triggerNonTest()
+  end
+  if text == "result" then
+    local lRes = 0
+    local nRes = 0
+    for k,v in pairs(color_local_frametimes) do
+      lRes = lRes + v
+    end
+    for k,v in pairs(color_non_frametimes) do
+      nRes = nRes + v
+    end
+    chat.AddText("Tests: local="..#color_local_frametimes.." / non-local="..#color_non_frametimes)
+    chat.AddText("Local: "..(lRes/#color_local_frametimes))
+    chat.AddText("Non-Local: "..(nRes/#color_non_frametimes))
+  end
+end)
+
+
+color_local_frametimes = {}
+color_non_frametimes = {}
+
+function triggerNonTest()
+  local i = 0
+  hook.Add("HUDPaint","luctus_fps_test_non",function()
+    local ss = SysTime()
+    draw.RoundedBox(0, 500, 500, 500, 500, Color(100,200,100) )
+    draw.RoundedBox(0, 200, 200, 200, 200, Color(100,200,100) )
+    draw.RoundedBox(0, 10, 10, 10, 10, Color(100,200,100) )
+    table.insert(color_non_frametimes,SysTime()-ss)
+    i = i + 1
+    if i == 1000 then hook.Remove("HUDPaint", "luctus_fps_test_non") end
+  end)
+end
+
+function triggerLocalTest()
+  local i = 0
+  local color_local = Color(100,200,100)
+  hook.Add("HUDPaint","luctus_fps_test_local",function()
+    local ss = SysTime()
+    draw.RoundedBox(0, 500, 500, 500, 500, color_local )
+    draw.RoundedBox(0, 200, 200, 200, 200, color_local )
+    draw.RoundedBox(0, 10, 10, 10, 10, color_local )
+    table.insert(color_local_frametimes,SysTime()-ss)
+    i = i + 1
+    if i == 1000 then hook.Remove("HUDPaint", "luctus_fps_test_local") end
+  end)
+end
+</pre>
+
+<br><br><br>
+</body>
+</html>
+
+
+
+

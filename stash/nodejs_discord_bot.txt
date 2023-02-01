@@ -1,0 +1,41 @@
+// Source:   https://www.npmjs.com/package/discord.js
+// Website: https://discord.js.org/
+// Helpful:  https://discordjs.guide/#before-you-begin
+
+const Discord = require('discord.js');
+const client = new Discord.Client();
+ 
+client.on('ready', () => {
+  console.log(`Logged in as ${client.user.tag}!`);
+ });
+ 
+client.on('message', msg => {
+ if(msg.author.username === "heineMops"){
+  msg.channel.send("That was funny, thanks for your input!");
+ }
+ if(msg.author.username === "Tatsu"){
+  msg.react("♥");
+ }
+ if(msg.content.toLowerCase().includes("pizza")){
+  msg.reply("Pizza Diavolo!"); //msg.reply == "@user, <message>"
+ }
+ if(msg.author.username === "heineMops" && msg.content.includes("http")){
+  msg.channel.send("I don't like links!");
+ }
+ if (msg.content.toLowerCase() === "ping") {
+  msg.reply('pong');
+ }
+ if (msg.content.toLowerCase() === "e"){
+  const embed = new Discord.RichEmbed();
+  embed.setTitle("EmbedTitle");
+  embed.setColor(0xFF0000);
+  embed.setDescription("Hi, Embed Text!");
+  msg.channel.send(embed);
+ }
+ if (msg.content.toLowerCase() === "!bobross"){
+  const attachment = new Discord.Attachment("./bobross.png");
+  msg.channel.send(attachment);
+ }
+});
+ 
+client.login('<TOKEN_HERE>');

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>gitea | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>gitea install guide</h1>
+
+<ul>
+<li><a href="#whyusegitea">Why use gitea?</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#reverseproxy">Reverse-proxy via nginx</a></li>
+</ul>
+
+<h3 id="whyusegitea">Why use gitea?</h3>
+<p>
+What are the differences to github / gitlab?
+-> <a href="https://docs.gitea.io/en-us/comparison/">https://docs.gitea.io/en-us/comparison/</a><br><br>
+Gitea is a "github clone" that you can host yourself. With this you can (for example) host your own github locally without anyone having access to it. With github you have to pay to host private repositories.<br>
+Gitea can also run on a very small raspberry pi zero w without any performance issues. (The zero w has a single core ARM6 Processor)<br>
+It is written in go. The website is <a href="https://gitea.io/en-us/">https://gitea.io/en-us/</a>
+</p>
+
+<h3 id="installation">Installation</h3>
+<p>
+Requirements: Have git installed (example: <span>sudo apt-get install git</span>)
+<br><br>
+Get the latest version of gitea (binary) from gitea (<a href="https://dl.gitea.io/gitea/">https://dl.gitea.io/gitea/</a>) and make it executeable.<br>
+Example with version 1.13.0 on x64 linux (newest version as of 2020.12.26):
+<pre>
+wget -O gitea https://dl.gitea.io/gitea/1.13.0/gitea-1.13.0-linux-amd64
+chmod +x gitea
+</pre>
+<br>
+Add a user for gitea:<br>
+<pre>
+adduser \
+--system \
+--shell /bin/bash \
+--gecos 'Git Version Control' \
+--group \
+--disabled-password \
+--home /home/git \
+git
+</pre>
+<br>
+Create directory structure for gitea:<br>
+<pre>
+mkdir -p /var/lib/gitea/{custom,data,log}
+chown -R git:git /var/lib/gitea/
+chmod -R 750 /var/lib/gitea/
+mkdir /etc/gitea
+chown root:git /etc/gitea
+chmod 770 /etc/gitea
+</pre>
+<br>
+
+Now "Install" gitea:<br>
+<pre>
+cp gitea /usr/local/bin/gitea
+</pre>
+<br>
+Create service for gitea:<br>
+Download <a href="https://github.com/go-gitea/gitea/blob/master/contrib/systemd/gitea.service">https://github.com/go-gitea/gitea/blob/master/contrib/systemd/gitea.service</a> and move it to <span>/etc/systemd/system/gitea.service</span>
+<pre>
+wget https://github.com/go-gitea/gitea/blob/master/contrib/systemd/gitea.service
+sudo cp gitea.service /etc/systemd/system/gitea.service
+</pre>
+<br>
+Now start gitea:<br>
+<pre>
+sudo systemctl enable gitea --now
+</pre>
+<br>
+The default port for gitea is 3000.<br>
+<br>
+If you don't know what database you want:<br>
+Use SQLite3 if you don't have a lot of people working at once. SQLite3 is more minimalistic, but can't handle concurrent writing very well.<br>
+With MySQL, you need to have the mysql-server installed and set up with a new user and database.<br>
+With SQLite3, you don't have to install or setup anything, because the database is saved in a file locally.<br>
+Source: <a href="https://stackoverflow.com/a/6914810">https://stackoverflow.com/a/6914810</a><br><br>
+
+<h3 id="reverseproxy">Reverse-proxy via nginx</h3>
+If you want to reach it via <span>example.com/git</span> instead of <span>example.com:3000</span> then you can use a reverse proxy. This example requires you to have nginx installed.<br>
+Simply add the following to your server block:
+<pre>
+location /git/ {
+  proxy_pass http://localhost:3000/;
+}
+</pre>
+If you want to setup gitea via this reverse-proxy then you also have to do the following:<br>
+(You do not have to do this if you visit it via port 3000 to configure it!)<br>
+Change the ROOT_URL line in your gitea config (located at <span>/etc/gitea/app.ini</span> with Debian 10):<br>
+<pre>
+...
+[server]
+PROTOCOL = http
+DOMAIN = localhost
+ROOT_URL = http://localhost:3000/git/
+...
+</pre>
+If this line doesn't exist then create the code block from above and save the file.<br>
+<br>
+Then check the config via <span>sudo nginx -t</sudo>.<br>
+If there are no problems you can reload the config via <span>sudo nginx -s reload</span>.<br>
+</p>
+<br><br><br>
+</body>
+</html>

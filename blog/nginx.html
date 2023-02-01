@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>nginx | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>nginx CentOS 8 quickstart</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#install">Installation</a></li>
+<li><a href="#config">Config</a></li>
+<li><a href="#https">HTTPS with certbot</a></li>
+<li><a href="#reverseproxy">Reverse-Proxy</a></li>
+<li><a href="#php">PHP7</a></li>
+<li><a href="#password">Password Protect a folder</a></li>
+<li><a href="#performance">Performance limits</a></li>
+</ul>
+
+<h3 id="about">About nginx</h3>
+<p>
+NGINX is an alternative to apache2 / httpd.<br>
+It is faster, less complex and more often used in production environments than apache2.<br>
+Commonly used features are: Reverse-proxy, Handling SSL Certificates, load balancing and caching (files, FastCGI, uWSGI).<br>
+It creates (by default) one worker thread per CPU core available, and each core can handle up to 10.000 connections easily.<br>
+With a 2 core CPU you have 3 processes: 1 main and 2 worker. With HTTPD (Apache2) you have ~220 Processes / Worker Threads.<br>
+NGINX uses way less RAM and processes then apache2. (<a href="https://help.dreamhost.com/hc/en-us/articles/215945987-Web-server-performance-comparison">source</a>)<br>
+Warning: NGINX doesn't have a feature like .htaccess (but is faster because of that), so you have to deny access to folders via the nginx config instead of an .htaccess file.<br>
+It is way more difficult to install third-party modules into nginx then into apache2.<br>
+<br>
+Read more: <a href="https://en.wikipedia.org/wiki/Nginx">https://en.wikipedia.org/wiki/Nginx</a><br>
+Official site: <a href="https://www.nginx.com/company/">https://www.nginx.com/company/</a> (Official partners are IBM, Microsoft, redhat, AWS and more)<br>
+</p>
+
+<h3 id="install">Installation</h3>
+<p>Install nginx via <span>sudo yum install nginx</span><br>
+You may have to start and enable nginx manually via <span>sudo systemctl enable nginx --now</span><br>
+Default-Configuration is at <span>/etc/nginx/nginx.conf</span><br>
+Default-Webpages are located in  <span>/usr/share/nginx/html</span><br>
+If you can't connect check your firewall, maybe it blocks http / port 80 traffic.<br>
+To enable the HTTP and HTTPS via firewalld run the following:<br>
+<span>sudo firewall-cmd --permanent --add-service=http</span><br>
+<span>sudo firewall-cmd --permanent --add-service=https</span><br>
+<span>sudo firewall-cmd --reload</span><br>
+You should now be able to reach your website from your browser.
+</p>
+
+<h3 id="config">Config & Commands</h3>
+<p>Configurations for domains or subdomains are stored in <span>/etc/nginx/conf.d/</span> (on debian in <span>/etc/nginx/sites-available</span>)
+On debian, these files will be linked to the <span>/etc/nginx/sites-enabled</span> directory via the <span>ln -s</span> command.<br>
+To create your first file for your domain (we use the <span>example.com</span> domain here) simply create the file and paste your config in there: <span>sudo nano /etc/nginx/conf.d/example.com.conf</span> (on debian: <span>sudo nano /etc/nginx/site-available/example.com</span>)<br>
+<b>Warning</b>: On CentOS the config files <b>have to end with .conf</b>, or else they won't load.<br>
+Content of the file:<br>
+<pre>
+server {
+  listen 80;
+  listen [::]:80;
+  server_name example.com;
+  root /var/www/example.com;
+  index index.html;
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}
+</pre>
+Please be careful with the <span>root /var/www/example.com</span> line of the config.<br>
+This folder has to exist! This folder is your web folder, so everything in there will be publicly available via the server_name <span>example.com</span>.<br>
+For Debian users: To "activate" the config you have to symlink the file to the <span> sites-enabled</span> folder. To do this simply use the following command: <span>sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/example.com</span><br>
+To test your config file you can use the nginx test-config command: <span>sudo nginx -t</span><br>
+If there are no problems you can reload the config via <span>sudo nginx -s reload</span><br>
+</p>
+
+<h3 id="https">HTTPS</h3>
+<p>Having an HTTPS webserver is standard nowadays and easy to do aswell.<br>
+Install certbot to get ssl certificates for https: <span>sudo yum install certbot python-certbot-nginx</span><br>
+To Create these certificates just run the command (in our example for example.com and test.example.com):<br>
+<span>sudo certbot --nginx</span><br>
+For this command to work you need to have a config file with your <span>ServerName</span> already in the conf.d/ directory, because certbot will fetch all the ServerNames and generate HTTPS certificates automatically. You will get asked a few questions, just fill them out correctly. If certbot asks you if you want auto redirect from HTTP to HTTPS say Yes (the second option) so that traffic automatically runs on HTTPS only.<br>
+This redirect setting happens automatically on the newest Certbot version.<br>
+Afterwards check your firewall if you are allowing https traffic.<br>
+Then restart nginx with <span>sudo nginx -s reload</span> and you are good to go.<br>
+</p>
+
+<h3 id="reverseproxy">Reverse-Proxy</h3>
+<p>With nginx you can redirect URLs to your server to internal services on different ports / sockets.<br>
+This makes it easier to handle HTTPS (SSL) certificates for your services, because nginx can handle the HTTPS connections and internally redirect them to your applications in plain HTTP.<br>
+This way you don't have to install SSL modules into your applications, nginx handles all of that.<br>
+<br>
+For reverse-proxy to work under CentOS you have to enable the SELinux setting for it. Execute the following command for it to work:<br>
+<pre>
+setsebool -P httpd_can_network_connect 1
+</pre>
+<br>
+Now you can, for example, make a NodeJS http-server that listens on port 3000 available through your website via the <span>example.com/myapp/</span> url.<br>
+This exact scenario can easily be done with the nginx "location" block.<br>
+Simply add the following inside your server block:<br>
+<pre>
+location /myapp/ {
+  proxy_pass http://localhost:3000/;
+}
+</pre>
+Now people can access your nodejs app via <span>example.com/myapp/</span> instead of <span>example.com:3000/</span>. This way you also don't have to open port 3000.<br>
+The config file example from the <a href="#config">Config & Commands</a> Section of this article would then look like this:<br>
+<pre>
+server {
+  listen 80;
+  listen [::]:80;
+  server_name example.com;
+  root /var/www/example.com;
+  index index.html;
+  location / {
+    try_files $uri $uri/ =404;
+  }
+  location /myapp/ {
+    proxy_pass http://localhost:3000/;
+  }
+}
+</pre>
+<br>
+<b>Warning:</b> Be careful where you add the location block. If you already installed the HTTPS via certbot then you have to add the location block to the server block that listens on port 443 and NOT port 80.<br>
+The port 80 server block is then only there to redirect incoming requests to port 443.<br>
+<br>
+
+<b>Socket.io</b><br>
+If you want to use socket.io with a nginx reverse-proxy you have to add the following location block:<br>
+<pre>
+location ~* \.io {
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header Host $http_host;
+  proxy_set_header X-NginX-Proxy false;
+
+  proxy_pass http://localhost:3001;
+  proxy_redirect off;
+
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade";
+}
+</pre>
+Don't forget to change the port in the <span>proxy_pass</span> line.<br>
+</p>
+
+<h3 id="php">PHP with nginx</h3>
+<p>
+PHP is not that easy to install with nginx. It's not difficult, but definetely more work then with apache2.<br>
+First install the PHP backend <span>php-fpm</span>, which will most likely be version 7.2 for you. Example command: <span>sudo apt-get install php-fpm</span><br>
+Now check if php-fpm is actually running with the following command (replace version if yours is different):<br>
+<pre>
+sudo systemctl status php-fpm
+</pre>
+If it says enabled and running then you are good to go. If it doesn't state that then enable and start it via <span>sudo systemctl enable php-fpm --now</span>.<br>
+Now you have to configure nginx to use that PHP. Edit your nginx domain config (probably located at <span>/etc/nginx/conf.d/example.com</span>) and add the following code in your server block:<br>
+<pre>
+location ~ \.php$ {
+  include /etc/nginx/fastcgi_params;
+  fastcgi_index index.php;
+  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+  fastcgi_pass unix:/run/php-fpm/www.sock;
+}
+</pre>
+<br>
+<b>Debian only config:</b><br>
+<pre>
+location ~ \.php$ {
+  include snippets/fastcgi-php.conf;
+  fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+}
+</pre>
+Check your nginx config with <span>sudo nginx -t</span>.<br>
+If there are no problems then you can reload the config with <span>sudo nginx -s reload</span>.<br>
+Now you can create a test file and check if everything works:<br>
+simply create a file like <span>/usr/share/nginx/html/test.php</span> and write the php testcode <span><?php phpinfo(); ?></span> in the file and save it.<br>
+If you now visit that file on your website (example: <span>example.com/test.php</span>) it should print the phpinfo!<br>
+<br>
+Don't forget to change your "index" entry on your nginx config to include php files:<br>
+<pre>
+server {
+  index index.html index.php
+  ...
+}
+</pre>
+</p>
+
+<h3 id="password">Password Protect a folder</h3>
+<p>
+A simple password-protected folder can be achieved via .htpasswd files.<br>
+<pre>
+location /admin/ {
+  auth_basic "Admin Login";
+  auth_basic_user_file /etc/nginx/.htpasswd
+}
+</pre>
+If you want to have the .htpasswd file in your web folder then deny access to it:<br>
+<pre>
+location = /.htpasswd {
+  deny all;
+  return 404;
+}
+</pre>
+To create this file you can use the <span>apache2-utils</span> (Debian) or the <span>httpd-tools</span> (CentOS) tools.<br>
+After installing them you can use the following command to create a file and the first user:<span>sudo htpasswd -c /etc/nginx/.htpasswd chris</span><br>
+The password will be put in on the next line via an interactive console.<br>
+To create additional users remove the -c flag: <span>sudo htpasswd /etc/nginx/.htpasswd lukas</span><br>
+</p>
+
+<h3 id="performance">Performance limits</h3>
+<p>
+The nginx server is fast, but it also has it's limits.<br>
+One limit is the "max files open at once" linux limitation. A system can only have that many files open at once. To see the number you can use the <span>ulimit -a</span> command. These are the soft limits. The hard limits can be seen by appending an <span>-H</span> to the command. On Raspbian this is 1024 (soft) and 1048576 (hard).<br><br>
+Another big limit is the max connections a system can have. There are only so many ports the system can use.
+To see the number of ports you can use for connections use the following command: <span>cat /proc/sys/net/ipv4/ip_local_port_range</span>. On raspbian it is 32768-60999, which means around 25.000 Ports can be used, which means around 25.000 Connections can be handled at once.<br>
+But this value needs to be cut in half if you have a reverse-proxy running. This doubles the connection usage, as one connection is from the client to the server and another one goes from the server to the reverse-proxy location.<br><br>
+Last but not least: Your PHP-FPM / other backend application can be limited too. Your nginx worker threads may work fast, but if you have a PHP website and PHP-FPM is slow, then everything gets slowed down too.<br>
+</p>
+<br><br><br>
+</body>
+</html>

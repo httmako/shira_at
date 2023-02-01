@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>darkrp | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<span style="color:transparent;text-shadow: 0 0 0 black;font-size:5em;">💧</span>
+<h1>luctus' darkrp setup guide</h1>
+
+<ul>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#addons">Addons</a></li>
+<li><a href="#installing">Installing Addons</a></li>
+<li><a href="#recommended">Recommended Addons</a></li>
+<li><a href="#badaddons">Addons you should NOT get</a></li>
+<li><a href="#freeaddons">Free Addons</a></li>
+<li><a href="#autodownload">Make players download addons</a></li>
+<li><a href="#collections">About creating your own addon collections</a></li>
+<li><a href="#configuration">Configuration</a></li>
+<li><a href="#restrictions">Setting Restrictions</a></li>
+<li><a href="#other">Other important things</a></li>
+<li><a href="#rules">Roleplay Rules</a></li>
+<li><a href="#testing">Testing your server</a></li>
+<li><a href="#forum">Forum</a></li>
+</ul>
+
+<br>
+<h3 id="intro">Introduction</h3>
+<p>Please read this guide all the way through.<br>
+There are a lot of little helpful tips explained here.<br>
+For this guide you need a Garry's Mod server.<br>
+Before we begin: <b>Please do not buy any addons yet!</b><br>
+We will go over free addons and addons you should NOT get soon enough.<br>
+</p>
+
+
+<br>
+<h3 id="addons">Addons</h3>
+<p>Before we begin: Don't add too much stuff when first creating your server. Instead do not install a few addons and reserve them for future updates.<br>
+For example: You could keep a "Bank Robbery" addon not installed and install it later with the "Gangster Update".<br>
+<br>
+If you install all your addons at the beginning of your server, then people have to download a lot when joining. They also will get bored rather quickly because they have seen everything on your server.<br>
+With those "updates" and new addons people will come back to test things out and play again.
+<br><br>
+
+<h3 id="installing">Installing Addons</h3>
+<p>
+There are 2 ways to install addons on your server: Either via a workshop collection or by manually uploading the folder.<br>
+The workshop collection is easy: Simply get your steam api key and your workshop collection id and set it on your server.<br>
+If you upload addons into your addon folder you have to look out for a few things:<br>
+<br>
+1. Addon-folders always have to start with a small (lowercase) letter!<br>
+Good:easychat<br>
+Bad:<b>E</b>asychat<br>
+<br>
+2. The addon should not contain subfolders of addons.<br>
+Good: addons/easychat/lua<br>
+Bad: addons/easychat<b>/easychat</b>/lua<br>
+<br>
+3. You can remove the <i>-master</i> from your addon name. It's just there because you downloaded it from github.<br>
+4. Try not to have spaces in your addon name. Replace them with a dash (-) or a underscore (_).<br>
+5. Always add the appropriate content packs to your workshop collection. Players and the server need the content packs for addons to work properly. For example: Blue's Addons need content packs from the workshop (<a target="_blank" href="https://steamcommunity.com/id/codeblue/myworkshopfiles?appid=4000">here</a>) to work properly.
+</p>
+<br>
+<h3 id="recommended">Addon Recommendations</h3><br>
+<p>First of all you need the gamemode <a target="_blank" href="https://github.com/FPtje/DarkRP">DarkRP</a> and <a target="_blank" href="https://github.com/FPtje/darkrpmodification">darkrpmodifications</a>. You configure most things in darkrpmodifications, except if you want to configure the default jobs.<br>
+Put the DarkRP gamemode into the garrysmod/gamemode/ folder.<br>
+Put darkrpmodification into your addons folder.<br>
+<br>
+There are a few must-have addons that you need for a proper DarkRP server:</p>
+<ul>
+<li>A <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=115753588">Fading Door</a> and a <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=108424005">Keypad</a> Addon</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=109643223">3D2D Textscreens</a> for advertising ingame Shops (set the textscreen-limit to atleast 3)</li>
+
+<li><a target="_blank" href="https://github.com/NanoAi/gm_apg">gm_apg</a> for anti-propkill / anti-propcrash (FPP is not that good at anti-crash protection)</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=220336312">Permaprops</a> to make props/npcs respawn after a map change</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1149344121">Classic Advert</a> so that you can write in the global non-ooc chat with /advert</li>
+
+</ul>
+
+<p>
+Now come the non-must-have addons that I think are good for a DarkRP server:
+</p>
+<ul>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=557962238">ULib</a> and <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=557962280">ULX</a> for administration of your server. (You can also use the preinstalled FAdmin mod if you want)</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=108176967">The sit anywhere script!</a> for more roleplay</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=503194668">Pickpocket</a> to make the thief more THIEF</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=104482086">Precision Tool</a> to make building bases easier and more fun</li>
+
+<li><a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=773402917">Advanced Duplicator 2</a> to make building bases way faster and more comfortable</li>
+
+<li>Cars, because kids love having expensive cars (either <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=112606459">TDM</a> or any other type of car)</li>
+
+<li>Custom Weapons for better <b>Dark</b> Roleplay (<a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=128089118">M9K weapons</a> are pretty popular and easy to use)</li>
+
+<li>A new HUD, Scoreboard and F4 menu Design</li>
+
+<li>A custom chatbox addon, because the default chatbox lacks features</li>
+
+<li>Either an inventory system or a good Pocket Blacklist (so that players can store their weapons)</li>
+
+<li>Atleast one legal job that can make money without spending much for it, so that even poor players can get back to roleplaying quickly.</li>
+
+<li>If you want a taser you can use <a target="_blank" href="https://steamcommunity.com/sharedfiles/filedetails/?id=1729622779">This free workshop taser</a>.</li>
+
+</ul>
+
+
+<br>
+<h3 id="badaddons">Addons you should NOT get</h3>
+<p>
+First we go over the addons you shouldn't install/buy.<br>
+Please, for the love of god, <b><u>do NOT buy ANY of those addons!</u></b> You can get them better for free!</p>
+
+<ul>
+
+<li><u>Anticheat</u> - If you set up your server without being braindead then you don't need an anticheat, as most exploits are fixed anyways. Most Anticheats also use a lot of CPU / Network Bandwidth, which makes the server even more laggy.</li>
+
+<li><u>Prop-Protection</u> - There are a lot of free and better alternatives than the paid ones.</li>
+
+<li><u>Admin-System</u> - ULX is free and way better than any admin mod you can buy. Do NOT buy xAdmin or SAM, they do the same thing but just cost something. Don't be an idiot!</li>
+
+<li><u>Job-Whitelist</u> - You can do Job-Whitelisting (with leveling systems, steamIDs, ulx ranks, etc.) without any addons! This is a feature of default DarkRP! Do NOT buy any addon like "job-whitelist"!</li>
+
+<li><u>Job-Configurator</u> - You can configure jobs easily in DarkRP itself. There is no need to spend money on a dynamic ingame job-configuration system!</li>
+
+<li><u>Logging System</u> - The default logging is more then enough. If you don't trust your players during support sessions, how can you trust them to make proper roleplay?</li>
+
+<li>Too many extra systems like "jewelry robbery" or "fine system" - Too much extra stuff destroys the roleplay that DarkRP was made for. It also makes the game lag a lot if you have 100+ addons.</li>
+</ul>
+
+
+<br>
+<h3 id="freeaddons">Free Addons</h3>
+<p>There are a lot of free and good addons, so don't buy any yet!<br>
+Sources for free addons:</p>
+
+<ul>
+  <li><a href="https://github.com/OverlordAkise/darkrp-addons" target="_blank">https://github.com/OverlordAkise/darkrp-addons</a> for huds, scoreboard, warn system and co.</li>
+  <li><a href="https://codefodder.store/search?type=free" target="_blank">https://codefodder.store</a></li>
+  <li><a href="https://github.com/In-memory-of-CODE-BLUE" target="_blank">https://github.com/In-memory-of-CODE-BLUE</a> for ATMs, Jobs and co.</li>
+  <li><a href="https://github.com/OverlordAkise/chefs-utilities" target="_blank">https://github.com/OverlordAkise/chefs-utilities</a> for anticheat and Quality of Life improvements</li>
+  <li><a href="https://github.com/TeamUlysses/ulib" target="_blank">https://github.com/TeamUlysses/ulib</a> and <a href="https://github.com/TeamUlysses/ulx" target="_blank">https://github.com/TeamUlysses/ulx</a> for Administration; do NOT buy SAM!</li>
+</ul>
+
+
+<br>
+<h3 id="autodownload">Make players download addons</h3>
+<p>
+Players who join your server have to download the addons of your server. If new players see errors instead of cars then you forgot to add the cars to the download list.<br>
+<u>You do NOT need FastDL for this. You can use the workshop downloader.</u>
+</p>
+
+<div style="border:1px solid black; padding:5px;">
+<b>Why use workshop instead of FastDL?</b><br>
+FastDL is way more complicated to set up. It also makes you download individual files instead of a single file for the whole addon. In comparison, workshop download is easily setup and optimized for clients.<br><br>
+
+FastDL makes users download the addons from your own server. This means: If 10 people are joining at once, they are all downloading the addons from your server, using up your bandwidth.<br>With workshop download they download the addons from steam servers. Example: If you use FastDL and 5 people join at once, they will all download the addons from your server which could make the servers' ping bad. (5players x 3GB addons = 15GB Upload for your server!)<br><br>
+
+With FastDL you "zip" the single files of your addon and the client has to download every texture and model one by one, which is a lot of overhead. You also need a webserver for FastDL, because you need to host the files for the clients.<br>
+With workshop download the player downloads the addon as one big package, well compressed in a single .gma file from steam servers. If the player already has the addon then he skips the download, saving download and load times.
+</div>
+<br>
+<p>An important notice: The player doesn't have to download every addon you have. The player - for example - doesn't have to download ULX or Ulib, because it's only serverside commands.<br>
+The player has to download models and textures though.<br>
+<br><br>
+To include your addons as downloads for your players you simply have to go to this site <a href="https://csite.io/tools/gmod-universal-workshop" target="_blank">https://csite.io/tools/gmod-universal-workshop</a>, enter your workshop-collection ID and then copy the code at the bottom.<br>
+You get your workshop ID from your workshop collection link. It's in the URL at the end with 'id=XXXXXX'.<br>
+Now with your code copied go to your server and create a new file in the lua/autorun/server folder and name it something like "workshop.lua". ( Full path would be <span>garrysmod/lua/autorun/server/workshop.lua</span> )
+<br>
+Paste the code into the file and save it.<br>
+Now after a server restart every player will download your workshop collection when joining.<br>
+<br>
+<b>Warning:</b> Be careful to not make your workshop collection too big! Around 3GB should be the max. size for players to download upon joining. If you make the player download 8GB before joining your server they will probably disconnect and search for another server to play on!
+</p>
+<br>
+
+<h3 id="#collections">About creating your own addon collections</h3>
+<p>
+Please do <b>NOT</b> create your own content packs for the workshop.<br>
+<br>
+If you create your own content pack with M9k weapons every player has to download them again, even if someone already has all the M9k weapons.<br>
+If a player already has the M9k Heavy Weapons addon then they skip the download when joining your server. BUT: If you make your own M9k Heavy Weapons Addon then they have to re-download it even though they already have all the weapons.
+<br>
+This is because addons are cached. If you already have an addon you skip the download and load your local copy of the addon. If someone makes an extra addon for something that you would normally already have then you have to redownload it, which wastes storage space, bandwidth and time.
+</p>
+
+<br>
+<h3 id="configuration">Configuration</h3>
+<p>
+<b>Server config</b><br>
+sv_playershurtplayers should be set to 1. This config can be located in garrysmod/cfg.<br>
+<br>
+<b><u>Really Important:</u></b>: The Tickrate should NEVER be 66! It should max. be 33!<br>
+<br>
+<b>General</b><br>
+Before you start to configure anything please read through the whole darkrp config. There are 2 config-files: <span>disabled_defaults.lua</span> and <span>settings.lua</span>.<br>
+They are located in <span>addons/darkrpmodification/lua/darkrp_config/</span>.<br>
+Read them through and enable / disable the settings as you wish. This will be the basis of everything else you configure!<br>
+A few important settings would be:</p>
+
+<ul>
+<li>disallowClientsideScripts should be set to true to disallow people from cheating (line 76)</li>
+<li>dropspawnedweapons should be false or else people can put their cop weapon in their inventory and duplicate weapons (line 87)</li>
+<li>restrictbuypistol should be true - if it's false citizens can buy pistols via the F4 menu (line 143)</li>
+<li>adminnpcs and adminvehicles should be 1 or you won't be able to spawn anything as admin (line 179)</li>
+<li>Change all the 'allowedProperties' to false except 'remover'. (Lines 468 to 473)</li>
+</ul>
+
+<br>
+
+<p>
+<b>Jobs</b><br>
+Never edit the DarkRP gamemode files! To configure DarkRP use the addon <i>darkrpmodification</i>!<br>
+The only thing you configure in the gamemode files are the default jobs.<br>
+If you want to configure the default jobs then edit <i>garrysmod/gamemode/darkrp/gamemode/config/jobrelated.lua</i><br>
+If you want to add new jobs do that in <i>garrysmod/addons/darkrpmodification/lua/darkrp_customthings/jobs.lua</i>.<br>
+How to configure new jobs: <a target="_blank" href="https://darkrp.miraheze.org/wiki/DarkRP:CustomJobFields">https://darkrp.miraheze.org/wiki/DarkRP:CustomJobFields</a><br>
+<br>
+<b>Weapons</b><br>
+If you want to give a job a specific weapon then do that in the job config itself. (either in <span>gamemode/darkrp/gamemode/config/jobrelated.lua</span> or <span>addons/darkrpmodification/lua/darkrp_customthings/jobs.lua</span>)<br>
+<br>
+If you want to give everyone (no matter the job) a weapon then add it to the DefaultWeapons. They are located in <i>addons/darkrpmodification/lua/darkrp_config/settings.lua</i> at around line 353.
+</p>
+
+<br>
+<h3 id="restrictions">Setting Restrictions</h3>
+<p>
+You don't want people to troll and crash the server right?<br>
+Then set the correct restrictions.<br>
+<br>
+<b>Max Entities and co.</b><br>
+An important thing is to disable the spawning of ragdolls, effects and co..<br>
+Either disable it with ULX by setting it to 0 in Settings -> Sandbox or you can also use these commands and maybe put them in your server.cfg file:</p>
+
+<pre>
+sbox_maxeffects 0
+sbox_maxragdolls 0
+sbox_maxballoons 0
+sbox_maxdynamite 0
+sbox_maxemitters 0
+sbox_maxlamps 0
+sbox_maxthrusters 0
+sbox_maxwheels 0
+</pre>
+
+<p>
+<b>Toolguns</b><br>
+Also restrict toolguns that people could use to crash the server or troll others.<br>
+For example, Zero's Retrominer toolgun to create ores is not restricted by default, so users could spawn their own ores anywhere on the map.<br>
+With FPP (Falcos Prop Protection, in the spawn menu under the utilities tab on the right) you can restrict toolguns so that normal players can't use them.<br>
+<br>
+<b>Props</b><br>
+As already discussed above, you <b>have to</b> install an anti-propgrief addon or else people will propkill and crash the server with props.<br>
+But there is also another configuration: A good prop blacklist.<br>
+There are huge props that players can spawn by default, and you should put these props on the blacklist.<br>
+Also set the pickup restriction to only a players props. By default players can also pick up their car with their physgun.<br>
+<br>
+</p>
+
+<br>
+<h3 id="other">Other important things</h3>
+<ul>
+
+<li>Check all of your addons (Playermodels of Jobs, Equipment of Jobs like Methcook, etc.) ingame for Errors. Either lua errors or Error Models. A lot of servers have a lot of Error Models (mostly playermodels) when first joining, because they forgot to add it to the download. Test everything!</li>
+
+<li>Also check if the console gets spammed by errors or something. That may not generate errors for the player, but lots of console messages with stuff like "0 nil" are still not nice to see as a player.</li>
+
+<li>Try to write your own DarkRP jobs and shipments and do NOT use something like dconfig to create them dynamically ingame. This could lead to conflicting problems with other addons. (Someone once had problems with realistickidnapsystem and dconfig jobs)</li>
+
+<li>Have your rules easily accessible ingame. (Either in the F4 Menu, Scoreboard or with ulx's !motd)</li>
+
+<li>You can also use ULX to create an automatic popup whenever you join that shows you the rules. It's called MOTD, and with ULX you can set the MOTD to an URL of your choice.</li>
+
+<li>Look out for big addons that download when joining your server. Downloading 4 GB of files just to join a DarkRP server is a bit much isn't it? Try to keep it as low as possible, because some players don't like waiting.</li>
+
+<li>Try not to make too many rules (KISS principle, "Keep It Simple Stupid"). Try to configure restrictions ingame instead of writing them in your rules. (Example: Install an anti-bunnyhop addon instead of having a rule for it not to do that)</li>
+
+<li>Don't add too many systems. Having a fine system, a radar station, a special "toll" addon, a special taser and cuff system for cops is a bit too much. The more addons you have, the higher is the possibility of 2 addons conflicting and creating errors. Same with "Logging" addons like bLogs: They use a lot of resources, so choose carefully if you <b>really</b> need them.</li>
+
+<li>Enable (if you want) the default /afk and cooking addon in darkrpmodifications/ lua/ darkrp_config/ disabledDefaults.lua. With this people will automatically be moved AFK and people also get hungry ingame after a while.</li>
+
+<li>Disable the "Context Menu" for players. If you hold C and right-click on a prop you can delete it or disable collision. Players shouldn't be able to disable collisions for their props.</li>
+
+<li>Don't create too many Donator-Only Jobs. These don't make me want to donate, these want to make me leave the server.</li>
+
+<li>Don't add too many cars at once. They add a lot of download size, and having a lot of cars at the beginning means you won't be able to add more later on without adding more downloadsize and lag to the server.</li>
+
+<li>Don't forget to add an ATM system to your Server (Critzer ATMs or Blues ATMs)</li>
+
+<li>A custom chat is always nice too, because the default Gmod chat is missing a lot of "comfortable" functions.</li>
+
+<li>Try to make your money system fun and not too strict. Grinding 20 minutes for an AK47 is not fun. Also have a job where people can get money without spending anything.</li>
+</ul>
+
+
+<br>
+<h3 id="rules">Roleplay Rules</h3>
+<p>Roleplay rules are difficult to get perfect, but they are easy to get right.<br><br>
+The best tip would be: Keep them simple and clean. Try to disable things ingame and not just add rules to prohibit them.<br>
+Example: Install an anti-bhop addon instead of prohibiting people to bunnyhop via a rule.<br>
+Here is a checklist of things to do better:</p>
+<ul>
+  <li>Even if many people will disagree: Try to look at other server's rules. It's not forbidden to get some kind of template from others on what you have to include in your own rules.</li>
+
+  <li>If you want a big and good server: Explain rules like RDM and VDM. When I first began playing DarkRP there was only "VDM is forbidden". What is VDM though? Explain unknown terms and wordings. Example: "RDM, the killing of players with no roleplay background, is forbidden."</li>
+
+  <li>Rules like "Be aware of NLR" or similar are bad. What is NLR? How long does it last? Explain it instead of simply saying "it exists".</li>
+
+  <li>Try to be consistent with your wording. "strictly forbidden", "prohibited" or "not allowed and will be punished" are all different wordings for the same purpose of "don't do that". Simply write "X is forbidden" and it's simple and easier to remember then "X is strictly prohibited and will be punished".</li>
+
+  <li>Try not to have any "wildcard rules" like: "Teammembers can still punish you if you did something wrong without breaking the rules". These rules are basically "Im an admin, i can do whatever i want and how i like it" and these make the server look bad.</li>
+
+  <li>Don't have your "punishments list" in your rules. Players shouldn't be able to see how long they get punished for breaking rule X.</li>
+
+</ul>
+
+
+<br>
+<h3 id="testing">Testing your server</h3>
+<p>
+The most important thing before making your server public: <b>TEST EVERYTHING</b>.<br><br>
+Go through every job you have and check if you can do what you are supposed to do.<br>
+Can you buy shipments as a weapon dealer? Can you collect trash as a trash collector? Can you spam props? Can you Propkill? Do you get enough money for the work you do?<br><br>
+Also let others test, because you, as a developer, have everything (models,weapons,etc.) the server has. You don't see any error models, but other players might see it. It would be a good idea to let someone else join and let him check every job too.<br><br>
+For better Testing use the guide at <a href="https://shira.at/gmod/darkrp_qos.html">darkrp_qos.html</a>.
+</p>
+
+<br>
+<h3 id="forum">Forum</h3>
+<p>
+Please, for the love of god, <b>do NOT buy woltlab forums</b>.<br>
+They are very expensive and you don't need such expensive forum software at the beginning.<br>
+Instead simply install Mybb (<a target="_blank" href="https://mybb.com/download/">https://mybb.com/download/</a>) and use a theme like flatty (<a target="_blank" href="https://community.mybb.com/mods.php?action=view&amp;pid=617">https://community.mybb.com/mods.php?action=view&amp;pid=617</a>) to make it look nice and similar to woltlab.<br>
+Example image of mybb with flatty theme: <a target="_blank" href="https://community.mybb.com/uploads/mods/previews/preview_102346_1586027530_3f1a06b6f420467a2ffc76ced03cdf99.png">here</a>.
+</p>
+</body></html>
+

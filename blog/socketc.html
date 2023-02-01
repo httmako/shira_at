@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>sockets | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>socketc</h1>
+<h2>Handling Sockets and Large Data in C</h2>
+
+<ol>
+<li><a href="#intro">Introduction</a></li>
+<li><a href="#problem">Problem and sendall</a></li>
+<li><a href="#solution">Solution and recvall</a></li>
+</ol>
+
+<h3 id="intro">Introduction</h3>
+<p>We had a project of creating our own client-server C program recently, so we also had to work with sockets for the TCP connections.<br>
+The basic connection of sending data and receiving it was pretty easy, but the requirement of only sending 1024byte of data in a single tcp-package was making it a little bit more complicated.<br>
+Here is the process of how I solved the problem of getting a counterpart to sendall().<br>
+</p>
+
+<h3 id="problem">Problem and sendall</h3>
+<p>Example Code:<br>
+<pre>
+char buffer[100000] = "";
+strcat(buffer,big_amount_of_data);
+send(new_socket, buffer, strlen(buffer),0);
+</pre>
+The above code may seem ok at first, but if there is a lot of data to send then it's not good anymore.<br>
+Sending large data with a huge buffer would mean using up a lot of the bandwidth of your network, so splitting it up is the only solution.<br>
+Simply call send() multiple times so that you send the data in multiple small 1024byte blocks. You can find the code block for that on the internet, which looks something like this:<br>
+<pre>
+int sendall(int socket, char * buf, int *len){
+    int total = 0;        // how many bytes we've sent
+    int bytesleft = *len; // how many we have left to send
+    int n;
+    
+    while(total < *len) {
+        n = send(socket, buf + total, bytesleft, 0);
+        if (n == -1) { break; }
+        total += n;
+        bytesleft -= n;
+    }
+    
+    *len = total; // return number actually sent here
+    
+    return n==-1?-1:0; // return -1 on failure, 0 on success
+}
+</pre>
+But now the main problem arrives: What is the recvall function for that? When does the recvall function know that the sendall function has finishing sending all of its data?<br><br>
+I searched on the internet for the solution but couldn't find an easy one, so here is my own solution for the problem.<br>
+</p>
+
+<h3 id="solution">Solution and recvall</h3>
+<p>First up, there is no recvall. My solution uses the inbuilt flags for send() to indicate when the sendall function finished.<br>
+I found this solution by reading the man page of send(), and even then I couldn't find a good example of what I found. I tried it out and it worked according to what I thought it would do.<br><br>
+Simply said, i think the internet version of sendall is bad. Atleast in my eyes. The more simple version, which I still call sendall, is this:<br>
+<pre>
+int sendall(int sock, char *buf, int buflen){
+    int len = buflen;
+    int n;
+    
+    int total = 0;
+    while(len != 0){
+        if(len > 1023){
+            //Bigger 1023, needs multiple packets
+            n = send(sock,buf+total,1023,0|MSG_MORE);
+            len = len - 1023;
+            total = total + 1023;
+        }else{
+            //Smaller 1023
+            n = send(sock,buf+total,len,0);
+            total = total + len;
+            len = 0;
+        }
+        printf("n sent: %d\n",n);
+        if(n==-1){
+            perror("[sendall] send error");
+            break;
+        }        
+    }
+    return n==-1?-1:0;
+}
+</pre>
+Instead of simply sending the data to the client it sends it with the MSG_MORE flag if there is more data being sent after the current send(), or in other terms: If the data is bigger then the max. size you want to send at once, which is in this case 1023bytes.<br>
+Short explanation:<br>
+The recv() function blocks until it receives data, then it continues. If recv() receives a TCP packet with the MSG_MORE flag it waits and blocks for the next package aswell. If that has the flag set too, it still waits for the next one. It only stops blocking if a package without the flag arrives.<br>
+This way you can receive all the data from sendall in a single recv. You just have to set a big enough buffer so that you can read it all at once too.<br><br>
+More on that topic: <a href="https://linux.die.net/man/2/send">https://linux.die.net/man/2/send</a>, specifically the MSG_MORE flag explanation.<br><br>
+The receive all function in this case would simply be a recv() with a huge buffer:<br>
+<pre><span>
+
+</span></pre>
+Handling the buffer overflow and other stuff is not shown here.<br>
+</p>
+
+<br><br><br>
+</body>
+</html>

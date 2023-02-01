@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>serversetup | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>My Linux Server Setup</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#update">Update & Install</a></li>
+<li><a href="#users">User Management</a></li>
+<li><a href="#sshd">SSH</a></li>
+<li><a href="#sysstat">Monitoring with sysstat</a></li>
+<li><a href="#firewall">Firewall</a></li>
+<li><a href="#fail2ban">Fail2ban</a></li>
+<li><a href="#other">Other services</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+This guide is meant for people who have bought/installed a Linux Server.<br>
+It is not a perfect guide. It is my personal guide on what I do after installation.<br>
+It will not go over the Installation of the OS itself.<br>
+We will use Debian 10 as the OS here.<br>
+If you have any CentOS Distro then please install <span>epel-release</span>.<br>
+If you have a CentOS 8 Server then please use <span>dnf install</span> to install packages instead.<br>
+If you have a CentOS 7 Server please use <span>yum install</span> instead.
+</p>
+
+<h3 id="update">Update & Install</h3>
+<p>
+The first command is usually <span>sudo apt-get update</span> and then <span>sudo apt-get upgrade</span>.<br>
+After that the system is up to date.<br>
+Then install some commonly used tools, mine are:<br>
+<pre>sudo apt-get install nano vim screen htop zip unzip wget curl</pre>
+</p>
+
+<h3 id="users">User Management</h3>
+<p>
+It's not good to log in as root over SSH. Many spambots try to log in as root, which means your server is constantly under attack.<br>
+Create a new user and give him permission to use sudo. With sudo a user can get temporary admin-rights if needed.<br>
+On some systems <span>sudo</span> isn't preinstalled. For a user to be able to use sudo you just have to add him to the sudo group. (On CentOS the groupname is <span>wheel</span> instead)<br>
+<span>adduser chris</span> and then <span>usermod -aG sudo chris</span>.<br>
+<br>
+I also recommend to create a user for every service you manually install. If you install git/jenkins/teamspeak then create a new user for those services.
+</p>
+
+<h3 id="sshd">Securing SSH</h3>
+<p>
+You don't want people to be able to log in on your server as root.<br>
+To edit the SSHd configuration of your server simply edit /etc/ssh/sshd_config. (SSHD is the server, SSH is the client)<br>
+Here at the bottom of the file you can add <span>PermitRootLogin no</span> , this makes the user root not able to login with SSH.<br>
+You can also write <span>AllowUsers chris</span> to only allow the user chris access to login via SSH.<br>
+I recommend to use both of these lines: Deny root login and only allow specific users login.<br>
+<br>
+In this file you can also change the default port if you add the line <span>Port 97</span> at the bottom.<br>
+Automated attacks on servers always use the Port 22 for SSH, so if you change it most bots on the internet won't be able to automatically attack you that easily anymore.<br>
+I don't change it from Port 22, because it's standardized on that port via IANA.<br>
+<br>
+You can also use SSH Keys instead of a password authentication to log in.<br>
+It's more secure because nobody can brute-force the key easily.<br>
+But you don't have to use this to be secure, because we will install fail2ban later.<br>
+(Just a thought: Someone would have to guess the username and then the password, together with fail2ban it's highly unlikely that someone can get access.)
+</p>
+
+<h3 id="sysstat">Monitoring with sysstat</h3>
+<p>
+It automatically logs CPU, network and disk usage.<br>
+The command for this is <span>sar</span>. If you use it without any flags it will show you the CPU usage in percent.<br>
+<br>
+First install the sysstat package with <span>sudo apt-get install sysstat</span>.<br>
+To enable the logging edit <span>/etc/default/sysstat</span> and change the <span>"false"</span> to <span>"true"</span>.<br>
+Now restart it with <span>sudo systemctl restart sysstat</span>.<br>
+You can now use the <span>sar</span> command to get your resource log. At first it needs a while (5min) to get the first log entry.<br>
+You can also generate a picture from these logs via <span>sadf -g -- -A > today.svg</span>.<br>
+(German) More at <a href="https://www.thomas-krenn.com/de/wiki/Linux_Performance_Aufzeichnung_und_Auswertung_mit_sar" target="_blank">https://www.thomas-krenn.com/de/wiki/Linux_Performance_Aufzeichnung_und_Auswertung_mit_sar</a>
+</p>
+
+<h3 id="firewall">Firewall</h3>
+<p>
+For me <span>iptables</span> is enough of a firewall. It blocks/allows protocols,states and IP addresses.<br>
+You can also look into <span>firewalld</span> or <span>uncomplicated firewall (ufw)</span>. These are just applications that build ontop of iptables.<br>
+<br>
+First install iptables and iptables-persistant via <span>sudo apt-get install iptables iptables-persistant</span>. (It doesn't matter if you save your current config or not if asked)<br>
+Now everytime you reboot it will take the rules from <span>/etc/iptables/rules.v4</span> and apply them.<br>
+<span>sudo nano /etc/iptables/rules.v4</span> and copy in this basic ruleset:<br>
+<pre>
+# sample configuration for iptables service
+# from shira.at
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+-A FORWARD -j REJECT --reject-with icmp-host-prohibited
+COMMIT
+</pre>
+Now you can live-reload these rules into your system with <span>sudo iptables-restore < /etc/iptables/rules.v4</span>.<br>
+To save your current rules you can use <span>sudo iptables-save > /etc/iptables/rules.v4</span>.
+</p>
+
+<h3 id="fail2ban">Fail2ban</h3>
+<p>
+Fail2ban does what it says: It bans people after too many failed attempts.<br>
+<br>
+Simply install it via <span>sudo apt-get install fail2ban</span>.<br>
+The default configuration is located at <span>/etc/fail2ban/jail.conf</span>. Do not edit this configuration directly, instead create a new file there called <span>jail.local</span>.<br>
+My default jail.local file for SSH:<br>
+<pre>
+[DEFAULT]
+bantime = 900
+maxretry = 3
+[sshd]
+enabled = true
+</pre>
+It bans for 15 minutes upon 3 failed attempts at SSH Login.
+</p>
+
+<h3 id="other">Other Services</h3>
+<p>
+I also install other services on initial setup.<br>
+A big and important one is a webserver. There are 2 main webservers: apache2 and nginx.<br>
+The easier one for beginners is apache2, but if you want performance and aren't too scared of new stuff then nginx is your way to go.<br>
+<span>sudo apt-get install nginx</span> and for php <span>sudo apt-get install php-fpm</span>.<br>
+<br>
+Don't forget to add new firewall rules if your new services require different ports than 80/443.
+</p>
+<br><br><br>
+</body>
+</html>
+

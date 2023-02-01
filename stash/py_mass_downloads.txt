@@ -1,0 +1,29 @@
+import requests
+import shutil
+import os
+
+'''
+Python3 download tool
+Everything should be pre-installed already
+
+every line from every .txt file in the folder "files" will be downloaded
+User-Agent is provided because some sites won't let you access content without it
+'''
+
+for el in os.listdir("files"):
+  if ".txt" in el:
+    with open(el,"r",encoding='utf-8-sig') as f:
+      data = f.readlines()
+      for line in data:
+        line = line.split("\n")[0]
+        url = line
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        }
+        print("Downloading "+line)
+        r = requests.get(url, headers=headers, stream=True)
+        with open('img/'+line.split("/")[-1], 'wb') as ff:
+            r.raw.decode_content = True
+            shutil.copyfileobj(r.raw, ff)
+            
+print("Done!")

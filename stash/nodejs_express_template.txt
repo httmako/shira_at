@@ -1,0 +1,71 @@
+//Before running install:
+//npm install express express-session
+var express = require('express');
+var session = require('express-session');
+var fs = require('fs');
+
+var PORT = 3001
+
+
+var app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+var auth = function(req, res, next) {
+  if (req.session && req.session.user && req.session.loggedin)
+    return next();
+  else
+    return res.redirect("/login");
+};
+
+app.use(session({
+    secret: 'twg4a432tweaw43tewat4wa3rew',
+    resave: true,
+    saveUninitialized: true
+}));
+
+app.get("/login",function(req,res){
+  if (req.session.loggedin){
+    res.redirect("/home");
+  }else{
+    res.send(`
+  <form action="/login" method="post">
+    <input type="text" id="user" name="user"> 
+    <input type="password" id="pw" name="pw">
+    <input style="display:none;" type="submit" value="Submit">
+  </form>
+    `);
+  }
+});
+
+app.post("/login",function(req,res){
+  if(req.body.user === "Christoph" && req.body.pw === "StrongPassword") {
+    req.session.user = "Christoph";
+    req.session.loggedin = true;
+    res.redirect("/home");
+  }else{
+    res.sendStatus(401); // Unauthorized
+  }
+});
+
+app.get("/logout",auth,function(req,res){
+  req.session.destroy(); //removes attribute loggedin & user
+  res.redirect("/login");
+});
+
+app.get("/",auth,function(req,res){
+  res.redirect("/home");
+});
+
+app.get("/home",auth,function(req,res){
+  res.send("Welcome, "+req.session.user+"<br><a href='/logout'>Logout</a>");
+});
+
+app.get("/api/:id",auth,function(req,res){
+  res.send("You requested: "+req.params.id);
+});
+
+
+app.listen(PORT,()=>console.log("Now listening on *:"+PORT));

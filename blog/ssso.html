@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Simple SSO | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Simple Web-only SSO with NGINX, PHP and Basic Auth</h1>
+
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#problem">Problem</a></li>
+<li><a href="#solution">Solution</a></li>
+<li><a href="#managing">Managing logins</a></li>
+</ul>
+
+<h3 id="about">About</h3>
+<p>
+This is a guide on how to make a simple SSO solution for your webservices.<br>
+This guide uses PHP, .htpasswd files and the webserver NGINX.<br>
+NGINX handles the authentication and lets the applications know which users are logged in.<br>
+This works for: Jenkins, MediaWiki, MantisBT, Kanboard, Nextcloud.<br>
+This does not work for: git servers. Git needs a different authentication method, Basic Auth doesn't work, because for pushing you can't use basic auth.<br>
+For a service to work with this method it needs to support "Pre Basic Authentication". The service gets only the username of the logged-in user, so it has to support this.<br>
+</p>
+
+<h3 id="problem">Problem</h3>
+<p>
+There is a NGINX webserver as a reverse-proxy for 3 web-based services: Kanboard, MantisBT and MediaWiki.<br>
+The Problem: You have to login into every application one by one each time you want to work with them.<br>
+This means every platform has their own database for users and each user has a different password for each service.<br>
+<br>
+Everything is on one webserver and managed by the same system, so why not combine them?<br>
+This brings us to another problem: Radius/Active Directory take a lot of work to setup. Too much work for a small one-server system.<br>
+I read about SSO, but it's a lot to learn and setup for only 3 mini-web-services.<br>
+</p>
+
+<h3 id="solution">Solution</h3>
+<p>
+The solution to this is NGINX's built-in basic-authentication.<br>
+You can let NGINX handle the authentication and just send the username to the service.<br><br>
+<b>Warning:</b> This is only secure if your web-service is only accessible via NGINX and has HTTPS enabled! For example: Jenkins should only be accessible through port 443 (https) and NOT port 8080 (outside of nginx via http).<br>
+<br>
+Create the .htpasswd file in the web root folder. Then add the "deny access" block for your .htpasswd file to your config file in nginx:<br>
+<pre>
+sudo htpasswd -c /var/www/html/.htpasswd chris
+
+sudo nano /etc/nginx/sites-enabled/&lt;yourfile&gt;
+  
+  location = /.htpasswd {
+    deny all;
+    return 404;
+  }
+</pre>
+Now you can - for example - make a folder login-only by adding the following in your nginx server block config:<br>
+<pre>
+location /wiki/ {
+  auth_basic "Please Login";
+  auth_basic_user_file /var/www/html/.htpasswd;
+}
+</pre>
+Now comes the auto-login/single-sign-on part: NGINX can forward your authenticated username to backend applications like the following for PHP:<br>
+<pre>
+location ~ \.php$ {
+  fastcgi_param REMOTE_USER $remote_user;
+  include snippets/fastcgi-php.conf;
+  fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+}
+</pre>
+Every PHP file you visit gets your username by nginx. This is only save to use if there is no other method of visiting this website except nginx.<br>
+<br>
+Now you can install an Addon that lets you use "preauthenticated" / "basic-auth" to set the user. For mediawiki and Kanboard there are already addons available for that. (Even Jenkins has an addon for this)<br>
+<br>
+If you write a .php file that prints out your headers (example: <span>&lt;?php print_r($_SERVER); ?&gt;</span>) you can read the following:<br>
+<pre>
+Array ( ...  [REMOTE_USER] => Chris ... )
+</pre>
+This means that our REMOTE_USER setting worked and the PHP applications behind your nginx webserver now can use this username to automatically log you in your user.<br>
+<br>
+An example of this:<br>
+<a href="files/php_preauth_jenkins.gif" target="_blank"><img src="files/php_preauth_jenkins.gif"></a>
+<br>
+Ofcourse this only works for websites behind nginx, but it's a nice way of not making your team sign in to every application each time they try to use it.<br>
+</p>
+
+<h3 id="managing">Managing Users</h3>
+<p>
+For managing these basic authentication passwords I recommend this simple one-file-based PHP file: <a href="http://patch.be/htpasstool/" target="_blank">htpasstool</a> (local download: <a href="files/htpasstool-v1.04.zip" target="_blank">htpasstool.zip</a>)<br>
+With this file you can create new users for .htpasswd files. These users will then automatically be created and logged in in your backend websites.<br>
+<b>Warning: </b>Be sure to make this file password-protected from normal users! <br>
+<br>
+To protect the file you can do the following (file is example.com/htpasstool.php):<br>
+<pre>
+location = /htpasstool.php {
+  if ($remote_user != "Administrator"){
+    return 404;
+  }
+}
+</pre>
+Now only the <span>Administrator</span> user can see and use the htpasstool file.<br>
+<br>
+Example Screenshot of the application:<br>
+<a href="files/htpasstool.png" target="_blank"><img src="files/htpasstool.png"></a>
+<br>
+</p>
+
+<h3 id="logout">Logout Problems</h3>
+<p>
+One problem this method has: Basic Authentication doesn't have a simple way to logout.<br>
+<br>
+To actually make a logout functionality you have to delete the browsers basic auth cache.<br>
+This used to work by respond with an 401 http error code, but this doesn't work anymore.<br>
+The easiest method now is to fake-login with a non-existent user and the browser will delete the old (working) authentication.<br>
+To make a logout-functionality I use this as a link:<br>
+<pre>
+&lt;a href="https://a@example.com"&gt;Logout&lt;/a&gt;
+</pre>
+Basic Authentication can be used as <span>user:pass@example.com</span>. If you do that with a new (non-existant) user while logged-in it will forget the old user.<br>
+</p>
+
+<br><br><br>
+</body>
+</html>
+
+

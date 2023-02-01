@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>ttt setup | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<pre><span>
+_______
+| | | |
+| | | |
+|     |   <b>chef's ttt configuration</b>
+|-----|
+|_____|
+
+-------------------------------------
+</span>
+This "guide" is for people who just want to setup a simple TTT server.
+Most of these addons are "kinda necessary" for TTT.
+To use this guide you need an already setup Gmod TTT server.
+
+TODO: Add a compiled mega-addon of all these small addons.
+
+<!--If you are really lazy and just want to play TTT then download my already configured TTT pack:
+<a href="ttt_v1.1.zip">ttt_v1.1.zip</a>
+This .zip file contains a readme.txt which explains everything.
+-->
+
+<b>Addons</b>
+These are "must have" addons that nearly every server has.
+Ofcourse this is a kind-of subjective list, but these only enhance the TTT experience.
+The download links to these addons will be in the brackets.
+Either subscribe to the addon or if it's a github link simply download and add it to your addons folder.
+WARNING: every addon-folder name has to begin with a lowercase letter after extracting it.
+Good: garrysmod/addons/<b>e</b>asychat
+Bad: garrysmod/addons/<b>E</b>asychat-master
+
+ - ulib (<a href="https://steamcommunity.com/workshop/filedetails/?id=557962238">steam workshop</a>)
+ - ulx (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=557962280">steam workshop</a>)
+ - ulx_extended  (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=718665054">steam workshop</a>)
+ - ulx_ttt (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=127865722">steam workshop</a>)
+ - rdm manager  (<a href="https://github.com/Tommy228/tttdamagelogs/archive/v3.1.0.zip">steam workshop</a>)
+ - pointshop (<a href="https://github.com/adamdburton/pointshop/archive/master.zip">github download</a>)
+ - chat  (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1182471500">steam workshop</a>)
+ - hud (<a href="https://github.com/Exho1/TTT_Octagonal_HUD/archive/master.zip">steam workshop</a>)
+ - weapon info (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=219713513">steam workshop</a>)
+ - killer info (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=167547072">steam workshop</a>)
+ - round info (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=649273679">steam workshop</a>)
+ - autopromote (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=226312488">steam workshop</a>)
+ - utime (<a href="https://github.com/TeamUlysses/utime/archive/ulx-v3_62.zip">github download</a>)
+ - hitnumbers  (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=110871780">steam workshop</a>)
+ - mapvote (<a href="https://github.com/tyrantelf/gmod-mapvote/archive/master.zip">github download</a>)
+ - ttt-weapons-plus (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=194965598">steam workshop</a>)
+ - roundalert (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1131903966">steam workshop</a>)
+ - scoreboard (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1438201250">steam workshop</a>)
+
+Traitor / Detective weapons:
+ - Detective Defibrilator (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1199113632">steam workshop</a>)
+ - Golden Deagle (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1636448544">steam workshop</a>)
+ - Martyrdom (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=309299668">steam workshop</a>)
+ - Beartrap (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1470823315">steam workshop</a>)
+
+Good maps I like:
+ - ttt_waterworld (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=157420728">steam workshop</a>)
+ - ttt_bb_teenroom_b2 (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=141103402">steam workshop</a>)
+ - ttt_minecraft_b5 (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=159321088">steam workshop</a>)
+ - ttt_community_bowling (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=131667838">steam workshop</a>)
+ - ttt_community_pool_2017 (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=936764744">steam workshop</a>)
+ - ttt_fastfood_a6 (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=145316417">steam workshop</a>)
+ - ttt_island_2013 (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=183797802">steam workshop</a>)
+ - ttt_pelicantown (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1219185412">steam workshop</a>)
+ - ttt_lego (<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=295897079">steam workshop</a>)
+
+You have to add these maps to a workshop collection.
+Then you can set the server up to use that workshop collection.
+This way the maps will be automatically downloaded when joining one.
+Do <b>NOT</b> let the user download every map upon joining the server.
+The user will automatically download the active map from the workshop.
+ 
+  
+TODO after installing everything:
+ - Change the ULX MOTD so that it contains your rules (No RDM, etc.)
+ - Change things in the pointshop
+ - Maybe change the karma autoban amount and ttt traitor chances
+ - Add custom ULX roles
+ - If you installed Autopromote: Set autopromote time for ULX ranks
+  
+
+If you installed the Server via LinuxGSM:
+
+ - Change your defaultmap and standard gamemode:
+ 
+  edit the file ~/lgsm/config-lgsm/gmodserver/common.cfg
+    defaultmap="ttt_lego"
+    maxplayers="20"
+    gamemode="terrortown"
+
+
+Change your servername and maybe add an Loadingscreen URL:
+
+  ~/serverfiles/garrysmod/cfg/gmodserver.cfg (or autoexec.cfg / server.cfg)
+  
+    hostname "[LANG] MyGaming TTT | Vanilla"
+    sv_loadingurl "https://example.com"
+
+
+
+Other Scripts you could write:
+ - Drop every weapon on death
+ - Disable Innocent Chat
+ - Traitor Weapons
+ - FPS boost ("gmod_mcore_test 1" in console)
+ 
+</pre>
+</body>
+</html>
+
