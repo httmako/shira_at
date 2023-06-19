@@ -1,0 +1,49 @@
+function mcstart() {
+    if [ $(ps -aux | grep papermc | grep -v grep | wc -l) -gt 0 ]; then
+        echo "SERVER RUNNING! STOP IT FIRST!";
+    else
+        echo "Starting server...";
+        screen -A -m -d -S papermc java -jar -Xms4G -Xmx6G -XX:+UseG1GC -jar paper.jar nogui
+    fi
+}
+
+function mcstop() {
+    if [ $(ps -aux | grep papermc | grep -v grep | wc -l) -gt 0 ]; then
+      echo "Stopping server...";
+      myvar=$(ps -aux | grep papermc | grep -v grep | awk '{print $2}')
+      kill $myvar
+    else
+      echo "SERVER NOT RUNNING! START IT FIRST!";
+    fi
+}
+
+function mcstatus() {
+    if [ $(ps -aux | grep papermc | grep -v grep | wc -l) -gt 0 ]; then
+      echo "Server is running!";
+    else
+      echo "Server is NOT running!";
+    fi
+}
+
+function mcfix() {
+    rm ~/world/session.lock
+    rm ~/world_nether/session.lock
+    rm ~/world_the_end/session.lock
+}
+
+function mckill() {
+    echo "Killing all running papermc servers...";
+    kill -9 $(ps -aux | grep paper | grep -v grep | awk '{print $2}')
+}
+
+function mclog() {
+    tail -f ~/logs/latest.log
+}
+
+function mcconsole() {
+    echo "This opens the interactive minecraft console!";
+    echo "Wenn du STRG+C drückst dann TÖTEST DU DEN SERVER!!!";
+    echo "Verlassen die console immer mit STRG+A und dann D !!!";
+    read  -n 1 -p "Press any key to continue" mainmenuinput
+    screen -r papermc
+}
