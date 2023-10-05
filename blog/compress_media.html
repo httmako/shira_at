@@ -22,6 +22,7 @@ table, th, td {
 <li><a href="#images-jpg">Compressing .jpg images</a></li>
 <li><a href="#images-png">Compressing .png images</a></li>
 <li><a href="#videos">Compressing videos</a></li>
+<li><a href="#converting">Converting images</a></li>
 </ul>
 
 <h3 id="preamble">Preamble</h3>
@@ -31,10 +32,11 @@ This is not an analysis about the different compression methods or how they comp
 This is a simple comparison of my own experiments and methods on how to reduce filesizes.<br>
 To install the tools mentioned here:
 <ul>
-<li><a target="_blank" href="https://0xacab.org/jvoisin/mat2">mat2</a> - installed via git clone</li>
+<li><a target="_blank" href="https://0xacab.org/jvoisin/mat2">mat2</a> - via <span>sudo apt-get install mat2</span> or via git clone</li>
 <li><a target="_blank" href="https://github.com/tjko/jpegoptim">jpegoptim</a> - via <span>sudo apt-get install jpegoptim</span></li>
 <li><a target="_blank" href="https://pngquant.org/">pngquant</a> - via <span>sudo apt-get install pngquant</span></li>
 <li><a target="_blank" href="https://ffmpeg.org/">ffmpeg</a> - via <span>sudo apt-get install ffmpeg</span></li>
+<li><a target="_blank" href="https://imagemagick.org/">convert</a> - via <span>sudo apt-get install imagemagick</span></li>
 </ul>
 </p>
 
@@ -86,11 +88,16 @@ Explanation of the command above: -v makes it verbose, skip-if-larger is self-ex
 <br>
 <br>
 With this the filesize went from 728KB to 189KB (!).<br>
-A comparison of both of these files (left unoptimized, right optimized):<br>
-<img style="float:left;max-width:380px;" src="files/arknights.png">
-<img style="float:right;max-width:380px;" src="files/arknights-fs8.png">
-<br><br>
-Barely any noticeable difference between the two, while the filesize is more than halfed!
+A comparison of both of these files (the first / left file is the unoptimized one, the later the optimized one):<br>
+
+<div style="overflow:auto;">
+<img style="float:left;width:380px;max-width:95%;margin-right:5px;" src="files/arknights.png">
+<img style="float:left;width:380px;max-width:95%;" src="files/arknights-fs8.png">
+</div>
+
+<br>
+
+Barely any noticeable difference between the two, while the filesize is more than halfed.
 </p>
 
 <h3 id="videos">Compressing videos</h3>
@@ -124,6 +131,56 @@ user@debian:~/Videos$ ls -ahl _divinity2_20220122_16.mp4
 Using ffmpeg to either optimize or compress the video to sizes you think are reasonably enough is a great way to save a lot of storage space.
 </p>
 
+<h3 id="converting">Converting images</h3>
+<p>
+There are many filetypes for images. The most common ones nowadays are: jpg,png,webp,gif<br>
+<br>
+A small feature comparison:
+<ul>
+<li>jpg , lossy format which enables smaller filesizes</li>
+<li>png , lossless format which can limit its colors and support transparency</li>
+<li>gif , lossless and supports transparency and animations</li>
+<li>webp, which enables lossy and lossless images with smaller filesizes as jpg or png</li>
+</ul>
+
+The image formats where tested with a normal image of a girl in .jpg form, a manga page in .jpg and a graphic of an anime-arknights character in .png with transparency.<br>
+The transparency will be lost if it gets converted to jpg, which will not be shown below in the comparison but has to be kept in mind.
+<br>
+<table>
+<tr><th>type</th><th>input</th><th>jpegoptim</th><th>pngquant</th><th>webp</th><th>jpg</th><th>png</th><th>gif</th><th>webp(lossless)</th></tr>
+<tr><td>photograph</td><td>1.4M</td><td>1.3M</td><td>8.0M</td><td>634K</td><td>1.4M</td><td>12M</td><td>13M</td><td>69M</td></tr>
+<tr><td>mangapage</td><td>304K</td><td>304K</td><td>626K</td><td>169K</td><td>304K</td><td>614K</td><td>522K</td><td>599K</td></tr>
+<tr><td>artwork</td><td>729K</td><td>181K</td><td>205K</td><td>98K</td><td>181K</td><td>729K</td><td>241K</td><td>449K</td></tr>
+</table>
+<br>
+
+The above table shows that webp has the lowest filesize of all of them.<br>
+The jpg format is 2nd place because it is a lossy format, which is the reason why png is (as a lossless format) in 3rd place. The last place is the GIF format.<br>
+
+<br>
+The manga page can be further converted / compressed by limiting the available colors because the image is mainly using black and white as colors.<br>
+If you use the command <span>pngquant -s 1 10 input.png</span> you can limit the available colors to only 10, which will all be different tones of black/gray. This keeps the quality of the image but lowers the filesize down to 2/3 of the original .jpg image.<br>
+To further compress a black and white manga page you can make it monochrome only, which will reduce its size down to 1/3 of the original.<br>
+To make an image black and white only you can use the following command:<br>
+<span>convert input.png -monochrome output.png</span><br>
+
+A comparison of the (in order) original jpg image, the converted and optimized png image with only 10 colors and the monochrome png image:<br>
+<div style="overflow:auto;">
+<img style="float:left;max-width:250px;margin-right:5px;" src="files/conv_orig_356111.jpg">
+<img style="float:left;max-width:250px;;margin-right:5px;" src="files/conv_10colors.png">
+<img style="float:left;max-width:250px;" src="files/conv_mono.png">
+</div>
+
+<br>
+
+As you can see in the images above, the first 2 are near identical but the last one has the typical "dotted surfaces" to simulate different shades of gray. The file size is, from first to last, 303KB - 230KB - 98,2KB.<br>
+
+<br>
+
+One important fact to consider when chosing your prefered image format: Webp is not fully supported on every platform yet.<br>
+Microsoft Paint can not edit it and some image viewers can not open it yet either. On the internet many people dislike it because it can not be as easily handled as a png.<br>
+There are also vulnerabilities like this one: <a target="_blank" href="https://arstechnica.com/security/2023/09/google-quietly-corrects-previously-submitted-disclosure-for-critical-webp-0-day/">https://arstechnica.com/security/2023/09/google-quietly-corrects-previously-submitted-disclosure-for-critical-webp-0-day/</a> , which really make it difficult to like webp in its current state.
+</p>
 
 <br><br><br>
 </body>
