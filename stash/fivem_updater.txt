@@ -1,0 +1,33 @@
+
+echo "Update-Script for fxserver";
+echo "Made by OverlordAkise";
+echo "";
+if screen -list | grep -q "fivem"; then
+    echo "Found a running fxserver, will stop it first...";
+    screen -S fivem -p 0 -X stuff "^C"
+    echo "Fxserver stopped.";
+    echo "";
+fi
+
+if [ -d "alpine" ]; then
+    echo "Found an already existing fxserver installation";
+    echo "Creating backup...";
+    zip -r0 --quiet bak_luuq_fx_$(date +\%Y\%m\%d\%H\%M).zip alpine/
+    echo "Backup finished.";
+    echo "";
+fi
+echo "Getting newest Version URL...";
+NEW_VER=$(curl https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/ | grep .tar.xz | sed '3q;d' | sed -nr 's/.*href=\"(.*?)\" style.*/\1/p')
+echo "Version found: ${echo $NEW_VER | sed -nr 's/.\/([0-9]{4})-.*/\1/p'}";
+DOWNLOAD_URL="https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master/${NEW_VER}"
+echo "Downloading it from: ${DOWNLOAD_URL}";
+wget $DOWNLOAD_URL;
+echo "Download finished";
+echo "Removing old installation...";
+rm -fr alpine/ run.sh
+echo "Unpacking new installation...";
+tar -xf fx.tar.xz
+echo "New installation unpacked.";
+echo "Starting new server...";
+screen -A -d -m -S fivem ./run.sh
+echo "Done!";
