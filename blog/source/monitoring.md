@@ -53,6 +53,7 @@ Your exporters, grafana and prometheus do not have to be available from the inte
 
 In my setup I only have port 443 (HTTPS) open for grafana, because all other applications run on the same server so no port has to be opened.
 
+
 ## Grafana
 
 Grafana is the UI frontend of the whole monitoring.  
@@ -87,7 +88,9 @@ Create a new file called "grafana.ini" and put the following configuration in it
     [server]
     domain = example.com
     root_url = https://example.com/grafana/
-    serve_from_sub_path = true
+    serve_from_sub_path = false
+
+**Attention**: With Grafana 10 you have to set `serve_from_sub_path=false` but with Grafana 9 you have to set this to true.
 
 Then change your "startgrafana.sh" file to add this config:
 
@@ -300,6 +303,27 @@ We can do this with gin-gonic by wrapping it like this:
 Now your application is ready and can be scraped by prometheus.
 
 
+# Create alerts for downtimes
+
+Every prometheus metric-source has an `up` metric that is available to view in grafana.  
+You can view this metric in grafana by going to `Explore` on the left and then simply typing in `up` and pressing shift+enter.
+
+This metric will be 1 if the service was able to be scraped (=accessed) by prometheus and will be 0 if Prometheus wasn't able to access the /metrics path.  
+This metric has a different label (job) for each service.
+
+You can easily monitor your services (in general, if they are running) by creating an alert with the `up` metric.  
+On the left menu you have an "Alerting" tab. There you can create "Contact points" (the place where you will get your is-down notification) and "Alert rules" (the checks that send notifications).
+
+You can create an alert rule with the following:
+
+ - Prometheus, Time Range "now-5m to now"
+ - PromQL query: `up`
+ - Expressions B (Reduce): Input A, Function Min, Mode Strict
+ - Expressions C (Threshold): Input B, Is Below, 1
+
+This way your alert rule will check every 5 minutes if a service is down. If it is down for 2 checks in a row (e.g. 10 minutes) then you will get a notification.
+
+
 # Creating histogram graphs in grafana
 
 The above commit shows a "HistogramVec", so a bucket-based metric with different labels.  
@@ -327,32 +351,40 @@ I have 3 main routes but my bucket bar gauge is now displayed as one:
 ![an image of a bar gauge in grafana](files/grafana_bar_gauge.png)
 
 
-
-# About grafana loki
-
-Loki is not enterprise ready yet.
+# About grafana loki, an update
 
 Grafana loki is a "competitor" to other logging tools like Elasticsearch.  
-It is quite easy to setup and runs flawlessly like grafana and prometheus, but it's not quite feature ready in my opinion.
+Promtail is a kind of "agent" that tails your log files and sends them to your loki instance. You can then view those loki logs inside grafana.
 
-To send logs to loki they expect you to run promtail, a kind of "agent" that tails your log files and sends them to your loki instance. You can then view those loki logs inside grafana. This agent is also not enterprise ready yet, far from it.
+I have now used grafana loki for close to a year.  
+It is still, in my opinion, not a good replacement for all the features and performance of Elasticsearch, BUT it is a very good small scale logging server solution for non-enterprise.
+
+Promtail can handle log rotation and never had any problems with getting and sending my application logs to loki.  
+Loki is sometimes slow to query (if you search quickly and mulitple times in a row) but works quite well for me, a single person using it and with ~7 services logging to it. The fact that loki doesn't index text never bothered me as the queries were still fast no matter what I searched for.
+
+All in all, i can recommend using Loki and Promtail for your logging needs. It uses way less RAM and CPU than e.g. Elasticsearch and works well with my logging setup of only 7 applications.
+
+
+## My old opinion about grafana loki
+
+Loki is not enterprise ready yet.  
 
 My pain points with this logging solution:
 
 **Promtail is a must have**  
-They really expect you to use promtail for sending logs to loki. There is no official solution for sending logs directly out of your application to loki. This means another application like promtail makes your whole landscape even more complex to manage. Promtail also only handles files,pods and journal as a log source, which means no stdout support.
+They expect you to use promtail for sending logs to loki. There is no official solution for sending logs directly out of your application or via other log-pushers to loki. This means another application like promtail makes your whole landscape even more complex to manage. Promtail also only handles files,pods and journal as a log source, which means no stdout support as far as I know.
 
 **Promtail can't handle log rotation**  
 According to [https://grafana.com/docs/loki/latest/clients/promtail/](https://grafana.com/docs/loki/latest/clients/promtail/).  
-If I have logging in my applications I have to rotate them out before they become too big and clog the filesystem. But promtail, the official tool for loki, doesn't support this, which means it's very difficult to use anywhere.
+If I have logging in my applications I have to rotate them out before they become too big and clog the filesystem. But promtail, the official tool for loki, doesn't support this, which means it's very difficult to use anywhere. (This seems to, as of 2023.11.13, to work?)
 
 **Promtails config is weird**  
 This may be subjective, but having this weird config setup with a "__path__" variable inside the targets->labels block to signal what log file I want to tail is neither easy to read nor easy to configure. I also have to add "localhost" as a target, even though promtail can only read files from your local machine. (?!)
 
 **Expectation of cloud usage**  
-Both loki and promtail have only documentation about cloud usage. Finding an easy to follow guide to install this locally on a single bare-metal linux server is not easy, but for e.g. Kubernetes I would use elasticsearch anyways.
+Both loki and promtail have only documentation about cloud usage. Finding an easy to follow guide to install this locally on a single bare-metal linux server is not easy, but for e.g. Kubernetes I would use elasticsearch and their stack anyways.
 
 **Loki doesn't index text**  
-This may be a bit subjective aswell, but loki only indexes the labels and not the message itself.  
+Loki only indexes the labels and not the message itself.  
 This means you have to add lots of labels for easy and quick log searching, but loki wants you to have non-dynamic labels (e.g. a fixed amount of possible labels) which makes this more difficult again.  
 This means a "correlation ID" as a label doesn't work because it is different for every request, of which you have thousands a minute.
