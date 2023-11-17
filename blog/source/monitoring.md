@@ -351,18 +351,83 @@ I have 3 main routes but my bucket bar gauge is now displayed as one:
 ![an image of a bar gauge in grafana](files/grafana_bar_gauge.png)
 
 
-# About grafana loki, an update
+# Installing Loki and Promtail
 
-Grafana loki is a "competitor" to other logging tools like Elasticsearch.  
-Promtail is a kind of "agent" that tails your log files and sends them to your loki instance. You can then view those loki logs inside grafana.
+Loki is the logging backend that has to be added as a data source in grafana.  
+Promtail is the "log-grabber" that basically uses `tail -f` to send the log files you specify to loki.
 
-I have now used grafana loki for close to a year.  
+To install loki and promtail first download them from here: [https://github.com/grafana/loki/releases](https://github.com/grafana/loki/releases)  
+Example:
+
+    wget "https://github.com/grafana/loki/releases/download/v2.9.2/loki-linux-amd64.zip"
+    wget "https://github.com/grafana/loki/releases/download/v2.9.2/promtail-linux-amd64.zip"
+    unzip loki-linux-amd64.zip
+    unzip promtail-linux-amd64.zip
+
+An example loki config, taken from [https://grafana.com/docs/loki/latest/configure/examples/#1-local-configuration-exampleyaml](https://grafana.com/docs/loki/latest/configure/examples/#1-local-configuration-exampleyaml)  
+This will be put into `loki.yaml` in the loki folder:
+
+    auth_enabled: false
+    server:
+      http_listen_port: 3100
+    common:
+      ring:
+        instance_addr: 127.0.0.1
+        kvstore:
+          store: inmemory
+      replication_factor: 1
+      path_prefix: /tmp/loki
+    schema_config:
+      configs:
+      - from: 2020-05-15
+        store: boltdb-shipper
+        object_store: filesystem
+        schema: v11
+        index:
+          prefix: index_
+          period: 24h
+
+To start loki simply use the following command from within the loki folder:
+
+    ./loki-linux-amd64 --config.file=loki.yaml
+
+An example promtail config, taken from [https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#example-static-config](https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#example-static-config)  
+This will be put into `promtail.yaml` in the promtail folder:
+
+    server:
+      disable: true
+    positions:
+      filename: ./positions.yaml
+    clients:
+      - url: http://localhost:3100/loki/api/v1/push
+    scrape_configs:
+     - job_name: myapp
+       pipeline_stages:
+       static_configs:
+       - targets:
+          - localhost
+         labels:
+          app: myapp
+          __path__: /srv/myapp/myapp.log
+
+In this example configuration I changed the server to be disabled. This server is meant to receive logs via http push, which is not needed if you simply tail the logfiles.
+
+To start promtail simply use the following command from within the promtail folder:
+
+    ./promtail-linux-amd64 -config.file promtail.yaml
+
+Now all that is left is to add the loki data source in grafana, which can be done with the url "http://localhost:3100".
+
+
+# Opinion about grafana loki
+
+I have now used grafana loki for close to a year. It is similar to Elasticsearch.  
 It is still, in my opinion, not a good replacement for all the features and performance of Elasticsearch, BUT it is a very good small scale logging server solution for non-enterprise.
 
 Promtail can handle log rotation and never had any problems with getting and sending my application logs to loki.  
 Loki is sometimes slow to query (if you search quickly and mulitple times in a row) but works quite well for me, a single person using it and with ~7 services logging to it. The fact that loki doesn't index text never bothered me as the queries were still fast no matter what I searched for.
 
-All in all, i can recommend using Loki and Promtail for your logging needs. It uses way less RAM and CPU than e.g. Elasticsearch and works well with my logging setup of only 7 applications.
+All in all, I can recommend using Loki and Promtail for your personal logging needs. It uses way less RAM and CPU than e.g. Elasticsearch and works well with my logging setup of only 7 applications. I would not recommend it for enterprise logging with many machines.
 
 
 ## My old opinion about grafana loki
