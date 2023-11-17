@@ -13,7 +13,7 @@ A comparison of mariadb and postgresql based on a real life example.
 I wrote a twitch chat logger a long time ago with the sole goal to help a streamer with their chat moderation.  
 After a while I added even more streamers and rewrote it from a file-based NodeJS application to a database Golang application.
 
-Now it has over 45.000.000 chat messages logged in the database and I can use it to benchmark different things.
+At the time of testing it had a bit over 45.000.000 chat messages logged in the database. With this amount of data I was able to test the performance of both databases.
 
 The table looks as follows:
 
@@ -109,9 +109,23 @@ Postgres is faster with GROUP BY statements but not faster with DATE() calculati
 The backup process with mariadb is more clean (because it creates only one .sql file) but not faster than postgres.  
 The restore of backups with postgres is way faster than with mariadb.
 
+
 ## Subjective conclusion
 
 Postgres is faster than mariadb but also a bit more complex.
 
 All the basic mysql logic you learned back in school doesn't apply to postgres. For example: You have to use \l to list databases.
 My colleagues always say "postgres is the free oracle", and I think they are right. MariaDB should be used for smaller projects but if it gets big and complex then PostgreSQL is my go-to pick.
+
+
+## Experience fter 1 year of using MariaDB server
+
+I have been using a MariaDB server for storing any and all data of my now 5 self hosted applications.
+
+According to grafana I have 3qps/night and 7qps/day on average and I peak with up to 13 queries per second, saving up to 50.000 chat messages and a few thousand log/statistic lines per day.
+
+There has never been any performance or delay problem with mariadb.
+
+Even calculating the sum and count of a 500.000 row table with 2 WHERE's (and a few other queries added) does not take more than 400ms on average to return all the data.
+
+The fact that mariadb holds up with these loads made me not switch to postgres yet as it would take time to migrate all applications even though they all work flawlessly right now.
