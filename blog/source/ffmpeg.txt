@@ -26,12 +26,19 @@ A good value is 25 for compression/filesize balance.
 
     ffmpeg -i input.mp4 -crf 25 output.mp4
 
+## Faster starting for web videos
+
+Using the `-movflags +faststart` parameters puts specific metadata infront of the file, which allows for faster starting when received via e.g. a browser.  
+This does not raise the filesize.
+
+    ffmpeg -i input.mp4 -movflags +faststart output.mp4
+
 ## Remove Audio / Video
 
     -an
     -vn
 
-## Example: Convert video to audio
+### Example: Convert video to audio
 
     ffmpeg -i input_video.mp4 -vn output_audio.mp3
 
@@ -40,24 +47,45 @@ A good value is 25 for compression/filesize balance.
 vcodec changes the video's codec and acodec the audio one.  
 copy means it takes the input straight to the output. This makes it way faster.
 
+Do not copy the codec if you cut a video length. This will create errors because it HAS TO recode the beginning of the cut' video or else it will create an error-like video.
+
+Examples for video and audio codecs:
+
     -vcodec h264
-    -vcodec libvpx
+    -vcodec libx265
     -vcodec copy
 
     -acodec aac
     -acodec mp3
     -acodec copy
 
-## Copy all input codecs to output
-
-With this you take the input video and audio and copy it to output.  
-This makes cutting videos (e.g. by time) very quick as no converting takes place.  
-
-    ffmpeg -i input.mp4 -c copy output.mp4
-
 ## Convert Music to lower bitrate
 
-    -map 0:a:0 -b:a 96k
+    -b:a 96k
+
+## Set the preset / speed
+
+Speed and Quality are always opposite of each other.  
+Longer compression makes smaller filesizes, faster makes worse compression.
+
+The default is medium. slow takes 40% longer, slower 100% longer than medium.  
+On my test, with a 1min clip, the filesize difference between medium and slow was ~1MB (18.7 -> 17.5)
+
+    -preset slow
+
+## Tuning for specific videos
+
+With h264 video codec (which is mostly used in mp4) you can set a custom tuning to use for your videos. Example tuning options:
+
+    - film  , for high quality
+    - animation  , for cartoons
+    - stillimage  , for slideshows
+    - grain  , to preserve film grain
+    - fastdecode  , to view faster on slower devices
+
+Example usage:
+
+    ffmpeg -i input.mp4 -vcodec libx264 -tune film output.mp4
 
 ## Aspect ratio
 
@@ -69,7 +97,7 @@ This makes cutting videos (e.g. by time) very quick as no converting takes place
 
 ## Double audio speed
 
-    ffmpeg -i input.mp4 -filter:a "atempo=2.0" -vn output.mp3
+    -filter:a "atempo=2.0"
 
 ## Set bitrate
 
@@ -87,13 +115,14 @@ The second one sets the width and height (and thus the aspect ratio) explicitly
 
     -vf scale="iw/2:-1"
     -vf scale="1280:720"
+    # what also works for to-HD scaling is:
+    -vf scale="1280:-1"
 
 ## Crop (Cut) Video
 w = width of output video  
 x = left top startpoint for the rectangle
 
     ffmpeg -i input.mp4 -filter:v "crop=w:h:x:y" output.mp4
-
 
 
 ## Video to images
@@ -116,7 +145,11 @@ Names are image-001.png, image-002.png, ...
 
 ## Convert a video from 30 to 60 FPS
 
-    ffmpeg -i Input.mp4 -filter:v "minterpolate='fps=60'" Out60.mp4
+    -filter:v "minterpolate='fps=60'"
+
+## Set the target framerate of the video
+
+    -r 60
 
 ## Make 2 input files side by side
 
@@ -143,6 +176,12 @@ aka. 5 seconds long output video
 
     for i in *.mp4; do ffmpeg -i "$i" "_$(basename "$i" .mp4)".mp4 ; done
 
+## Create a thumbnail from video
+
+This creates a picture from the first frame of the video.  
+There are more complex thumbnail generation commands out there.
+
+    ffmpeg -i "input.mp4" -vf "thumbnail" -frames:v 1 input_thumbnail.jpg
 
 # Complex Example Commands
 
