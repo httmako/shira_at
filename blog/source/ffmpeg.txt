@@ -172,16 +172,13 @@ aka. 5 seconds long output video
 
     for i in *.mp4; do ffmpeg -i "$i" "$(basename "$i" .mp4)".mp3  ; done
 
-## Compress a folder with only 2 threads (2 cpu cores)
-
-    for i in *.mp4; do ffmpeg -i "$i" "_$(basename "$i" .mp4)".mp4 ; done
-
 ## Create a thumbnail from video
 
 This creates a picture from the first frame of the video.  
 There are more complex thumbnail generation commands out there.
 
     ffmpeg -i "input.mp4" -vf "thumbnail" -frames:v 1 input_thumbnail.jpg
+
 
 # Complex Example Commands
 
