@@ -16,6 +16,7 @@
 <li><a href="#config">Config</a></li>
 <li><a href="#https">HTTPS with certbot</a></li>
 <li><a href="#reverseproxy">Reverse-Proxy</a></li>
+<li><a href="#caching">Caching</a></li>
 <li><a href="#php">PHP7</a></li>
 <li><a href="#password">Password Protect a folder</a></li>
 <li><a href="#performance">Performance limits</a></li>
@@ -49,7 +50,7 @@ To enable the HTTP and HTTPS via firewalld run the following:<br>
 You should now be able to reach your website from your browser.
 </p>
 
-<h3 id="config">Config & Commands</h3>
+<h3 id="config">Config &amp; Commands</h3>
 <p>Configurations for domains or subdomains are stored in <span>/etc/nginx/conf.d/</span> (on debian in <span>/etc/nginx/sites-available</span>)
 On debian, these files will be linked to the <span>/etc/nginx/sites-enabled</span> directory via the <span>ln -s</span> command.<br>
 To create your first file for your domain (we use the <span>example.com</span> domain here) simply create the file and paste your config in there: <span>sudo nano /etc/nginx/conf.d/example.com.conf</span> (on debian: <span>sudo nano /etc/nginx/site-available/example.com</span>)<br>
@@ -57,14 +58,14 @@ To create your first file for your domain (we use the <span>example.com</span> d
 Content of the file:<br>
 <pre>
 server {
-  listen 80;
-  listen [::]:80;
-  server_name example.com;
-  root /var/www/example.com;
-  index index.html;
-  location / {
-    try_files $uri $uri/ =404;
-  }
+    listen 80;
+    listen [::]:80;
+    server_name example.com;
+    root /var/www/example.com;
+    index index.html;
+    location / {
+        try_files $uri $uri/ =404;
+    }
 }
 </pre>
 Please be careful with the <span>root /var/www/example.com</span> line of the config.<br>
@@ -86,63 +87,125 @@ Then restart nginx with <span>sudo nginx -s reload</span> and you are good to go
 </p>
 
 <h3 id="reverseproxy">Reverse-Proxy</h3>
-<p>With nginx you can redirect URLs to your server to internal services on different ports / sockets.<br>
+<p>With nginx you can redirect URLs on your server to internal services on different ports / sockets.<br>
 This makes it easier to handle HTTPS (SSL) certificates for your services, because nginx can handle the HTTPS connections and internally redirect them to your applications in plain HTTP.<br>
-This way you don't have to install SSL modules into your applications, nginx handles all of that.<br>
+This way you don't have to install SSL modules into your applications because nginx will handle that.<br>
 <br>
 For reverse-proxy to work under CentOS you have to enable the SELinux setting for it. Execute the following command for it to work:<br>
 <pre>
 setsebool -P httpd_can_network_connect 1
 </pre>
 <br>
-Now you can, for example, make a NodeJS http-server that listens on port 3000 available through your website via the <span>example.com/myapp/</span> url.<br>
-This exact scenario can easily be done with the nginx "location" block.<br>
-Simply add the following inside your server block:<br>
+Now you can, for example, make a NodeJS http-server that listens on port 3000.
+To now make this webservice available through your website via the <span>example.com/myapp/</span> url you can use the following location block:<br>
 <pre>
 location /myapp/ {
-  proxy_pass http://localhost:3000/;
-}
-</pre>
-Now people can access your nodejs app via <span>example.com/myapp/</span> instead of <span>example.com:3000/</span>. This way you also don't have to open port 3000.<br>
-The config file example from the <a href="#config">Config & Commands</a> Section of this article would then look like this:<br>
-<pre>
-server {
-  listen 80;
-  listen [::]:80;
-  server_name example.com;
-  root /var/www/example.com;
-  index index.html;
-  location / {
-    try_files $uri $uri/ =404;
-  }
-  location /myapp/ {
     proxy_pass http://localhost:3000/;
-  }
 }
 </pre>
+Now people can access your nodejs app via <span>example.com/myapp/</span> instead of <span>example.com:3000/</span>.<br>
+All things behind the slash will be forwarded to your nodejs backend app. Example: <span>example.com/myapp/user/me</span> will be "proxied" to <span>localhost:3000/user/me</span>.<br>
+This means you can now close port 3000 with your firewall and let all traffic go through your nginx.<br>
 <br>
-<b>Warning:</b> Be careful where you add the location block. If you already installed the HTTPS via certbot then you have to add the location block to the server block that listens on port 443 and NOT port 80.<br>
-The port 80 server block is then only there to redirect incoming requests to port 443.<br>
+This location block has to be added in your <span> server { </span> block where your port 443 is listening.<br>
 <br>
-
+<br>
+<b>IP Whitelisting</b><br>
+To only allow specific IPs you can use the following allow/deny commands in your location block:
+<pre>
+location /myapp/ {
+    allow 1.1.1.1;
+    deny all;
+    proxy_pass http://localhost:3000/;
+}
+</pre>
+This would allow the ip 1.1.1.1 to access this location but all others get a 403 http error instead.<br>
+<br>
+<b>Real-IP of request</b><br>
+By default the backend application will only get localhost IPs as requestors (127.0.0.1 and ::1). This is because the request originates from the nginx locally.<br>
+To correct this you can set the following headers in your location block, which will set the corresponding headers with the real ip from the requestor:
+<pre>
+location /myapp/ {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://localhost:3000/;
+}
+</pre>
+Now your backend application will see the real IP of the requestor and not the localhost IP of the nginx server.<br>
+<br>
 <b>Socket.io</b><br>
 If you want to use socket.io with a nginx reverse-proxy you have to add the following location block:<br>
 <pre>
 location ~* \.io {
-  proxy_set_header X-Real-IP $remote_addr;
-  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  proxy_set_header Host $http_host;
-  proxy_set_header X-NginX-Proxy false;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy false;
 
-  proxy_pass http://localhost:3001;
-  proxy_redirect off;
+    proxy_pass http://localhost:3001;
+    proxy_redirect off;
 
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection "upgrade";
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
 }
 </pre>
 Don't forget to change the port in the <span>proxy_pass</span> line.<br>
+</p>
+
+<h3 id="caching">Caching responses</h3>
+<p>
+NGINX allows you to cache responses from your proxied services.<br>
+This means you don't have to implement caching into your backend webservers.<br>
+The nginx doc website for caching: <a href="https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/">https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/</a><br>
+The nginx site for the proxy cache commands used: <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html">https://nginx.org/en/docs/http/ngx_http_proxy_module.html</a><br>
+<br>
+First put the proxy_cache_path config into your http config block, which on Debian should be located in the default nginx.conf at <span>/etc/nginx/nginx.conf</span><br>
+<pre>
+http {
+    # ...
+    
+    proxy_cache_path /opt/nginx/cache keys_zone=mycache:10m;
+    
+    # ...
+}
+</pre>
+The above config creates the cache named "mycache", which will be stored in the folder "/opt/nginx/cache" and hold a maximum of 10MB (10m).<br>
+<br>
+Next you can use this cache in your server blocks by using the <span>proxy_cache</span> command. After this you can use the <span>proxy_cache_key</span> and <span>proxy_cache_valid</span> commands to set the valid URLs and for how long they should be cached.<br>
+Example:<br>
+<pre>
+# MyService
+proxy_cache mycache;
+location /myservice/ {
+    # ...
+    proxy_cache_key "$scheme$proxy_host$request_uri";
+    proxy_cache_valid 200 302 5m;
+    proxy_cache_valid 404 1m;
+    proxy_cache_valid any 10s;
+    add_header X-Cache-Status $upstream_cache_status;
+    proxy_pass http://localhost:3000/;
+}
+</pre>
+The above example caches the requests to /myservice/. It caches requests by host and request URI. It caches 200 and 302 http response codes for 5 minutes and 404 for 1 minute. The Client (=Browser) can see if their response is cached if they inspect the "X-Cache-Status" header in the response.<br>
+<br>
+By default only GET and HEAD responses are cached. To set more you could use e.g.:
+<pre>
+proxy_cache_methods GET HEAD POST;
+</pre>
+To change the cache time from inside your backend you can set the "X-Accel-Expires" header to the number of seconds for how long this specific response sould be cached.<br>
+An example in the programming language golang with the gin web framework:
+<pre>
+func main() {
+    // ...
+    router.GET("/getnothing", func(c *gin.Contect) {
+        c.Writer.Header().Set("X-Accel-Expires","600")
+        c.String(200,"Nothing")
+    })
+    // ...
+}
+</pre>
+This example, no matter what is configured in the nginx server or location config, sets the cache time for this request/response to 600 seconds aka. 10 minutes.
 </p>
 
 <h3 id="php">PHP with nginx</h3>
@@ -154,33 +217,34 @@ Now check if php-fpm is actually running with the following command (replace ver
 sudo systemctl status php-fpm
 </pre>
 If it says enabled and running then you are good to go. If it doesn't state that then enable and start it via <span>sudo systemctl enable php-fpm --now</span>.<br>
-Now you have to configure nginx to use that PHP. Edit your nginx domain config (probably located at <span>/etc/nginx/conf.d/example.com</span>) and add the following code in your server block:<br>
-<pre>
-location ~ \.php$ {
-  include /etc/nginx/fastcgi_params;
-  fastcgi_index index.php;
-  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-  fastcgi_pass unix:/run/php-fpm/www.sock;
-}
-</pre>
+Now you have to configure nginx to use that PHP instance. Edit your nginx domain config (probably located at <span>/etc/nginx/conf.d/example.com</span> with redhat-based systems or <span>/etc/nginx/sites-available/example.com</span> with debian-based systems) and add the following code in your server block:<br>
 <br>
-<b>Debian only config:</b><br>
+Redhat-based:
 <pre>
 location ~ \.php$ {
-  include snippets/fastcgi-php.conf;
-  fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/php-fpm/www.sock;
 }
 </pre>
+Debian-based:
+<pre>
+location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+}
+</pre>
+It is highly recommended to just use the code that should already be present in your nginx default config for enabling PHP.<br>
+<br>
 Check your nginx config with <span>sudo nginx -t</span>.<br>
 If there are no problems then you can reload the config with <span>sudo nginx -s reload</span>.<br>
 Now you can create a test file and check if everything works:<br>
 simply create a file like <span>/usr/share/nginx/html/test.php</span> and write the php testcode <span><?php phpinfo(); ?></span> in the file and save it.<br>
-If you now visit that file on your website (example: <span>example.com/test.php</span>) it should print the phpinfo!<br>
+If you now visit that file on your website (e.g.: <span>example.com/test.php</span>) it should print the phpinfo.<br>
 <br>
 Don't forget to change your "index" entry on your nginx config to include php files:<br>
 <pre>
 server {
-  index index.html index.php
+  index index.html index.php;
   ...
 }
 </pre>
@@ -191,15 +255,15 @@ server {
 A simple password-protected folder can be achieved via .htpasswd files.<br>
 <pre>
 location /admin/ {
-  auth_basic "Admin Login";
-  auth_basic_user_file /etc/nginx/.htpasswd
+    auth_basic "Admin Login";
+    auth_basic_user_file /etc/nginx/.htpasswd
 }
 </pre>
 If you want to have the .htpasswd file in your web folder then deny access to it:<br>
 <pre>
 location = /.htpasswd {
-  deny all;
-  return 404;
+    deny all;
+    return 404;
 }
 </pre>
 To create this file you can use the <span>apache2-utils</span> (Debian) or the <span>httpd-tools</span> (CentOS) tools.<br>
@@ -214,8 +278,7 @@ The nginx server is fast, but it also has it's limits.<br>
 One limit is the "max files open at once" linux limitation. A system can only have that many files open at once. To see the number you can use the <span>ulimit -a</span> command. These are the soft limits. The hard limits can be seen by appending an <span>-H</span> to the command. On Raspbian this is 1024 (soft) and 1048576 (hard).<br><br>
 Another big limit is the max connections a system can have. There are only so many ports the system can use.
 To see the number of ports you can use for connections use the following command: <span>cat /proc/sys/net/ipv4/ip_local_port_range</span>. On raspbian it is 32768-60999, which means around 25.000 Ports can be used, which means around 25.000 Connections can be handled at once.<br>
-But this value needs to be cut in half if you have a reverse-proxy running. This doubles the connection usage, as one connection is from the client to the server and another one goes from the server to the reverse-proxy location.<br><br>
-Last but not least: Your PHP-FPM / other backend application can be limited too. Your nginx worker threads may work fast, but if you have a PHP website and PHP-FPM is slow, then everything gets slowed down too.<br>
+Your PHP-FPM / other backend application can be limited too. Your nginx worker threads may work fast, but if you have a PHP website and PHP-FPM is slow, then everything gets slowed down too.<br>
 </p>
 <br><br><br>
 </body>
