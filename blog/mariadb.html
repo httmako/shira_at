@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>mariadb | shira.at</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://shira.at/style.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">mariadb | shira.at</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#about" id="toc-about">About</a></li>
+<li><a href="#installing-and-configuration"
+id="toc-installing-and-configuration">Installing and
+Configuration</a></li>
+<li><a href="#storage" id="toc-storage">Storage</a></li>
+<li><a href="#backups" id="toc-backups">Backups</a></li>
+<li><a href="#performance" id="toc-performance">Performance</a></li>
+</ul>
+</nav>
+<h2 id="about">About</h2>
+<p>This page is a summary of my learnings with mariadb.</p>
+<p>It is not supposed to be a complete overview or a detailed guide on
+how to use it, but instead just a collection of experiences and
+accidental benchmarks.</p>
+<h2 id="installing-and-configuration">Installing and Configuration</h2>
+<p>To install mariadb simply use the default command:</p>
+<pre><code>sudo apt-get install mariadb-server</code></pre>
+<p>The only config you may have to change is the listening IP.<br />
+By default the mariadb server only listens on localhost port 3306, which
+means no one can connect from the outside.<br />
+To enable this you have to edit this in the config that is located in
+Debian 11 at:</p>
+<pre><code>/etc/mysql/mariadb.conf.d/50-server.cnf</code></pre>
+<p>There around line 30 you can change the bind-address to 0.0.0.0 to
+allow external access.</p>
+<h2 id="storage">Storage</h2>
+<p>I have over 50.000.000 (50million) chat messages saved in one table
+and around 10.000.000 log lines in another table.<br />
+If i export both with mariadb-dump I get around 6GB of .sql text
+files.<br />
+The lib folder which contains the database files directly are 7GB in
+size.</p>
+<h2 id="backups">Backups</h2>
+<p>Taken from my mariadb-vs-postgres blog:<br />
+Backing up 45.000.000 chat messages with mariadb-dump (or the old
+mysqldump command) takes around 1.5minutes.</p>
+<p>Important: During a backup of a MariaDB InnoDB Database the tables
+and data are NOT blocked!<br />
+If you create a backup with the following command:</p>
+<pre><code>mariadb-dump --single-transaction --databases mydatabase &gt; backup.sql</code></pre>
+<p>Then any other connection can still INSERT or SELECT data from the
+tables of this database.<br />
+This is because of the <code>--single-transaction</code> flag, which
+requires the storage engine InnoDB and allows you to do non-blocking
+backups.</p>
+<p><em>Warning: If you insert data during a backup it will not be
+included in it!</em></p>
+<p>If you do not use this flag then a backup blocks INSERT statements
+but you can still use SELECT during it.</p>
+<p>Source:</p>
+<ul>
+<li>Tested myself</li>
+<li><a
+href="https://mariadb.com/docs/server/ref/mdb/cli/mariadb-dump/single-transaction/">https://mariadb.com/docs/server/ref/mdb/cli/mariadb-dump/single-transaction/</a></li>
+<li><a
+href="https://mariadb.com/kb/en/mariadb-dump/#examples">https://mariadb.com/kb/en/mariadb-dump/#examples</a></li>
+</ul>
+<h2 id="performance">Performance</h2>
+<p>My installation of mariadb was never “tuned for performance”.</p>
+<p>An example of how to raise performance: Set the InnoDB buffer to ~80%
+of your available RAM.</p>
+<p>I have done nothing the like (buffer is at 128MB) and I still get an
+immense performance out of it.</p>
+<p><strong>A short story about an accidental database
+benchmark:</strong></p>
+<p>I am currently storing logs for gameservers.<br />
+The server for storing this has 4 CPU cores and 8GB of RAM with 128MB of
+that being InnoDB buffer.<br />
+They send me logs in 100 lines per request.<br />
+The request flow is: gameserver -&gt; nginx -&gt; golang-webserver -&gt;
+mariadb<br />
+I save all those 100 lines in a single transaction via my golang
+webserver (which uses gin and sqlx)</p>
+<p>One time someone found out how to create an exponential
+damage-creator on a gameserver.<br />
+This created 330.000 log lines in ~15 seconds.<br />
+These were sent via 3.300 requests to me and were successfully
+saved.</p>
+<p>Grafana showed me in a single 15s scrape-tick:</p>
+<ul>
+<li>CPU usage of ~54%</li>
+<li>3300 requests to my golang webserver</li>
+<li>3260 of these requests were done within 10ms</li>
+<li>24Mb/s network traffic</li>
+<li>330.000 new log lines in mariadb</li>
+<li>7.720 QPS (queries per second) on the mariadb</li>
+<li>10MB/s disk R/W</li>
+<li>254 io/s IOps on the disk</li>
+<li>only 2 database connections open from my go webserver</li>
+<li>no crashes, lags or other</li>
+</ul>
+<p>According to the timestamps with which the log lines have been
+inserted into the mariadb it was around 20.000 log lines per second for
+around 15 seconds.<br />
+The SQL used to see this is:</p>
+<pre><code>SELECT COUNT(datetime),datetime FROM logs WHERE datetime BETWEEN &#39;1970-01-02 13:01:00&#39; AND &#39;1970-01-02 13:02:15&#39; GROUP BY datetime;</code></pre>
+<p>Also, the above SQL statement took, in a table with 5 million
+loglines, only 3.8s to complete.</p>
+<p>To summarize this, you do not need to tune for performance as long as
+you do not have more than ~30.000 queries/second consistently.</p>
+</body>
+</html>
