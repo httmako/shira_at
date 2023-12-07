@@ -11,15 +11,18 @@
     div.columns{display: flex; gap: min(4vw, 1.5em);}
     div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
     ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
       width: 0.8em;
       margin: 0 0.8em 0.2em -1.6em;
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="https://shira.at/style.css">
+  <link rel="stylesheet" href="/style.css">
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
@@ -56,11 +59,22 @@ id="toc-grafana-data-sources">Grafana data sources</a></li>
 <li><a href="#monitoring-golang-gin-webservers"
 id="toc-monitoring-golang-gin-webservers">Monitoring golang gin
 webservers</a></li>
+<li><a href="#create-alerts-for-downtimes"
+id="toc-create-alerts-for-downtimes">Create alerts for
+downtimes</a></li>
 <li><a href="#creating-histogram-graphs-in-grafana"
 id="toc-creating-histogram-graphs-in-grafana">Creating histogram graphs
 in grafana</a></li>
-<li><a href="#about-grafana-loki" id="toc-about-grafana-loki">About
-grafana loki</a></li>
+<li><a href="#installing-loki-and-promtail"
+id="toc-installing-loki-and-promtail">Installing Loki and
+Promtail</a></li>
+<li><a href="#opinion-about-grafana-loki"
+id="toc-opinion-about-grafana-loki">Opinion about grafana loki</a>
+<ul>
+<li><a href="#my-old-opinion-about-grafana-loki"
+id="toc-my-old-opinion-about-grafana-loki">My old opinion about grafana
+loki</a></li>
+</ul></li>
 </ul>
 </nav>
 <p>Last changed: 2023.07.01</p>
@@ -147,7 +161,10 @@ configuration in it:</p>
 <pre><code>[server]
 domain = example.com
 root_url = https://example.com/grafana/
-serve_from_sub_path = true</code></pre>
+serve_from_sub_path = false</code></pre>
+<p><strong>Attention</strong>: With Grafana 10 you have to set
+<code>serve_from_sub_path=false</code> but with Grafana 9 you have to
+set this to true.</p>
 <p>Then change your “startgrafana.sh” file to add this config:</p>
 <pre><code>./grafana-10.0.1/bin/grafana server --config &quot;grafana.ini&quot; --homepath &quot;grafana-10.0.1&quot; web</code></pre>
 <p>This way grafana knows that it’s being called by a reverse proxy
@@ -329,6 +346,32 @@ with “w writer” and “r response” parameters.</p>
 <p>We can do this with gin-gonic by wrapping it like this:</p>
 <pre><code>r.GET(&quot;/metrics&quot;, gin.WrapH(promhttp.Handler()))</code></pre>
 <p>Now your application is ready and can be scraped by prometheus.</p>
+<h1 id="create-alerts-for-downtimes">Create alerts for downtimes</h1>
+<p>Every prometheus metric-source has an <code>up</code> metric that is
+available to view in grafana.<br />
+You can view this metric in grafana by going to <code>Explore</code> on
+the left and then simply typing in <code>up</code> and pressing
+shift+enter.</p>
+<p>This metric will be 1 if the service was able to be scraped
+(=accessed) by prometheus and will be 0 if Prometheus wasn’t able to
+access the /metrics path.<br />
+This metric has a different label (job) for each service.</p>
+<p>You can easily monitor your services (in general, if they are
+running) by creating an alert with the <code>up</code> metric.<br />
+On the left menu you have an “Alerting” tab. There you can create
+“Contact points” (the place where you will get your is-down
+notification) and “Alert rules” (the checks that send
+notifications).</p>
+<p>You can create an alert rule with the following:</p>
+<ul>
+<li>Prometheus, Time Range “now-5m to now”</li>
+<li>PromQL query: <code>up</code></li>
+<li>Expressions B (Reduce): Input A, Function Min, Mode Strict</li>
+<li>Expressions C (Threshold): Input B, Is Below, 1</li>
+</ul>
+<p>This way your alert rule will check every 5 minutes if a service is
+down. If it is down for 2 checks in a row (e.g. 10 minutes) then you
+will get a notification.</p>
 <h1 id="creating-histogram-graphs-in-grafana">Creating histogram graphs
 in grafana</h1>
 <p>The above commit shows a “HistogramVec”, so a bucket-based metric
@@ -360,31 +403,105 @@ alt="an image of a bar gauge in grafana" />
 <figcaption aria-hidden="true">an image of a bar gauge in
 grafana</figcaption>
 </figure>
-<h1 id="about-grafana-loki">About grafana loki</h1>
-<p>Loki is not enterprise ready yet.</p>
-<p>Grafana loki is a “competitor” to other logging tools like
+<h1 id="installing-loki-and-promtail">Installing Loki and Promtail</h1>
+<p>Loki is the logging backend that has to be added as a data source in
+grafana.<br />
+Promtail is the “log-grabber” that basically uses <code>tail -f</code>
+to send the log files you specify to loki.</p>
+<p>To install loki and promtail first download them from here: <a
+href="https://github.com/grafana/loki/releases">https://github.com/grafana/loki/releases</a><br />
+Example:</p>
+<pre><code>wget &quot;https://github.com/grafana/loki/releases/download/v2.9.2/loki-linux-amd64.zip&quot;
+wget &quot;https://github.com/grafana/loki/releases/download/v2.9.2/promtail-linux-amd64.zip&quot;
+unzip loki-linux-amd64.zip
+unzip promtail-linux-amd64.zip</code></pre>
+<p>An example loki config, taken from <a
+href="https://grafana.com/docs/loki/latest/configure/examples/#1-local-configuration-exampleyaml">https://grafana.com/docs/loki/latest/configure/examples/#1-local-configuration-exampleyaml</a><br />
+This will be put into <code>loki.yaml</code> in the loki folder:</p>
+<pre><code>auth_enabled: false
+server:
+  http_listen_port: 3100
+common:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  replication_factor: 1
+  path_prefix: /tmp/loki
+schema_config:
+  configs:
+  - from: 2020-05-15
+    store: boltdb-shipper
+    object_store: filesystem
+    schema: v11
+    index:
+      prefix: index_
+      period: 24h</code></pre>
+<p>To start loki simply use the following command from within the loki
+folder:</p>
+<pre><code>./loki-linux-amd64 --config.file=loki.yaml</code></pre>
+<p>An example promtail config, taken from <a
+href="https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#example-static-config">https://grafana.com/docs/loki/latest/send-data/promtail/configuration/#example-static-config</a><br />
+This will be put into <code>promtail.yaml</code> in the promtail
+folder:</p>
+<pre><code>server:
+  disable: true
+positions:
+  filename: ./positions.yaml
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+scrape_configs:
+ - job_name: myapp
+   pipeline_stages:
+   static_configs:
+   - targets:
+      - localhost
+     labels:
+      app: myapp
+      __path__: /srv/myapp/myapp.log</code></pre>
+<p>In this example configuration I changed the server to be disabled.
+This server is meant to receive logs via http push, which is not needed
+if you simply tail the logfiles.</p>
+<p>To start promtail simply use the following command from within the
+promtail folder:</p>
+<pre><code>./promtail-linux-amd64 -config.file promtail.yaml</code></pre>
+<p>Now all that is left is to add the loki data source in grafana, which
+can be done with the url “http://localhost:3100”.</p>
+<h1 id="opinion-about-grafana-loki">Opinion about grafana loki</h1>
+<p>I have now used grafana loki for close to a year. It is similar to
 Elasticsearch.<br />
-It is quite easy to setup and runs flawlessly like grafana and
-prometheus, but it’s not quite feature ready in my opinion.</p>
-<p>To send logs to loki they expect you to run promtail, a kind of
-“agent” that tails your log files and sends them to your loki instance.
-You can then view those loki logs inside grafana. This agent is also not
-enterprise ready yet, far from it.</p>
+It is still, in my opinion, not a good replacement for all the features
+and performance of Elasticsearch, BUT it is a very good small scale
+logging server solution for non-enterprise.</p>
+<p>Promtail can handle log rotation and never had any problems with
+getting and sending my application logs to loki.<br />
+Loki is sometimes slow to query (if you search quickly and mulitple
+times in a row) but works quite well for me, a single person using it
+and with ~7 services logging to it. The fact that loki doesn’t index
+text never bothered me as the queries were still fast no matter what I
+searched for.</p>
+<p>All in all, I can recommend using Loki and Promtail for your personal
+logging needs. It uses way less RAM and CPU than e.g. Elasticsearch and
+works well with my logging setup of only 7 applications. I would not
+recommend it for enterprise logging with many machines.</p>
+<h2 id="my-old-opinion-about-grafana-loki">My old opinion about grafana
+loki</h2>
+<p>Loki is not enterprise ready yet.</p>
 <p>My pain points with this logging solution:</p>
 <p><strong>Promtail is a must have</strong><br />
-They really expect you to use promtail for sending logs to loki. There
-is no official solution for sending logs directly out of your
-application to loki. This means another application like promtail makes
-your whole landscape even more complex to manage. Promtail also only
-handles files,pods and journal as a log source, which means no stdout
-support.</p>
+They expect you to use promtail for sending logs to loki. There is no
+official solution for sending logs directly out of your application or
+via other log-pushers to loki. This means another application like
+promtail makes your whole landscape even more complex to manage.
+Promtail also only handles files,pods and journal as a log source, which
+means no stdout support as far as I know.</p>
 <p><strong>Promtail can’t handle log rotation</strong><br />
 According to <a
 href="https://grafana.com/docs/loki/latest/clients/promtail/">https://grafana.com/docs/loki/latest/clients/promtail/</a>.<br />
 If I have logging in my applications I have to rotate them out before
 they become too big and clog the filesystem. But promtail, the official
 tool for loki, doesn’t support this, which means it’s very difficult to
-use anywhere.</p>
+use anywhere. (This seems to, as of 2023.11.13, to work?)</p>
 <p><strong>Promtails config is weird</strong><br />
 This may be subjective, but having this weird config setup with a
 “<strong>path</strong>” variable inside the targets-&gt;labels block to
@@ -395,10 +512,9 @@ promtail can only read files from your local machine. (?!)</p>
 Both loki and promtail have only documentation about cloud usage.
 Finding an easy to follow guide to install this locally on a single
 bare-metal linux server is not easy, but for e.g. Kubernetes I would use
-elasticsearch anyways.</p>
+elasticsearch and their stack anyways.</p>
 <p><strong>Loki doesn’t index text</strong><br />
-This may be a bit subjective aswell, but loki only indexes the labels
-and not the message itself.<br />
+Loki only indexes the labels and not the message itself.<br />
 This means you have to add lots of labels for easy and quick log
 searching, but loki wants you to have non-dynamic labels (e.g. a fixed
 amount of possible labels) which makes this more difficult again.<br />

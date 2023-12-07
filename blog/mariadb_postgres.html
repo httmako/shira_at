@@ -8,12 +8,22 @@
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    span.underline{text-decoration: underline;}
-    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    ul.task-list{list-style: none;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -50,7 +60,7 @@
     code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
     code span.at { color: #7d9029; } /* Attribute */
     code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { } /* BuiltIn */
+    code span.bu { color: #008000; } /* BuiltIn */
     code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
     code span.ch { color: #4070a0; } /* Char */
     code span.cn { color: #880000; } /* Constant */
@@ -63,7 +73,7 @@
     code span.ex { } /* Extension */
     code span.fl { color: #40a070; } /* Float */
     code span.fu { color: #06287e; } /* Function */
-    code span.im { } /* Import */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
     code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
     code span.kw { color: #007020; font-weight: bold; } /* Keyword */
     code span.op { color: #666666; } /* Operator */
@@ -75,12 +85,11 @@
     code span.va { color: #19177c; } /* Variable */
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <link rel="stylesheet" href="/style.css">
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
-  <link rel="stylesheet" href="https://shira.at/style.css">
 </head>
 <body>
 <header id="title-block-header">
@@ -88,24 +97,37 @@
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#comparison">Comparison</a>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#comparison" id="toc-comparison">Comparison</a>
 <ul>
-<li><a href="#group-by">GROUP BY</a></li>
-<li><a href="#date-interval">DATE Interval</a></li>
-<li><a href="#backup-restore">Backup &amp; Restore</a></li>
+<li><a href="#group-by" id="toc-group-by">GROUP BY</a></li>
+<li><a href="#date-interval" id="toc-date-interval">DATE
+Interval</a></li>
+<li><a href="#backup-restore" id="toc-backup-restore">Backup &amp;
+Restore</a></li>
 </ul></li>
-<li><a href="#objective-conclusion">Objective conclusion</a></li>
-<li><a href="#subjective-conclusion">Subjective conclusion</a></li>
+<li><a href="#objective-conclusion"
+id="toc-objective-conclusion">Objective conclusion</a></li>
+<li><a href="#subjective-conclusion"
+id="toc-subjective-conclusion">Subjective conclusion</a></li>
+<li><a href="#experience-fter-1-year-of-using-mariadb-server"
+id="toc-experience-fter-1-year-of-using-mariadb-server">Experience fter
+1 year of using MariaDB server</a></li>
 </ul>
 </nav>
-<p>A comparison of mariadb and postgresql based on a real life example.</p>
+<p>A comparison of mariadb and postgresql based on a real life
+example.</p>
 <h2 id="introduction">Introduction</h2>
-<p>I wrote a twitch chat logger a long time ago with the sole goal to help a streamer with their chat moderation.<br />
-After a while I added even more streamers and rewrote it from a file-based NodeJS application to a database Golang application.</p>
-<p>Now it has over 45.000.000 chat messages logged in the database and I can use it to benchmark different things.</p>
+<p>I wrote a twitch chat logger a long time ago with the sole goal to
+help a streamer with their chat moderation.<br />
+After a while I added even more streamers and rewrote it from a
+file-based NodeJS application to a database Golang application.</p>
+<p>At the time of testing it had a bit over 45.000.000 chat messages
+logged in the database. With this amount of data I was able to test the
+performance of both databases.</p>
 <p>The table looks as follows:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> messages(</span>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> messages(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> SERIAL,</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    streamer <span class="dt">VARCHAR</span>(<span class="dv">255</span>),</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">user</span> <span class="dt">VARCHAR</span>(<span class="dv">255</span>),</span>
@@ -113,21 +135,28 @@ After a while I added even more streamers and rewrote it from a file-based NodeJ
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    intime DATETIME <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="fu">current_timestamp</span>()</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>) ENGINE<span class="op">=</span>InnoDB</span></code></pre></div>
 <p>The mariadb SERIAL type is an id with auto increment and index.</p>
-<p>The hardware used: 8GB RAM, 4-core AMD EPYC 7702P CPU, 2.5inch SSD.</p>
+<p>The hardware used: 8GB RAM, 4-core AMD EPYC 7702P CPU, 2.5inch
+SSD.</p>
 <p>The data was transfered from mariadb to postgres with pgloader.</p>
 <h2 id="comparison">Comparison</h2>
 <h3 id="group-by">GROUP BY</h3>
-<p>Usecase: I want to know how many messages were received per day.<br />
+<p>Usecase: I want to know how many messages were received per
+day.<br />
 This is best solved within the database via a query.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>), <span class="dt">DATE</span>(intime) <span class="kw">FROM</span> messages <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">DATE</span>(intime);</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>), <span class="dt">DATE</span>(intime) <span class="kw">FROM</span> messages <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">DATE</span>(intime);</span></code></pre></div>
 <pre><code>| mariadb | postgresql |
 |---------|------------|
 | 24s     | 4s         |</code></pre>
-<p>This benchmark showed mariadb only using one core at once with 100% usage. Postgres used 3 cores at once with 60-100% usage with each core.</p>
+<p>This benchmark showed mariadb only using one core at once with 100%
+usage. Postgres used 3 cores at once with 60-100% usage with each
+core.</p>
 <hr />
 <h3 id="date-interval">DATE Interval</h3>
-<p>Usecase: I want to get the amount of messages that were saved in the last 24hours.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">//</span>mariadb:</span>
+<p>Usecase: I want to get the amount of messages that were saved in the
+last 24hours.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">//</span>mariadb:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> messages <span class="kw">WHERE</span> intime <span class="op">&gt;=</span> DATE_SUB(NOW(), <span class="dt">INTERVAL</span> <span class="dv">1</span> <span class="dt">DAY</span>);</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">//</span>postgres:</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> messages <span class="kw">WHERE</span> intime <span class="op">&gt;=</span> NOW() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="st">&#39;1 DAY&#39;</span>;</span></code></pre></div>
@@ -137,14 +166,22 @@ This is best solved within the database via a query.</p>
 <p>Here only one core was used by both postgres and mariadb.</p>
 <hr />
 <h3 id="backup-restore">Backup &amp; Restore</h3>
-<p>Usecase: I want to backup (and in the case of an emergency restore) the database without much downtime.</p>
-<p>I tested both database systems with their respective backup commands.</p>
+<p>Usecase: I want to backup (and in the case of an emergency restore)
+the database without much downtime.</p>
+<p>I tested both database systems with their respective backup
+commands.</p>
 <pre><code>| type    | mariadb   | postgres |
 |---------|-----------|----------|
 | backup  | mysqldump | pg_dump  |
 | restore | mysql     | psql     |</code></pre>
-<p>Both database systems support the use of non-blocking backups. This means that you can create a complete and consistent snapshot of your database during ongoing operation without any downtime or waiting inserts.</p>
-<p>Source: - <a href="https://www.postgresql.org/docs/current/backup-dump.html">https://www.postgresql.org/docs/current/backup-dump.html</a> - last paragraph before 26.1.1 - <a href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction">https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction</a></p>
+<p>Both database systems support the use of non-blocking backups. This
+means that you can create a complete and consistent snapshot of your
+database during ongoing operation without any downtime or waiting
+inserts.</p>
+<p>Source: - <a
+href="https://www.postgresql.org/docs/current/backup-dump.html">https://www.postgresql.org/docs/current/backup-dump.html</a>
+- last paragraph before 26.1.1 - <a
+href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction">https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction</a></p>
 <p>The times taken:</p>
 <pre><code>| type    | mariadb   | postgres |
 |---------|-----------|----------|
@@ -152,13 +189,36 @@ This is best solved within the database via a query.</p>
 | restore | 10:02min  | 2:10min  |</code></pre>
 <p>The mariadb backup .sql file was 3.6GB in size.<br />
 After using gzip to compress it the size went down to 772MB.<br />
-Just for clarification: Those are 45 million database rows in those backups.</p>
+Just for clarification: Those are 45 million database rows in those
+backups.</p>
 <h2 id="objective-conclusion">Objective conclusion</h2>
-<p>Postgres is faster with GROUP BY statements but not faster with DATE() calculation of column values.<br />
-The backup process with mariadb is more clean (because it creates only one .sql file) but not faster than postgres.<br />
-The restore of backups with postgres is way faster than with mariadb.</p>
+<p>Postgres is faster with GROUP BY statements but not faster with
+DATE() calculation of column values.<br />
+The backup process with mariadb is more clean (because it creates only
+one .sql file) but not faster than postgres.<br />
+The restore of backups with postgres is way faster than with
+mariadb.</p>
 <h2 id="subjective-conclusion">Subjective conclusion</h2>
 <p>Postgres is faster than mariadb but also a bit more complex.</p>
-<p>All the basic mysql logic you learned back in school doesn’t apply to postgres. For example: You have to use to list databases. My colleagues always say “postgres is the free oracle”, and I think they are right. MariaDB should be used for smaller projects but if it gets big and complex then PostgreSQL is my go-to pick.</p>
+<p>All the basic mysql logic you learned back in school doesn’t apply to
+postgres. For example: You have to use to list databases. My colleagues
+always say “postgres is the free oracle”, and I think they are right.
+MariaDB should be used for smaller projects but if it gets big and
+complex then PostgreSQL is my go-to pick.</p>
+<h2 id="experience-fter-1-year-of-using-mariadb-server">Experience fter
+1 year of using MariaDB server</h2>
+<p>I have been using a MariaDB server for storing any and all data of my
+now 5 self hosted applications.</p>
+<p>According to grafana I have 3qps/night and 7qps/day on average and I
+peak with up to 13 queries per second, saving up to 50.000 chat messages
+and a few thousand log/statistic lines per day.</p>
+<p>There has never been any performance or delay problem with
+mariadb.</p>
+<p>Even calculating the sum and count of a 500.000 row table with 2
+WHERE’s (and a few other queries added) does not take more than 400ms on
+average to return all the data.</p>
+<p>The fact that mariadb holds up with these loads made me not switch to
+postgres yet as it would take time to migrate all applications even
+though they all work flawlessly right now.</p>
 </body>
 </html>
