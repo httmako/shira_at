@@ -2,7 +2,7 @@
 title: linux commands | shira.at
 toc: true
 header-includes:
-    <link rel="stylesheet" href="https://shira.at/style.css">
+    <link rel="stylesheet" href="/style.css">
 ---
 
 

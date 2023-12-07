@@ -2,7 +2,7 @@
 title: grafana | shira.at
 toc: true
 header-includes:
-    <link rel="stylesheet" href="https://shira.at/style.css">
+    <link rel="stylesheet" href="/style.css">
 ---
 
 Last changed: 2023.07.01
