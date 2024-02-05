@@ -100,3 +100,19 @@ The SQL used to see this is:
 Also, the above SQL statement took, in a table with 5 million loglines, only 3.8s to complete.
 
 To summarize this, you do not need to tune for performance as long as you do not have more than ~30.000 queries/second consistently.
+
+
+## Performance by using index
+
+Using an index for an often queried column can help your performance a lot.
+
+An example:
+Using the same server as above (4core 8GB debian12 server) there is another application. It has 1.000.000 rows and has the column `serverid` which consists of around ~30 different IDs. If someone uses the application it executes 5 different queries which use the `serverid` column in a WHERE clause.
+
+By default (without an index) it takes 0.25s (250ms) to execute one of those queries. The browser shows a time of ~600ms for this request and also the turtle icon because the request was slow.
+
+After creating an index on this column (with `CREATE INDEX serverid ON server(serverid)`) it takes 0.01s (1ms) to execute the same query as above. The browser shows only 50ms of time taken for the whole request.
+
+Creating this index took only ~3seconds on a table with 1 million entries. Dropping it with `DROP INDEX serverid ON server` only takes around 3 seconds too.
+
+
