@@ -23,7 +23,9 @@ table, th, td {
 <li><a href="#images-png">Compressing .png images</a></li>
 <li><a href="#videos">Compressing videos</a></li>
 <li><a href="#videocodecs">Different video codecs</a></li>
+<li><a href="#gpuencoding">About GPU encoding</a></li>
 <li><a href="#converting">Converting images</a></li>
+<li><a href="#externals">About external websites</a></li>
 </ul>
 
 <h3 id="preamble">Preamble</h3>
@@ -181,7 +183,23 @@ Takeaways and learnings from these convertions:
 <li>"Preset slow" doesn't help much if you compare the extra time taken to the lower filesize. It's better to just take a slower codec without a slow preset (e.g. h264 preset slow -> h265 default)</li>
 <li>The "tune"'s for the h264 codec help a lot for barely any extra time taken</li>
 </ul>
+</p>
 
+<h3 id="gpuencoding">About GPU encoding</h3>
+<p>
+Modern GPUs support the option to encode and decode video streams directly on the GPU.<br>
+This is way faster than using the CPU, but also very limited with bad compression.<br>
+<br>
+This was tested with a RTX 4060 and the "Handbrake" software on windows 10.<br>
+It wasn't tested with ffmpeg as the compilation and flags for GPU encoding never worked.<br>
+In Handbrake it is called "nvenc".<br>
+<br>
+If you encode a video from h264 to libx265 with Handbrake it works really well. The GPU does all the work and the CPU sits idle. It converts a 20min video in a few seconds.<br>
+The main problem comes from this speed: It only converts the video codec, nothing more. It doesn't optimize the video or touch the quality at all.<br>
+Normally you want to convert from 264 to 265 for the better compression ratio (most of the time a 40% decrease in size for me, which saves a lot of storage space).<br>
+This compression is, atleast for me, absent when encoding with GPU. There is no reason to use this because the only reason I would want to convert these videos is for the better storage ratio.<br>
+<br>
+Maybe other tools do it better, or AMD GPUs are better at this. But atleast for me and the RTX4060 it is not worthwhile to encode with a GPU instead of a CPU.
 </p>
 
 <h3 id="converting">Converting images</h3>
@@ -233,6 +251,22 @@ As you can see in the images above, the first 2 are near identical but the last 
 One important fact to consider when chosing your prefered image format: Webp is not fully supported on every platform yet.<br>
 Microsoft Paint can not edit it and some image viewers can not open it yet either. On the internet many people dislike it because it can not be as easily handled as a png.<br>
 There are also vulnerabilities like this one: <a target="_blank" href="https://arstechnica.com/security/2023/09/google-quietly-corrects-previously-submitted-disclosure-for-critical-webp-0-day/">https://arstechnica.com/security/2023/09/google-quietly-corrects-previously-submitted-disclosure-for-critical-webp-0-day/</a> , which really make it difficult to like webp in its current state.
+</p>
+
+
+<h3 id="externals">About external websites</h3>
+<p>
+I recently got an email about this article which mentions a website that has better compression than the tools I mentioned here.<br>
+<br>
+Yes, this website has better compression than pngquant. Pngquant already has the best compression of all the linux commandline tools out there.<br>
+But I dislike having to rely on a website for my image compressions. This has multiple reasons:
+<ul>
+<li>The website could save every image I compress (privacy / confidentiality)</li>
+<li>If the website is down or if I am working offline then I would have to find an alternative (availability)</li>
+<li>The website could insert malicious data into my images (Integrity)</li>
+</ul>
+I tend to compare this with the webp image format: Ofcourse it has a way better filesize and compression ratio than png or jpg, but I personally do not use it because it has barely any support on modern devices or software.<br>
+So even though {webp,the website} is the best at compression, I stick to my little linux commands which do a well enough job for me and are supported {offline,everywhere}.
 </p>
 
 <br><br><br>
