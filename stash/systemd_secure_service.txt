@@ -1,0 +1,43 @@
+[Unit]
+Description=Testing x
+After=network.target iptables.service mariadb.service
+# Location of this file would be /etc/systemd/system/x.service (on redhat)
+
+[Service]
+#LimitMEMLOCK=infinity
+#LimitNOFILE=65535
+Type=simple
+User=x
+Group=x
+WorkingDirectory=/home/x
+ExecStart=/home/x/b
+Restart=always
+RestartSec=1m
+#Environment=USER=x HOME=/home/x
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateMounts=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHostname=true
+ProtectKernelTunables=true
+ProcSubset=pid
+RestrictSUIDSGID=true
+PrivateUsers=true
+#RootDirectory=/home/x
+InaccessiblePaths=/afs /bin /boot /lib /lib64 /media /mnt /opt /root /sbin /srv /usr /var
+# ^ /dev is protected by PrivateDevices
+# ^ /etc is readonly by ProtectSystem=full , it is needed for networking in golang applications
+# ^ /proc by ProcSubset=pid
+# ^ /sys by ProtectKernelTunables
+
+# Logging
+#SystemCallLog=~chown
+# ^This doesn't work?
+#StandardOutput=append:/home/x/b.log
+# ^This works only if SELinux is disabled
+
+[Install]
+WantedBy=multi-user.target
