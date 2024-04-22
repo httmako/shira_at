@@ -1,6 +1,8 @@
 ---
 title: selinux | shira.at
 toc: true
+lang: en
+description: Shows common selinux commands and troubleshoot tips
 header-includes:
     <link rel="stylesheet" href="https://shira.at/style.css">
 ---
