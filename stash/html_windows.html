@@ -1,86 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
 <style>
-#popup {
-  position: absolute;
-  z-index: 9;
-  background-color: #f1f1f1;
-  min-width:200px;
-  border: 1px solid #d3d3d3;
+body {
+    font-family: Arial;
+}
+.win {
+    position: absolute;
+    z-index: 9;
+    background-color: #f1f1f1;
+    min-width:200px;
+    border: 1px solid #d3d3d3;
 }
 
-#popupheader {
-  padding: 2px;
-  cursor: move;
-  z-index: 10;
-  background-color: #2196F3;
-  color: #fff;
+.win .header {
+    padding: 2px;
+    cursor: move;
+    z-index: 10;
+    background-color: #2196F3;
+    color: #fff;
+    --color: black;
 }
-#close{
-  float:right;
-  cursor: pointer;
+.win .close {
+    float: right;
+    cursor: pointer;
+    background-color: red;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+.win .close:hover {
+    background-color: darkred;
+    color: red;
 }
 </style>
+</head>
 <body>
 
 <h1>Draggable DIV Element</h1>
 
 <p>Click and hold the mouse button down while moving the DIV element</p>
 
-<button onclick="openpopup()">Open</button>
+<button onclick="WinShowStatus()">Status</button>
+<button onclick="WinShowSearch()">Search</button>
 
-<div id="popup">
-  <div id="popupheader">Popup<span onclick="closepopup()" id="close">X</span></div>
-  <p>Text here?</p>
+<div id="status" class="win" style="display:none;">
+  <div class="header">Status<span class="close">X</span></div>
+  <p style="color:green;">OK</p>
+</div>
+
+<div id="search" class="win" style="display:none;">
+  <div class="header">Search<span class="close">X</span></div>
+  <p>--</p>
 </div>
 
 <script>
-dragElement(document.getElementById("popup"));
-
-function openpopup(){
-  document.getElementById("popup").style.display = "inline";
+let els = document.getElementsByClassName("win");
+for (let i=0;i<els.length;i++) {
+    let el = els[i];
+    dragElement(el);
+    if (el.children && el.getElementsByClassName("close")[0]) {
+        el.getElementsByClassName("close")[0].addEventListener("click",function(e){
+            el.style.display = "none";
+        });
+    }
 }
-function closepopup(){
-  document.getElementById("popup").style.display = "none";
+
+function WinShowStatus(){
+    document.getElementById("status").style.display = "inline";
+}
+
+function WinShowSearch(){
+    document.getElementById("search").style.display = "inline";
 }
 
 function dragElement(elmnt) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(elmnt.id + "header")) {
-    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-  } else {
-    elmnt.onmousedown = dragMouseDown;
-  }
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    if (elmnt.children && elmnt.children[0] && elmnt.children[0].classList[0] == "header") {
+        elmnt.children[0].onmousedown = dragMouseDown;
+    } else {
+        elmnt.onmousedown = dragMouseDown;
+    }
 
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // call a function whenever the cursor moves:
+        document.onmousemove = elementDrag;
+    }
 
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-  }
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // calculate the new cursor position:
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // set the element's new position:
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+    }
 
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
-  }
+    function closeDragElement() {
+        /* stop moving when mouse button is released:*/
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }
 </script>
 
