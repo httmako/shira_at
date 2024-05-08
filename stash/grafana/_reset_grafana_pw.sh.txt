@@ -1,0 +1,6 @@
+#!/bin/bash
+
+p=`strings /dev/urandom | grep -o  '[[:alnum:]]' | head -n 30 | tr -d '\n'`
+cd /srv/grafana/
+bin/grafana cli admin reset-admin-password $p > grafana_pwreset_log.txt
+cd -

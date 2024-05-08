@@ -1,0 +1,120 @@
+#!/bin/bash
+if [[ $(whoami) != 'root' ]]; then
+    echo "Please execute this script as root! Exiting...";
+    exit 0;
+fi
+
+echo "Minimalistic installer for grafana stack v3.0";
+echo "New: service files";
+echo "";
+
+grafana=10.4.2
+node=1.8.0
+prometheus=2.51.2
+loki=3.0.0
+mysqlv=0.15.1
+
+cd /srv
+mkdir loki
+mkdir exportermysql
+mkdir promtail
+
+echo "Downloading mysqld_exporter"
+wget -qO- https://github.com/prometheus/mysqld_exporter/releases/download/v$mysqlv/mysqld_exporter-$mysqlv.linux-amd64.tar.gz | tar -xzO mysqld_exporter-$mysqlv.linux-amd64/mysqld_exporter > /srv/exportermysql/mysqld_exporter
+echo '[client]
+user=mysqlexporter
+password=abc123' > /srv/exportermysql/mysqld_exporter.cnf
+
+echo "Downloading prometheus"
+wget -qO- https://github.com/prometheus/prometheus/releases/download/v$prometheus/prometheus-$prometheus.linux-amd64.tar.gz | tar -xz
+mv prometheus-$prometheus.linux-amd64 prometheus
+echo "global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+  - job_name: grafana
+    static_configs:
+      - targets: ['127.0.0.1:3000']
+  - job_name: linux
+    static_configs:
+      - targets: ['127.0.0.1:9100']
+  - job_name: loki
+    static_configs:
+      - targets: ['127.0.0.1:3100']" > /srv/prometheus/prometheus.yml
+
+echo "Downloading mysqld_exporter"
+cd /srv
+wget -qO- https://github.com/prometheus/node_exporter/releases/download/v$node/node_exporter-$node.linux-amd64.tar.gz | tar -xz
+mv node_exporter-$node.linux-amd64 exporternode
+
+echo "Downloading loki"
+cd /srv/loki
+wget -q https://github.com/grafana/loki/releases/download/v$loki/loki-linux-amd64.zip
+unzip -q loki-linux-amd64.zip
+wget -q https://raw.githubusercontent.com/grafana/loki/main/cmd/loki/loki-local-config.yaml -O loki.yaml
+rm loki-linux-amd64.zip
+
+echo "Downloading promtail"
+cd /srv/promtail
+wget -q https://github.com/grafana/loki/releases/download/v$loki/promtail-linux-amd64.zip
+unzip -q promtail-linux-amd64.zip
+rm promtail-linux-amd64.zip
+echo "server:
+  disable: true
+
+clients:
+  - url: http://localhost:3100/loki/api/v1/push
+
+positions:
+  filename: ./positions.yml
+
+scrape_configs:
+- job_name: myapp
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      app: myapp
+      __path__: /srv/myapp/myapp.log
+" > /srv/promtail/promtail_config.yaml
+
+echo "Downloading grafana"
+cd /srv
+wget -qO- https://dl.grafana.com/enterprise/release/grafana-enterprise-$grafana.linux-amd64.tar.gz | tar -xz
+mv grafana-v$grafana grafana
+
+# Setting permissions
+chown -R root:root /srv/prometheus /srv/grafana /srv/exportermysql /srv/exporternode /srv/loki /srv/promtail
+
+# Service files
+echo "Creating service files"
+cd /etc/systemd/system/
+wget -q https://shira.at/stash/grafana/exportermysql.service
+wget -q https://shira.at/stash/grafana/exporternode.service
+wget -q https://shira.at/stash/grafana/grafana.service
+wget -q https://shira.at/stash/grafana/loki.service
+wget -q https://shira.at/stash/grafana/prometheus.service
+wget -q https://shira.at/stash/grafana/promtail.service
+
+systemctl daemon-reload
+
+
+echo "Starting services node_exporter,grafana,loki,prometheus"
+systemctl enable --now exporternode
+systemctl enable --now loki
+systemctl enable --now prometheus
+systemctl enable --now grafana
+
+echo ""
+
+echo "Please change the config of promtail and mysqld_exporter"
+echo "Then start them with systemctl start <name>"
+
+cd /srv
+wget -q https://shira.at/stash/grafana/_create_default_datasources.sh.txt -O _create_datasources.sh
+chmod +x _create_datasources.sh
+echo "To create the loki/prometheus datasources use ./_create_datasources.sh"
+echo "To import a basic node_exporter dashboard import the ID 1860"

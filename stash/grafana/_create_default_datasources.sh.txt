@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "Creating datasources..."
+curl -s -X POST -H "Accept: application/json" -H "Content-Type: application/json" -H "X-Disable-Provenance: true" http://admin:admin@localhost:3000/api/datasources -d '{"name":"Prometheus","type":"prometheus","url":"http://127.0.0.1:9090","access":"proxy","basicAuth":false,"isDefault":true}'
+curl -s -X POST -H "Accept: application/json" -H "Content-Type: application/json" -H "X-Disable-Provenance: true" http://admin:admin@localhost:3000/api/datasources -d '{"name":"Loki","type":"loki","url":"http://127.0.0.1:3100","access":"proxy","basicAuth":false}'
