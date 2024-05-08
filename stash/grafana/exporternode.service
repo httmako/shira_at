@@ -1,0 +1,37 @@
+[Unit]
+Description=Linux Node exporter for grafana/prometheus
+After=network.target iptables.service
+# Location of this file would be /etc/systemd/system/x.service (on redhat)
+
+[Service]
+Type=simple
+#User=myuser
+#Group=myuser
+WorkingDirectory=/srv/exporternode
+ExecStart=/srv/exporternode/node_exporter
+Restart=always
+RestartSec=1m
+IPAccounting=yes
+IPAddressDeny=any
+IPAddressAllow=127.0.0.0/8
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateMounts=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHostname=true
+ProtectKernelTunables=true
+#ProcSubset=pid
+RestrictSUIDSGID=true
+PrivateUsers=true
+#RootDirectory=/srv/exportermysql
+#BindReadOnlyPaths=/etc/resolv.conf
+#InaccessiblePaths=/bin /boot /lib /lib64 /media /mnt /opt /root /sbin /usr /var
+ReadOnlyPaths=/bin /boot /lib /lib64 /media /mnt /opt /root /sbin /usr /var
+StandardOutput=append:/srv/exporternode/stdout.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

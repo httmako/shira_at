@@ -1,0 +1,34 @@
+[Unit]
+Description=loki log server
+After=network.target iptables.service
+# Location of this file would be /etc/systemd/system/x.service (on redhat)
+
+[Service]
+Type=simple
+#User=myuser
+#Group=myuser
+WorkingDirectory=/srv/loki
+ExecStart=/srv/loki/loki-linux-amd64 --config.file=loki.yaml
+Restart=always
+RestartSec=1m
+IPAccounting=yes
+#IPAddressDeny=any
+#IPAddressAllow=127.0.0.0/8
+
+# Hardening
+NoNewPrivileges=true
+#PrivateTmp=true
+PrivateMounts=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHostname=true
+ProtectKernelTunables=true
+ProcSubset=pid
+RestrictSUIDSGID=true
+PrivateUsers=true
+InaccessiblePaths=/bin /boot /lib /lib64 /media /mnt /opt /root /sbin /usr /var
+StandardOutput=append:/srv/loki/stdout.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

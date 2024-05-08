@@ -1,0 +1,30 @@
+[Unit]
+Description=Promtail
+After=network.target iptables.service
+# Location of this file would be /etc/systemd/system/x.service (on redhat)
+
+[Service]
+Type=simple
+#User=myuser
+#Group=myuser
+WorkingDirectory=/srv/promtail
+ExecStart=/srv/promtail/promtail-linux-amd64 -config.file promtail_config.yaml
+Restart=always
+RestartSec=1m
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateMounts=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHostname=true
+ProtectKernelTunables=true
+ProcSubset=pid
+RestrictSUIDSGID=true
+PrivateUsers=true
+StandardOutput=append:/srv/promtail/stdout.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
