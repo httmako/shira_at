@@ -21,6 +21,7 @@ mkdir promtail
 
 echo "Downloading mysqld_exporter"
 wget -qO- https://github.com/prometheus/mysqld_exporter/releases/download/v$mysqlv/mysqld_exporter-$mysqlv.linux-amd64.tar.gz | tar -xzO mysqld_exporter-$mysqlv.linux-amd64/mysqld_exporter > /srv/exportermysql/mysqld_exporter
+chmod +x /srv/exportermysql/mysqld_exporter
 echo '[client]
 user=mysqlexporter
 password=abc123' > /srv/exportermysql/mysqld_exporter.cnf
