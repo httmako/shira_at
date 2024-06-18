@@ -10,6 +10,9 @@ header-includes:
 
 This page is a summary of my learnings with mariadb.
 
+All performance results were tested on an Debian11 server with a 4core 2GHz CPU (Burst 3.35GHz, AMD EPYC 7702P) and 8GB RAM.  
+The mariadb was not changed from its default settings, the innodb cache is (according to grafana) 128MiB.
+
 It is not supposed to be a complete overview or a detailed guide on how to use it, but instead just a collection of experiences and accidental benchmarks.
 
 
@@ -59,7 +62,7 @@ Source:
  - [https://mariadb.com/kb/en/mariadb-dump/#examples](https://mariadb.com/kb/en/mariadb-dump/#examples)
 
 
-## Performance
+## Performance for inserts
 
 My installation of mariadb was never "tuned for performance".  
 
@@ -102,17 +105,60 @@ Also, the above SQL statement took, in a table with 5 million loglines, only 3.8
 To summarize this, you do not need to tune for performance as long as you do not have more than ~30.000 queries/second consistently.
 
 
+## Performance for SELECT WHERE LIKE
+
+I have a table with chat messages, one row is one chat message with sender,receiver/channel,datetime,id.  
+This table has 65630443 messages, counting this takes 15.07s.
+
+If you now want to count how many chat messages have the word sleep in it that will take only 85seconds on average.
+
+```
+MariaDB [chat]> SELECT COUNT(*) FROM messages WHERE message LIKE "%sleep%";
++----------+
+| COUNT(*) |
++----------+
+|   112946 |
++----------+
+1 row in set (1 min 25.829 sec)
+```
+
+Reruns of this query, after restart or after different queries, always returns a time-taken of about 85seconds.
+
+
 ## Performance by using index
 
-Using an index for an often queried column can help your performance a lot.
+Using an index for an often filtered column can help your performance a lot.
 
-An example:
-Using the same server as above (4core 8GB debian12 server) there is another application. It has 1.000.000 rows and has the column `serverid` which consists of around ~30 different IDs. If someone uses the application it executes 5 different queries which use the `serverid` column in a WHERE clause.
+I have a table with logs for different servers. There are around 20 different server IDs and a total of 20.503.200 rows in the table.  
 
-By default (without an index) it takes 0.25s (250ms) to execute one of those queries. The browser shows a time of ~600ms for this request and also the turtle icon because the request was slow.
+If you want, for example, all log message that contains the word "cheat" on server X you can use the following query:
 
-After creating an index on this column (with `CREATE INDEX serverid ON server(serverid)`) it takes 0.01s (1ms) to execute the same query as above. The browser shows only 50ms of time taken for the whole request.
+```
+MariaDB [llog]> SELECT ts,msg FROM llog WHERE serverid="X" AND msg LIKE "%cheat%";
+Empty set (14.329 sec)
+```
 
-Creating this index took only ~3seconds on a table with 1 million entries. Dropping it with `DROP INDEX serverid ON server` only takes around 3 seconds too.
+As you can see above, it takes 15seconds to search for this, subsequent queries take the same amount of time.
+
+If you now add a simple index like this:
+
+```
+MariaDB [llog]> CREATE INDEX llogserverid ON llog(serverid);
+Query OK, 0 rows affected (1 min 52.698 sec)
+```
+
+The time will be taken down to 0.043s (-99.6%) if you execute the same query again:
+
+```
+MariaDB [llog]> SELECT ts,msg FROM llog WHERE serverid="X" AND msg LIKE "%cheat%";
+Empty set (0.043 sec)
+```
 
 
+Another example:  
+A table with 1.000.000 rows and a column that gets filtered often (column is named serverid with around 30 unique values). The application executes 5 different queries on this table that all use the `WHERE serverid="X"` filter.  
+
+Before creating an index the request took 0.6s (one of the 5 queries took 0.25s alone).  
+After creating an index the request took 0.05s (the query above took only 0.01s instead).
+
+This index took 3seconds to create (1mil rows) and dropping the index took 3seconds too.

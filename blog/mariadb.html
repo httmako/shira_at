@@ -23,9 +23,6 @@
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -39,11 +36,21 @@ id="toc-installing-and-configuration">Installing and
 Configuration</a></li>
 <li><a href="#storage" id="toc-storage">Storage</a></li>
 <li><a href="#backups" id="toc-backups">Backups</a></li>
-<li><a href="#performance" id="toc-performance">Performance</a></li>
+<li><a href="#performance-for-inserts"
+id="toc-performance-for-inserts">Performance for inserts</a></li>
+<li><a href="#performance-for-select-where-like"
+id="toc-performance-for-select-where-like">Performance for SELECT WHERE
+LIKE</a></li>
+<li><a href="#performance-by-using-index"
+id="toc-performance-by-using-index">Performance by using index</a></li>
 </ul>
 </nav>
 <h2 id="about">About</h2>
 <p>This page is a summary of my learnings with mariadb.</p>
+<p>All performance results were tested on an Debian11 server with a
+4core 2GHz CPU (Burst 3.35GHz, AMD EPYC 7702P) and 8GB RAM.<br />
+The mariadb was not changed from its default settings, the innodb cache
+is (according to grafana) 128MiB.</p>
 <p>It is not supposed to be a complete overview or a detailed guide on
 how to use it, but instead just a collection of experiences and
 accidental benchmarks.</p>
@@ -90,7 +97,7 @@ href="https://mariadb.com/docs/server/ref/mdb/cli/mariadb-dump/single-transactio
 <li><a
 href="https://mariadb.com/kb/en/mariadb-dump/#examples">https://mariadb.com/kb/en/mariadb-dump/#examples</a></li>
 </ul>
-<h2 id="performance">Performance</h2>
+<h2 id="performance-for-inserts">Performance for inserts</h2>
 <p>My installation of mariadb was never “tuned for performance”.</p>
 <p>An example of how to raise performance: Set the InnoDB buffer to ~80%
 of your available RAM.</p>
@@ -133,5 +140,50 @@ The SQL used to see this is:</p>
 loglines, only 3.8s to complete.</p>
 <p>To summarize this, you do not need to tune for performance as long as
 you do not have more than ~30.000 queries/second consistently.</p>
+<h2 id="performance-for-select-where-like">Performance for SELECT WHERE
+LIKE</h2>
+<p>I have a table with chat messages, one row is one chat message with
+sender,receiver/channel,datetime,id.<br />
+This table has 65630443 messages, counting this takes 15.07s.</p>
+<p>If you now want to count how many chat messages have the word sleep
+in it that will take only 85seconds on average.</p>
+<pre><code>MariaDB [chat]&gt; SELECT COUNT(*) FROM messages WHERE message LIKE &quot;%sleep%&quot;;
++----------+
+| COUNT(*) |
++----------+
+|   112946 |
++----------+
+1 row in set (1 min 25.829 sec)</code></pre>
+<p>Reruns of this query, after restart or after different queries,
+always returns a time-taken of about 85seconds.</p>
+<h2 id="performance-by-using-index">Performance by using index</h2>
+<p>Using an index for an often filtered column can help your performance
+a lot.</p>
+<p>I have a table with logs for different servers. There are around 20
+different server IDs and a total of 20.503.200 rows in the table.</p>
+<p>If you want, for example, all log message that contains the word
+“cheat” on server X you can use the following query:</p>
+<pre><code>MariaDB [llog]&gt; SELECT ts,msg FROM llog WHERE serverid=&quot;X&quot; AND msg LIKE &quot;%cheat%&quot;;
+Empty set (14.329 sec)</code></pre>
+<p>As you can see above, it takes 15seconds to search for this,
+subsequent queries take the same amount of time.</p>
+<p>If you now add a simple index like this:</p>
+<pre><code>MariaDB [llog]&gt; CREATE INDEX llogserverid ON llog(serverid);
+Query OK, 0 rows affected (1 min 52.698 sec)</code></pre>
+<p>The time will be taken down to 0.043s (-99.6%) if you execute the
+same query again:</p>
+<pre><code>MariaDB [llog]&gt; SELECT ts,msg FROM llog WHERE serverid=&quot;X&quot; AND msg LIKE &quot;%cheat%&quot;;
+Empty set (0.043 sec)</code></pre>
+<p>Another example:<br />
+A table with 1.000.000 rows and a column that gets filtered often
+(column is named serverid with around 30 unique values). The application
+executes 5 different queries on this table that all use the
+<code>WHERE serverid="X"</code> filter.</p>
+<p>Before creating an index the request took 0.6s (one of the 5 queries
+took 0.25s alone).<br />
+After creating an index the request took 0.05s (the query above took
+only 0.01s instead).</p>
+<p>This index took 3seconds to create (1mil rows) and dropping the index
+took 3seconds too.</p>
 </body>
 </html>
