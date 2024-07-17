@@ -14,7 +14,6 @@ This is neither a complete list nor a guide on how to use ffmpeg.
 If the code doesn't start with `ffmpeg` then it's only the middle part.  
 This middle part needs to be inserted `ffmpeg -i input.mp4 <here> output.mp4`.  
 
-
 # Common flags
 
 ## Compress video 
@@ -23,6 +22,7 @@ Should be between 20 and 28 for good quality.
 The lower the bigger the filesize.  
 51 is max compression and looks very bad.  
 A good value is 25 for compression/filesize balance.  
+The default value is 23.  
 
     ffmpeg -i input.mp4 -crf 25 output.mp4
 
@@ -85,7 +85,7 @@ With h264 video codec (which is mostly used in mp4) you can set a custom tuning 
 
 Example usage:
 
-    ffmpeg -i input.mp4 -vcodec libx264 -tune film output.mp4
+    ffmpeg -i input.mp4 -vcodec h264 -tune film output.mp4
 
 ## Aspect ratio
 
@@ -115,10 +115,10 @@ The second one sets the width and height (and thus the aspect ratio) explicitly
 
     -vf scale="iw/2:-1"
     -vf scale="1280:720"
-    # what also works for to-HD scaling is:
+    # what also works for scaling to HD is:
     -vf scale="1280:-1"
 
-## Crop (Cut) Video
+## Crop (Cut out part of a) Video
 w = width of output video  
 x = left top startpoint for the rectangle
 
@@ -178,6 +178,19 @@ This creates a picture from the first frame of the video.
 There are more complex thumbnail generation commands out there.
 
     ffmpeg -i "input.mp4" -vf "thumbnail" -frames:v 1 input_thumbnail.jpg
+
+## Convert an image
+
+You can use ffmpeg to convert between image formats too
+
+    ffmpeg -i "input.jpg" output.png
+
+
+## Remove noise (like TV static) from video
+
+This can remove noise (e.g. flickering of pixels in the background) and "soften" videos, reducing filesize but also removing a few fine-grained details
+
+    ffmpeg -i "input.mp4" -vf "atadenoise" output.mp4
 
 
 # Complex Example Commands

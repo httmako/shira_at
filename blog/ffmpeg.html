@@ -23,9 +23,6 @@
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -68,7 +65,8 @@ audio speed</a></li>
 audio</a></li>
 <li><a href="#change-scale-of-video"
 id="toc-change-scale-of-video">Change scale of video</a></li>
-<li><a href="#crop-cut-video" id="toc-crop-cut-video">Crop (Cut)
+<li><a href="#crop-cut-out-part-of-a-video"
+id="toc-crop-cut-out-part-of-a-video">Crop (Cut out part of a)
 Video</a></li>
 <li><a href="#video-to-images" id="toc-video-to-images">Video to
 images</a></li>
@@ -94,6 +92,11 @@ mp3</a></li>
 <li><a href="#create-a-thumbnail-from-video"
 id="toc-create-a-thumbnail-from-video">Create a thumbnail from
 video</a></li>
+<li><a href="#convert-an-image" id="toc-convert-an-image">Convert an
+image</a></li>
+<li><a href="#remove-noise-like-tv-static-from-video"
+id="toc-remove-noise-like-tv-static-from-video">Remove noise (like TV
+static) from video</a></li>
 </ul></li>
 <li><a href="#complex-example-commands"
 id="toc-complex-example-commands">Complex Example Commands</a>
@@ -128,7 +131,8 @@ This middle part needs to be inserted
 <p>Should be between 20 and 28 for good quality.<br />
 The lower the bigger the filesize.<br />
 51 is max compression and looks very bad.<br />
-A good value is 25 for compression/filesize balance.</p>
+A good value is 25 for compression/filesize balance.<br />
+The default value is 23.</p>
 <pre><code>ffmpeg -i input.mp4 -crf 25 output.mp4</code></pre>
 <h2 id="faster-starting-for-web-videos">Faster starting for web
 videos</h2>
@@ -179,7 +183,7 @@ custom tuning to use for your videos. Example tuning options:</p>
 - grain  , to preserve film grain
 - fastdecode  , to view faster on slower devices</code></pre>
 <p>Example usage:</p>
-<pre><code>ffmpeg -i input.mp4 -vcodec libx264 -tune film output.mp4</code></pre>
+<pre><code>ffmpeg -i input.mp4 -vcodec h264 -tune film output.mp4</code></pre>
 <h2 id="aspect-ratio">Aspect ratio</h2>
 <pre><code>-aspect 16:9</code></pre>
 <h2 id="double-speed-of-video-0.5-x2">Double Speed of video (0.5 =
@@ -200,9 +204,10 @@ The second one sets the width and height (and thus the aspect ratio)
 explicitly</p>
 <pre><code>-vf scale=&quot;iw/2:-1&quot;
 -vf scale=&quot;1280:720&quot;
-# what also works for to-HD scaling is:
+# what also works for scaling to HD is:
 -vf scale=&quot;1280:-1&quot;</code></pre>
-<h2 id="crop-cut-video">Crop (Cut) Video</h2>
+<h2 id="crop-cut-out-part-of-a-video">Crop (Cut out part of a)
+Video</h2>
 <p>w = width of output video<br />
 x = left top startpoint for the rectangle</p>
 <pre><code>ffmpeg -i input.mp4 -filter:v &quot;crop=w:h:x:y&quot; output.mp4</code></pre>
@@ -243,6 +248,15 @@ video</h2>
 <p>This creates a picture from the first frame of the video.<br />
 There are more complex thumbnail generation commands out there.</p>
 <pre><code>ffmpeg -i &quot;input.mp4&quot; -vf &quot;thumbnail&quot; -frames:v 1 input_thumbnail.jpg</code></pre>
+<h2 id="convert-an-image">Convert an image</h2>
+<p>You can use ffmpeg to convert between image formats too</p>
+<pre><code>ffmpeg -i &quot;input.jpg&quot; output.png</code></pre>
+<h2 id="remove-noise-like-tv-static-from-video">Remove noise (like TV
+static) from video</h2>
+<p>This can remove noise (e.g. flickering of pixels in the background)
+and “soften” videos, reducing filesize but also removing a few
+fine-grained details</p>
+<pre><code>ffmpeg -i &quot;input.mp4&quot; -vf &quot;atadenoise&quot; output.mp4</code></pre>
 <h1 id="complex-example-commands">Complex Example Commands</h1>
 <h2 id="convert-gif-to-mp4-file">Convert gif to mp4 file</h2>
 <p>Source: <a

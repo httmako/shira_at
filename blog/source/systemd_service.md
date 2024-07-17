@@ -74,12 +74,13 @@ Running the service as a user has many advantages, for example:
  - More security compliant thanks to less attack surface
 
 SystemD, as mentioned in the documentation above, has many more security features than just user services.  
+To analyze your systemd service files you can use the `systemd-analyze security` command. To analyze a single service file in detail you can use `systemd-analyze security <svcname>`.  
 This is a fully enhanced systemd service file with comments to explain each feature:
 
 ```bash
 [Unit]
 Description=MyRestAPI
-After=network.target iptables.service mariadb.service
+After=network.target mariadb.service
 # Location of this file would be /etc/systemd/system/myrestapi.service (on redhat and debian)
 
 [Service]
@@ -106,39 +107,66 @@ RestartSec=1m
 
 # Enable counting of IP bytes in and out for the service
 IPAccounting=yes
+# Only allow sockets, IPv4 and IPv6 as network protocols
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 # The following 2 lines enable an IP whitelist for this service
 # This allows this application to only communicate with the localhost, neither requests from nor to the internet are allowed
 IPAddressDeny=any
 IPAddressAllow=127.0.0.0/8
-# Service can no longer gain privileges via e.g. setuid or fs caps)
+# You can also disable all network traffic with PrivateNetwork
+# PrivateNetwork=true
+# Service can no longer gain privileges via e.g. setuid or fs caps
 NoNewPrivileges=true
 # Creates new /tmp and /var/tmp directories for this process. After this systemd service stops these tmp folders will be removed!
 PrivateTmp=true
 # Filesystem namespacing, doesn't propagate mounts to this process
 PrivateMounts=true
-# Disables /dev/sda,mem,port,etc. (removes @raw-io capabilities)
+# Disables /dev/sda,mem,port,etc.
 PrivateDevices=true
-# Makes /usr,/boot,/efi,/etc read-only
+# Makes /usr,/boot,/efi,/etc read-only, but can still write to /tmp,/srv
+# Set this to "strict" to make the whole filesystem read-only
 ProtectSystem=full
-# Prevents hostname/domainname changes
+# Hide /home,/root and /run/user (inaccessible and empty)
+ProtectHome=true
+# Make cgroups read-only (only container managers use write) and disallow namespace creation
+ProtectControlGroups=true
+RestrictNamespaces=true
+# Prevents hostname and clock changes
 ProtectHostname=true
-# Makes kernelvariables in /proc,/sys read-only
+ProtectClock=true
+# Set umask of files created by service's application (u=rwx, go=nothing)
+UMask=0077
+# Remove IPC after service is stopped
+RemoveIPC=true
+# Protect kernel variables and modules
 ProtectKernelTunables=true
+ProtectKernelModules=true
 # Only lets the process see itself in /proc/
 ProcSubset=pid
+ProtectProc=noaccess
 # Disables setting SUID/SGID on files
 RestrictSUIDSGID=true
+# Remove all root capabilities (bind port < 1024, ignore file perms, etc.)
+CapabilityBoundingSet=
 # Files not owned by you appear to be owned by "nobody" (or root)
 PrivateUsers=true
-# Makes directories invisible for the process. Warning, some processes need those!
-# To instead make directories read-only use ReadOnlyPaths=
+# Disallow access to syslog
+ProtectKernelLogs=true
+# Makes directories invisible for the process. Warning, some processes need those! (or use ReadOnlyPaths=)
 InaccessiblePaths=/bin /boot /lib /lib64 /media /mnt /opt /root /sbin /usr /var
+# Disable specific syscalls (setting clock, tracing, kernel-modules, mounting, rebooting, root-only, changing sawp, emulating other CPUs, obsolete calls)
+SystemCallFilter=~@clock @debug @module @mount @reboot @privileged @swap @cpu-emulation @obsolete
+# Disable changing kernel-exec-domain and realtime execution (could hog cpu)
+LockPersonality=true
+RestrictRealtime=true
+
+
 # Redirect the stdout and stderror to a file
 StandardOutput=append:/srv/myrestapi/stdout.log
 StandardError=inherit
 
 # Chroot's the process into the directory.
-# Warning: This doesn't work well for non-static binaries!
+# Warning: This doesn't work well for non-static binaries because of missing /lib!
 # RootDirectory=/srv/myrestapi
 
 [Install]

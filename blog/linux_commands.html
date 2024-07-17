@@ -23,9 +23,6 @@
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -162,6 +159,9 @@ into screen</a></li>
 href="#script---convert-colored-command-output-to-a-html-page-requisites"
 id="toc-script---convert-colored-command-output-to-a-html-page-requisites">script
 - convert colored command output to a html page-requisites</a></li>
+<li><a href="#ssh---access-port-on-server-via-tunnel"
+id="toc-ssh---access-port-on-server-via-tunnel">ssh - access port on
+server via tunnel</a></li>
 </ul></li>
 <li><a href="#cronjobs" id="toc-cronjobs">Cronjobs</a>
 <ul>
@@ -391,6 +391,15 @@ id="script---convert-colored-command-output-to-a-html-page-requisites">script
 - convert colored command output to a html page-requisites</h2>
 <pre><code>script -c &quot;grep -rin Receive&quot;
 aha -s -f typescript &gt; out.html</code></pre>
+<h2 id="ssh---access-port-on-server-via-tunnel">ssh - access port on
+server via tunnel</h2>
+<p>Example: you have a linux server (root@example.com) that has an
+application running on port 3000 but only locally.<br />
+You can access this application by using the following command and then
+visiting localhost:9100 in your browser:</p>
+<pre><code>ssh -L 9100:localhost:3000 root@example.com</code></pre>
+<p>The syntax is
+<code>&lt;local_port&gt;:localhost:&lt;remote_port&gt; &lt;user@remote_server&gt; -P &lt;remote_ssh_port&gt;</code></p>
 <h1 id="cronjobs">Cronjobs</h1>
 <h2
 id="automatically-backup-your-mariadb-and-delete-backups-older-than-7days">Automatically

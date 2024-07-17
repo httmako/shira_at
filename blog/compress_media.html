@@ -131,7 +131,31 @@ user@debian:~/Videos$ ls -ahl _divinity2_20220122_16.mp4
 -rwxrwxrwx 1 user user <b>54M</b> Feb  3 10:31 _divinity2_20220122_16.mp4
 </pre>
 <br>
-Using ffmpeg to either optimize or compress the video to sizes you think are reasonably enough is a great way to save a lot of storage space.
+Using ffmpeg to either optimize or compress the video to sizes you think are reasonably enough is a great way to save a lot of storage space.<br>
+<br>
+Bitrates from compressing 2 different videos, cut out from a livestream with copied codecs):<br>
+
+Elden Ring gameplay (running around, camera movement, action, no static screens)
+<table>
+<tr><th>Bitrate(kbit/s)</th><th>Size</th><th>Type</th><th>Command</th></tr>
+<tr><td>5400</td><td>38.7M</td><td>60FPS/FHD</td><td>/source file/</td></tr>
+<tr><td>6700</td><td>49.1M</td><td>60FPS/FHD</td><td>-acodec aac -vcodec h264</td></tr>
+<tr><td>6100</td><td>44.9M</td><td>30FPS/FHD</td><td>-acodec aac -vcodec h264 -r 30</td></tr>
+<tr><td>3500</td><td>26.8M</td><td>60FPS/HD</td><td>-acodec aac -vcodec h264 -vf "scale=1280:-1"</td></tr>
+<tr><td>3200</td><td>23.9M</td><td>30FPS/HD</td><td>-acodec aac -vcodec h264 -vf "scale=1280:-1" -r 30</td></tr>
+</table>
+
+Vlog video (static camera, not much movement, focus on talking, shoulders-up angle)
+<table>
+<tr><th>Bitrate(kbit/s)</th><th>Size</th><th>Type</th><th>Command</th></tr>
+<tr><td>5100</td><td>38.4M</td><td>60FPS/FHD</td><td>/source file/</td></tr>
+<tr><td>1100</td><td>8.99M</td><td>60FPS/FHD</td><td>-acodec aac -vcodec h264</td></tr>
+<tr><td>1000</td><td>8.51M</td><td>30FPS/FHD</td><td>-acodec aac -vcodec h264 -r 30</td></tr>
+<tr><td>464</td><td>4.41M</td><td>30FPS/HD</td><td>-acodec aac -vcodec h264 -vf "scale=1280:-1" -r 30</td></tr>
+</table>
+
+Both of these videos above are taken from a single livestream. The bitrate of these streams is rather static because livestreaming services prefer encoding speed over size-efficiency. This enables them to show streams live and with not much delay, but this also causes the bitrate to be quite higher with static videos.  
+Re-encoding (compressing) videos with not much movement/action can save a lot of storage space, but gaming videos are not easily reduced in size without sacrificing the quality of the video. 
 </p>
 
 <h3 id="videocodecs">Different video codecs</h3>

@@ -236,6 +236,15 @@ Example: Stop a Minecraft server running in a screen called "mc" by sending "sto
     script -c "grep -rin Receive"
     aha -s -f typescript > out.html
 
+## ssh - access port on server via tunnel
+
+Example: you have a linux server (root@example.com) that has an application running on port 3000 but only locally.  
+You can access this application by using the following command and then visiting localhost:9100 in your browser:
+
+    ssh -L 9100:localhost:3000 root@example.com
+
+The syntax is `<local_port>:localhost:<remote_port> <user@remote_server> -P <remote_ssh_port>`
+
 
 
 # Cronjobs
