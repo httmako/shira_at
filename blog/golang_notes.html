@@ -35,7 +35,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -88,9 +88,6 @@
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -224,6 +221,12 @@ can only use and recommend <a
 href="https://github.com/go-sql-driver/mysql">https://github.com/go-sql-driver/mysql</a>.<br />
 It has never failed me and works perfectly, auto reconnecting and
 pooling of connections has never created any problems for me.</p>
+<p>For postgres I tested multiple frameworks but I enjoy the one from
+uptrace/bun the most: <a
+href="github.com/uptrace/bun/driver/pgdriver">github.com/uptrace/bun/driver/pgdriver</a>.<br />
+It uses the database/sql interface, which means everything is the same
+as always and no code needs to be changed if you do a mysql-&gt;postgres
+switch.</p>
 <p>If you need more functions than the default <code>database/sql</code>
 package can provide then I can recommend <code>sqlx</code>: <a
 href="https://github.com/jmoiron/sqlx">https://github.com/jmoiron/sqlx</a>.<br />
@@ -245,12 +248,12 @@ xml doesn’t).</p>
 <p>Passwords are provided by environment, the rest are either configured
 via flags or config file.</p>
 <h2 id="logging">Logging</h2>
-<p>At the beginning I was using the inbuilt <code>logger</code>, then
-<code>zap</code> and I now ended up using the inbuilt
+<p>At the beginning I was using the inbuilt <code>log</code> module,
+then uber’s <code>zap</code> module and I now ended up using the inbuilt
 <code>log/slog</code> package.<br />
 The <code>slog</code> package supports structured logging with different
 levels (info,error,etc.) and can log to different formats
-(logfmt,json,plain) and locations (stdout,file,etc.).</p>
+(logfmt,json,plain) and locations (stdout,file).</p>
 <p>If your application doesn’t log much then simple <code>fmt</code>
 prints could be enough aswell, e.g. for commandline applications I
 prefer to just print information in plaintext instead of using a

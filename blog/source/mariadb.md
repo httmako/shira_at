@@ -31,6 +31,55 @@ To enable this you have to edit this in the config that is located in Debian 11 
 There around line 30 you can change the bind-address to 0.0.0.0 to allow external access.
 
 
+## RAM usage and performance
+
+By default mariadb only uses 128MB of RAM as cache.  
+This can be increased to increase performance. Citation from the mariadb wiki:
+
+> The InnoDB buffer pool is a key component for optimizing MariaDB. It stores data and indexes, and you usually want it as large as possible so as to keep as much of the data and indexes in memory, reducing disk IO, as main bottleneck.
+
+Source: [https://mariadb.com/kb/en/innodb-buffer-pool/](https://mariadb.com/kb/en/innodb-buffer-pool/)
+
+To check how large your current buffer is you can use one of those 2 commandlines as root (the first one uses SQL):
+
+```bash
+mysql -e "SHOW VARIABLES LIKE 'innodb_buffer_pool_size'"
+mysqld --help --verbose | grep innodb-buffer-pool-size
+```
+
+To set it temporary to 1GB you can use the following SQL:
+
+```sql
+SET GLOBAL innodb_buffer_pool_size=1073741824;
+```
+
+To make this setting persist between restarts you have to edit your config file.  
+This config file is most likely at `/etc/mysql/my.cnf`  
+In there add the following beneath the socket line:
+
+```
+[server]
+innodb_buffer_pool_size=1073741824
+```
+
+After adding this, my configuration file looks like this:
+
+```
+[client-server]
+port = 3306
+socket = /run/mysqld/mysqld.sock
+[server]
+innodb_buffer_pool_size=1073741824
+
+!includedir /etc/mysql/conf.d/
+!includedir /etc/mysql/mariadb.conf.d/
+```
+
+You can now restart mariadb (`systemctl restart mariadb`) and verify with the above commands that the 1GB setting is still set.
+
+It is recommended to set the buffer size to more than 1GB if your server has enough RAM, please consult the wiki or other sources for recommended settings beyond this.
+
+
 ## Storage
 
 I have over 50.000.000 (50million) chat messages saved in one table and around 10.000.000 log lines in another table.  

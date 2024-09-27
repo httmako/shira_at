@@ -132,6 +132,15 @@ Then use the following command to download a youtube video
 
     youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx --playlist-start 8 --rm-cache-dir
 
+### yt-dlp - download playlist without getting blocked
+
+    yt-dlp -f bestaudio --abort-on-error -4 --rate-limit "1M" --sleep-interval 5 --sleep-requests 5 --no-cookies --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36" "https://www.youtube.com/playlist?list=XXXXXXX"
+
+To resume a download after an error (e.g. from playlist item 1266) add the following to it:
+    
+    -I "1266:"
+
+You can remove the `--abort-on-error` flag if you only get "video not found" errors.
 
 
 

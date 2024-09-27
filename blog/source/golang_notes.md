@@ -133,6 +133,9 @@ It is very easy to use, fast and has a lot functions inbuilt that you would need
 My current database system is a `mariadb`, which means I can only use and recommend [https://github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql).  
 It has never failed me and works perfectly, auto reconnecting and pooling of connections has never created any problems for me.
 
+For postgres I tested multiple frameworks but I enjoy the one from uptrace/bun the most: [github.com/uptrace/bun/driver/pgdriver](github.com/uptrace/bun/driver/pgdriver).  
+It uses the database/sql interface, which means everything is the same as always and no code needs to be changed if you do a mysql->postgres switch.
+
 If you need more functions than the default `database/sql` package can provide then I can recommend `sqlx`: [https://github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx).  
 You can easily read sql into structs and write structs into sql.
 
@@ -152,8 +155,8 @@ Passwords are provided by environment, the rest are either configured via flags 
 
 ## Logging
 
-At the beginning I was using the inbuilt `logger`, then `zap` and I now ended up using the inbuilt `log/slog` package.  
-The `slog` package supports structured logging with different levels (info,error,etc.) and can log to different formats (logfmt,json,plain) and locations (stdout,file,etc.).
+At the beginning I was using the inbuilt `log` module, then uber's `zap` module and I now ended up using the inbuilt `log/slog` package.  
+The `slog` package supports structured logging with different levels (info,error,etc.) and can log to different formats (logfmt,json,plain) and locations (stdout,file).
 
 If your application doesn't log much then simple `fmt` prints could be enough aswell, e.g. for commandline applications I prefer to just print information in plaintext instead of using a logger.
 

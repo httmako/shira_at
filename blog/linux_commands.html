@@ -101,6 +101,9 @@ download a playlist as music files</a></li>
 <li><a href="#youtube-dl---resume-download-a-playlist-from-song-8"
 id="toc-youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
 - resume download a playlist from song 8</a></li>
+<li><a href="#yt-dlp---download-playlist-without-getting-blocked"
+id="toc-yt-dlp---download-playlist-without-getting-blocked">yt-dlp -
+download playlist without getting blocked</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#files" id="toc-files">Files</a>
@@ -313,6 +316,14 @@ download a playlist as music files</h3>
 <h3 id="youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
 - resume download a playlist from song 8</h3>
 <pre><code>youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx --playlist-start 8 --rm-cache-dir</code></pre>
+<h3 id="yt-dlp---download-playlist-without-getting-blocked">yt-dlp -
+download playlist without getting blocked</h3>
+<pre><code>yt-dlp -f bestaudio --abort-on-error -4 --rate-limit &quot;1M&quot; --sleep-interval 5 --sleep-requests 5 --no-cookies --user-agent &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36&quot; &quot;https://www.youtube.com/playlist?list=XXXXXXX&quot;</code></pre>
+<p>To resume a download after an error (e.g. from playlist item 1266)
+add the following to it:</p>
+<pre><code>-I &quot;1266:&quot;</code></pre>
+<p>You can remove the <code>--abort-on-error</code> flag if you only get
+“video not found” errors.</p>
 <h1 id="files">Files</h1>
 <h2 id="pandoc---convert-markdown-to-pdf">pandoc - convert markdown to
 pdf</h2>

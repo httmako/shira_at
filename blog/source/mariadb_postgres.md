@@ -86,9 +86,10 @@ I tested both database systems with their respective backup commands.
 
 Both database systems support the use of non-blocking backups. This means that you can create a complete and consistent snapshot of your database during ongoing operation without any downtime or waiting inserts.
 
-Source: 
- - [https://www.postgresql.org/docs/current/backup-dump.html](https://www.postgresql.org/docs/current/backup-dump.html) - last paragraph before 26.1.1
- - [https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction)
+Source:  
+
+ - [https://www.postgresql.org/docs/current/backup-dump.html](https://www.postgresql.org/docs/current/backup-dump.html) , last paragraph before 26.1.1  
+ - [https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction](https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction)  
 
 The times taken:
 

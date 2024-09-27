@@ -34,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -87,9 +87,6 @@
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -178,10 +175,15 @@ commands.</p>
 means that you can create a complete and consistent snapshot of your
 database during ongoing operation without any downtime or waiting
 inserts.</p>
-<p>Source: - <a
+<p>Source:</p>
+<ul>
+<li><a
 href="https://www.postgresql.org/docs/current/backup-dump.html">https://www.postgresql.org/docs/current/backup-dump.html</a>
-- last paragraph before 26.1.1 - <a
-href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction">https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction</a></p>
+, last paragraph before 26.1.1<br />
+</li>
+<li><a
+href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction">https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction</a></li>
+</ul>
 <p>The times taken:</p>
 <pre><code>| type    | mariadb   | postgres |
 |---------|-----------|----------|
