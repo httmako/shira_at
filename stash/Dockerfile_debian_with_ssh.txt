@@ -1,0 +1,13 @@
+FROM debian:stretch-slim
+# build: docker build --tag=debian .
+# start: docker run -h debian -d -p 222:22 --name=debian debian
+RUN apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    openssh-server \
+  && apt-get clean
+RUN mkdir /var/run/sshd
+RUN echo 'root:YourRootPasswordHere' | chpasswd
+RUN useradd -m --shell /bin/bash user
+RUN echo 'user:YourUserPasswordHere' | chpasswd
+EXPOSE 22
+CMD ["/usr/sbin/sshd","-D"]
