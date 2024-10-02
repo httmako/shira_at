@@ -26,34 +26,32 @@
 This guide is meant for people who have bought/installed a Linux Server.<br>
 It is not a perfect guide. It is my personal guide on what I do after installation.<br>
 It will not go over the Installation of the OS itself.<br>
-We will use Debian 10 as the OS here.<br>
-If you have any CentOS Distro then please install <span>epel-release</span>.<br>
-If you have a CentOS 8 Server then please use <span>dnf install</span> to install packages instead.<br>
-If you have a CentOS 7 Server please use <span>yum install</span> instead.
+We will use Debian 12 as the OS here.<br>
+If you use a RedHat based Distribution then please install <span>epel-release</span> and use <span>dnf install</span> to install packages instead.<br>
 </p>
 
-<h3 id="update">Update & Install</h3>
+<h3 id="update">Update &amp; Install</h3>
 <p>
-The first command is usually <span>sudo apt-get update</span> and then <span>sudo apt-get upgrade</span>.<br>
+The first command is usually <span>sudo apt-get update</span> and then <span>sudo apt-get upgrade</span>. (on redhat the "upgrade" command is not needed)<br>
 After that the system is up to date.<br>
 Then install some commonly used tools, mine are:<br>
-<pre>sudo apt-get install nano vim screen htop zip unzip wget curl</pre>
+<pre>sudo apt-get install nano vim screen htop zip unzip wget curl tmux</pre>
 </p>
 
 <h3 id="users">User Management</h3>
 <p>
-It's not good to log in as root over SSH. Many spambots try to log in as root, which means your server is constantly under attack.<br>
+It's not good to log in as root over SSH. Many spambots try to log in as root, your server is constantly under attack.<br>
 Create a new user and give him permission to use sudo. With sudo a user can get temporary admin-rights if needed.<br>
-On some systems <span>sudo</span> isn't preinstalled. For a user to be able to use sudo you just have to add him to the sudo group. (On CentOS the groupname is <span>wheel</span> instead)<br>
+On some systems <span>sudo</span> isn't preinstalled. For a user to be able to use sudo you just have to add him to the sudo group. (On RedHat-based systems the groupname is <span>wheel</span> instead)<br>
 <span>adduser chris</span> and then <span>usermod -aG sudo chris</span>.<br>
 <br>
-I also recommend to create a user for every service you manually install. If you install git/jenkins/teamspeak then create a new user for those services.
+I also recommend to create a user for other services you manually install. If you install git/jenkins/teamspeak then create a new user for those services or start them as a systemd service with a "nologin" user.
 </p>
 
 <h3 id="sshd">Securing SSH</h3>
 <p>
 You don't want people to be able to log in on your server as root.<br>
-To edit the SSHd configuration of your server simply edit /etc/ssh/sshd_config. (SSHD is the server, SSH is the client)<br>
+To edit the sshd configuration of your server simply edit /etc/ssh/sshd_config. (SSHD is the server, SSH is the client)<br>
 Here at the bottom of the file you can add <span>PermitRootLogin no</span> , this makes the user root not able to login with SSH.<br>
 You can also write <span>AllowUsers chris</span> to only allow the user chris access to login via SSH.<br>
 I recommend to use both of these lines: Deny root login and only allow specific users login.<br>
@@ -65,25 +63,26 @@ I don't change it from Port 22, because it's standardized on that port via IANA.
 You can also use SSH Keys instead of a password authentication to log in.<br>
 It's more secure because nobody can brute-force the key easily.<br>
 But you don't have to use this to be secure, because we will install fail2ban later.<br>
-(Just a thought: Someone would have to guess the username and then the password, together with fail2ban it's highly unlikely that someone can get access.)
+(Hint: Someone would have to guess the username and the password to login, together with fail2ban it's highly unlikely that someone can get access even if you do not use keys.)
 </p>
 
-<h3 id="sysstat">Monitoring with sysstat</h3>
+<h3 id="sysstat">Monitoring</h3>
 <p>
-It automatically logs CPU, network and disk usage.<br>
-The command for this is <span>sar</span>. If you use it without any flags it will show you the CPU usage in percent.<br>
-<br>
-First install the sysstat package with <span>sudo apt-get install sysstat</span>.<br>
-To enable the logging edit <span>/etc/default/sysstat</span> and change the <span>"false"</span> to <span>"true"</span>.<br>
-Now restart it with <span>sudo systemctl restart sysstat</span>.<br>
-You can now use the <span>sar</span> command to get your resource log. At first it needs a while (5min) to get the first log entry.<br>
-You can also generate a picture from these logs via <span>sadf -g -- -A > today.svg</span>.<br>
-(German) More at <a href="https://www.thomas-krenn.com/de/wiki/Linux_Performance_Aufzeichnung_und_Auswertung_mit_sar" target="_blank">https://www.thomas-krenn.com/de/wiki/Linux_Performance_Aufzeichnung_und_Auswertung_mit_sar</a>
+I recommend installing Grafana and Prometheus (and node_exporter) for monitoring your server.<br>
+For a quick installer you can use my script at <a href="https://shira.at/stash/grafana/_installer.sh.txt">https://shira.at/stash/grafana/_installer.sh.txt</a> or just search on the internet for a guide.<br>
+Grafana and Prometheus let you easily monitor anything and everything. It also enables you to receive notifications via email/msteams/discord if your configured alert is triggered.
 </p>
 
 <h3 id="firewall">Firewall</h3>
 <p>
-For me <span>iptables</span> is enough of a firewall. It blocks/allows protocols,states and IP addresses.<br>
+If you use a RedHat-based OS and want to keep it minimal for now then use firewalld with the following commands to open http/https:<br>
+<pre>
+firewall-cmd --zone=public --add-service=http --permanent
+firewall-cmd --zone=public --add-service=https --permanent
+firewall-cmd --reload
+</pre>
+<br>
+For me <span>iptables</span> is my favorite firewall. It blocks/allows protocols, states and IP addresses.<br>
 You can also look into <span>firewalld</span> or <span>uncomplicated firewall (ufw)</span>. These are just applications that build ontop of iptables.<br>
 <br>
 First install iptables and iptables-persistant via <span>sudo apt-get install iptables iptables-persistant</span>. (It doesn't matter if you save your current config or not if asked)<br>
@@ -93,8 +92,8 @@ Now everytime you reboot it will take the rules from <span>/etc/iptables/rules.v
 # sample configuration for iptables service
 # from shira.at
 *filter
-:INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
 :OUTPUT ACCEPT [0:0]
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -p icmp -j ACCEPT
@@ -102,12 +101,10 @@ Now everytime you reboot it will take the rules from <span>/etc/iptables/rules.v
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
 -A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
--A INPUT -j REJECT --reject-with icmp-host-prohibited
--A FORWARD -j REJECT --reject-with icmp-host-prohibited
 COMMIT
 </pre>
-Now you can live-reload these rules into your system with <span>sudo iptables-restore < /etc/iptables/rules.v4</span>.<br>
-To save your current rules you can use <span>sudo iptables-save > /etc/iptables/rules.v4</span>.
+Now you can live-reload these rules into your system with <span>sudo iptables-restore &lt; /etc/iptables/rules.v4</span>.<br>
+To save your current rules you can use <span>sudo iptables-save &gt; /etc/iptables/rules.v4</span>.
 </p>
 
 <h3 id="fail2ban">Fail2ban</h3>
@@ -118,11 +115,15 @@ Simply install it via <span>sudo apt-get install fail2ban</span>.<br>
 The default configuration is located at <span>/etc/fail2ban/jail.conf</span>. Do not edit this configuration directly, instead create a new file there called <span>jail.local</span>.<br>
 My default jail.local file for SSH:<br>
 <pre>
+
 [DEFAULT]
 bantime = 900
 maxretry = 3
 [sshd]
-enabled = true
+enabled   = true
+port    = ssh
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s
 </pre>
 It bans for 15 minutes upon 3 failed attempts at SSH Login.
 </p>
@@ -131,8 +132,8 @@ It bans for 15 minutes upon 3 failed attempts at SSH Login.
 <p>
 I also install other services on initial setup.<br>
 A big and important one is a webserver. There are 2 main webservers: apache2 and nginx.<br>
-The easier one for beginners is apache2, but if you want performance and aren't too scared of new stuff then nginx is your way to go.<br>
-<span>sudo apt-get install nginx</span> and for php <span>sudo apt-get install php-fpm</span>.<br>
+I personally use and recommend nginx.<br>
+My guide for nginx can be found here: <a href="nginx.html">nginx.html</a>
 <br>
 Don't forget to add new firewall rules if your new services require different ports than 80/443.
 </p>
