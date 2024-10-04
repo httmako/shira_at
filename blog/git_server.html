@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>git server | shira.at</title>
+<link rel="icon" type="image/png" href="/URLIcon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>minimal git server guide</h1>
+
+<ul>
+<li><a href="#comparison">comparison of git servers</a></li>
+<li><a href="#whyusegogs">Why use gogs?</a></li>
+<li><a href="#installation">Installation</a></li>
+</ul>
+
+<h2 id="comparison">comparison of git servers</h2>
+<p>
+There are many different open source git servers available.<br>
+I have used many and will try to compare them by experience and features.<br>
+For a comparison made by gitea visit <a href="https://docs.gitea.com/next/installation/comparison">https://docs.gitea.com/next/installation/comparison</a>
+</p>
+
+<h3>Gitlab</h3>
+<p>
+Source: <a href="https://about.gitlab.com/">https://about.gitlab.com/</a><br>
+Gitlab is, to my knowledge, the biggest and best suited git server for large groups or enterprise settings.<br>
+It has the most features and even an inbuilt CI/CD pipeline.<br>
+I would recommend it for companies or very big groups, but not for small deployments at home or for a small group of friends.
+</p>
+<h3>Gitea / Forgejo</h3>
+<p>
+Source: <a href="https://about.gitea.com/">https://about.gitea.com/</a> / <a href="https://forgejo.org/">https://forgejo.org/</a><br>
+Gitea is a small git server that has a github-like feeling.<br>
+It has many features but uses less resources than gitlab and is suited for smaller deployments, for example a group of friends.<br>
+Forgejo is a fork of gitea and is recommended over gitea by security enthusiasts online.
+</p>
+<h3>Gogs</h3>
+<p>
+Source: <a href="https://gogs.io/">https://gogs.io/</a><br>
+Gogs is the smallest git server which still has a good UI.<br>
+It feels similar to gitea but uses even less resources and runs on the smallest of raspberry pi's.<br>
+I would recommend Gogs for small homeserver deployments or private git servers in general.
+</p>
+
+<h2 id="whyusegogs">Why use gogs?</h2>
+<p>
+Gogs uses barely any resources and has a good looking UI with many features.<br>
+Gitea used (tested in 2022) ~5% cpu when idle on my raspberry pi. Gogs uses 0% cpu when idle.<br>
+Gogs is a single executable written in Golang and all it requires is to have git installed.<br>
+BUT: The jenkins gogs module has vulnerabilities which haven't been fixed in months, so if you need a good and secure jenkins addon for your git server then choose Gitea or GitLab instead.
+</p>
+
+<h2 id="installation">Installation</h2>
+<p>
+Requirements: Have git installed (example: <span>sudo apt-get install git</span>)
+<br><br>
+Get the latest version of the gogs binary from the release page: <a target="_blank" href="https://github.com/gogs/gogs/releases">https://github.com/gogs/gogs/releases</a><br>
+Unpack the archive, go into the unpacked folder and use "./gogs web" to start the server. The configuration resides at "custom/conf/app.ini".<br>
+<br>
+If you want to start it as a systemd service you can use the service file found here: <a target="_blank" href="https://github.com/gogs/gogs/blob/main/scripts/systemd/gogs.service">https://github.com/gogs/gogs/blob/main/scripts/systemd/gogs.service</a><br>
+<br>
+To setup a reverse proxy with nginx you can use the most simple proxy_pass configuration:<br>
+<pre>
+server_name git.example.com;
+location / {
+    proxy_pass http://localhost:3000;
+}
+
+# or with sub url
+
+server_name example.com;
+location /git/ {
+    proxy_pass http://localhost:3000/;
+}
+</pre><br>
+If you get an error message when pushing set the nginx "client_max_body_size" config to "50m" or higher.
+Don't forget to change the "custom/conf/app.ini" with your new URL:<br>
+<pre>
+[server]
+EXTERNAL_URL = https://example.com/git/
+ROOT_URL = https://example.com/git/
+</pre>
+<br>
+<br>For more information visit the faq: <a target="_blank" href="https://gogs.io/docs/intro/faqs">https://gogs.io/docs/intro/faqs</a><br>
+</p>
+
+
+</body>
+</html>
