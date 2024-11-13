@@ -101,10 +101,14 @@ Restart=always
 # Delay between restarts, 1m = 1minute
 RestartSec=1m
 # You could also set environment variables like this:
-#Environment=USER=x HOME=/home/x
+Environment=USER=x HOME=/home/x ES_HOME=/opt/es
 
 # Hardening from now on
 
+# Enable counting of CPU ms used
+CPUAccounting=yes
+# Limit the CPU usage to 50% of a SINGLE CORE, set it to e.g. 200% to only use 2 cores max. of your system
+CPUQuota=50%
 # Enable counting of IP bytes in and out for the service
 IPAccounting=yes
 # Only allow sockets, IPv4 and IPv6 as network protocols
