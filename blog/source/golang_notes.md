@@ -160,6 +160,8 @@ The `slog` package supports structured logging with different levels (info,error
 
 If your application doesn't log much then simple `fmt` prints could be enough aswell, e.g. for commandline applications I prefer to just print information in plaintext instead of using a logger.
 
+In a cloud environment you should always log to stdout. Containers do not keep data when being restarted, which means your logs would get lost afterwards. Docker and Kubernetes manage your stdout prints of your containers and log them to a more persistent place themselves, so the only thing you have to do is log to stdout and let them take care of the rest.
+
 
 
 # Jenkins pipeline
@@ -203,3 +205,8 @@ pipeline {
     }
 }
 ```
+
+
+# Other information
+
+ - Golang calls the "defer" function even after a panic occurs in the current function. By calling "recover" you can stop it from "bubbling up", but you could also not call recover and let the panic crash your application.

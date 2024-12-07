@@ -170,7 +170,11 @@ aka. 5 seconds long output video
 
 ## Convert a folder from mp4 to mp3
 
-    for i in *.mp4; do ffmpeg -i "$i" "$(basename "$i" .mp4)".mp3  ; done
+    for i in *.mp4; do ffmpeg -i "$i" "$(basename "$i" .mp4)".mp3; done
+
+Another example with converting music from webm/opus to m4a/aac:
+
+    for i in *.webm; do bn=$(basename "$i" ".webm"); ffmpeg -i "$i" -c:a aac "$bn.m4a"; rm "$i"; done
 
 ## Create a thumbnail from video
 

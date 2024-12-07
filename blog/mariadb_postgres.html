@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>mariadb/postgres | shira.at</title>
+  <title>mariadb vs postgres | shira.at</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -90,39 +90,28 @@
 </head>
 <body>
 <header id="title-block-header">
-<h1 class="title">mariadb/postgres | shira.at</h1>
+<h1 class="title">mariadb vs postgres | shira.at</h1>
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
 <li><a href="#introduction" id="toc-introduction">Introduction</a></li>
 <li><a href="#comparison" id="toc-comparison">Comparison</a>
 <ul>
-<li><a href="#group-by" id="toc-group-by">GROUP BY</a></li>
+<li><a href="#count" id="toc-count">COUNT(*)</a></li>
+<li><a href="#group-by-date" id="toc-group-by-date">GROUP BY
+DATE</a></li>
 <li><a href="#date-interval" id="toc-date-interval">DATE
 Interval</a></li>
 <li><a href="#backup-restore" id="toc-backup-restore">Backup &amp;
 Restore</a></li>
 </ul></li>
-<li><a href="#objective-conclusion"
-id="toc-objective-conclusion">Objective conclusion</a></li>
-<li><a href="#subjective-conclusion"
-id="toc-subjective-conclusion">Subjective conclusion</a></li>
-<li><a href="#experience-fter-1-year-of-using-mariadb-server"
-id="toc-experience-fter-1-year-of-using-mariadb-server">Experience fter
-1 year of using MariaDB server</a></li>
 </ul>
 </nav>
-<p>A comparison of mariadb and postgresql based on a real life
-example.</p>
+<p>A comparison of mariadb and postgresql based on chat data.</p>
 <h2 id="introduction">Introduction</h2>
-<p>I wrote a twitch chat logger a long time ago with the sole goal to
-help a streamer with their chat moderation.<br />
-After a while I added even more streamers and rewrote it from a
-file-based NodeJS application to a database Golang application.</p>
-<p>At the time of testing it had a bit over 45.000.000 chat messages
-logged in the database. With this amount of data I was able to test the
-performance of both databases.</p>
-<p>The table looks as follows:</p>
+<p>I wrote a chat bot in Golang that saves messages.<br />
+These tests were run with 161 million chat messages saved.<br />
+The sql table looks as follows (output from mariadb):</p>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> <span class="cf">IF</span> <span class="kw">NOT</span> <span class="kw">EXISTS</span> messages(</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> SERIAL,</span>
@@ -131,46 +120,114 @@ class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#c
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    message LONGTEXT,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    intime DATETIME <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="fu">current_timestamp</span>()</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>) ENGINE<span class="op">=</span>InnoDB</span></code></pre></div>
-<p>The mariadb SERIAL type is an id with auto increment and index.</p>
-<p>The hardware used: 8GB RAM, 4-core AMD EPYC 7702P CPU, 2.5inch
-SSD.</p>
-<p>The data was transfered from mariadb to postgres with pgloader.</p>
+<p>The mariadb SERIAL type is a BIG UNSIGNED INT with auto increment and
+index.</p>
+<p>The hardware used:</p>
+<ul>
+<li>Intel(R) Core(TM) i5-7500 CPU @ 3.40GHz</li>
+<li>16GB DDR4 RAM (2400 MT/s)</li>
+<li>256GB NVME SSD (Samsung PM961)</li>
+</ul>
+<p>Database versions (from <code>SELECT VERSION();</code>):</p>
+<ul>
+<li>PostgreSQL 15.8 (Debian 15.8-0+deb12u1) on x86_64-pc-linux-gnu,
+compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit</li>
+<li>10.11.6-MariaDB-0+deb12u1</li>
+</ul>
+<p>The data was initially transfered from mariadb to postgres with
+pgloader.</p>
 <h2 id="comparison">Comparison</h2>
-<h3 id="group-by">GROUP BY</h3>
-<p>Usecase: I want to know how many messages were received per
-day.<br />
-This is best solved within the database via a query.</p>
+<h3 id="count">COUNT(*)</h3>
+<p>Query:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>), <span class="dt">DATE</span>(intime) <span class="kw">FROM</span> messages <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">DATE</span>(intime);</span></code></pre></div>
-<pre><code>| mariadb | postgresql |
-|---------|------------|
-| 24s     | 4s         |</code></pre>
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> messages;</span></code></pre></div>
+<p>Output (same for both): <code>161572889</code></p>
+<p>Time taken:</p>
+<table>
+<thead>
+<tr class="header">
+<th>mariadb</th>
+<th>postgresql</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>29.731 sec</td>
+<td>13.196 sec</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="group-by-date">GROUP BY DATE</h3>
+<p>Query:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>), <span class="dt">DATE</span>(intime) <span class="kw">FROM</span> messages <span class="kw">GROUP</span> <span class="kw">BY</span> <span class="dt">DATE</span>(intime);</span></code></pre></div>
+<p>Time taken:</p>
+<table>
+<thead>
+<tr class="header">
+<th>mariadb</th>
+<th>postgresql</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>61.378 sec</td>
+<td>14.194 sec</td>
+</tr>
+</tbody>
+</table>
 <p>This benchmark showed mariadb only using one core at once with 100%
 usage. Postgres used 3 cores at once with 60-100% usage with each
 core.</p>
 <hr />
 <h3 id="date-interval">DATE Interval</h3>
-<p>Usecase: I want to get the amount of messages that were saved in the
-last 24hours.</p>
+<p>Query:</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">//</span>mariadb:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> messages <span class="kw">WHERE</span> intime <span class="op">&gt;=</span> DATE_SUB(NOW(), <span class="dt">INTERVAL</span> <span class="dv">1</span> <span class="dt">DAY</span>);</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">//</span>postgres:</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> messages <span class="kw">WHERE</span> intime <span class="op">&gt;=</span> NOW() <span class="op">-</span> <span class="dt">INTERVAL</span> <span class="st">&#39;1 DAY&#39;</span>;</span></code></pre></div>
-<pre><code>| mariadb | postgresql |
-|---------|------------|
-| 12s     | 12s        |</code></pre>
-<p>Here only one core was used by both postgres and mariadb.</p>
+<p>The output was 0 for both systems, which was OK.</p>
+<p>Time taken:</p>
+<table>
+<thead>
+<tr class="header">
+<th>mariadb</th>
+<th>postgresql</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>33.871 sec</td>
+<td>13.458 sec</td>
+</tr>
+</tbody>
+</table>
 <hr />
 <h3 id="backup-restore">Backup &amp; Restore</h3>
-<p>Usecase: I want to backup (and in the case of an emergency restore)
-the database without much downtime.</p>
-<p>I tested both database systems with their respective backup
-commands.</p>
-<pre><code>| type    | mariadb   | postgres |
-|---------|-----------|----------|
-| backup  | mysqldump | pg_dump  |
-| restore | mysql     | psql     |</code></pre>
+<p>Backup and restore commands for each system:</p>
+<table>
+<thead>
+<tr class="header">
+<th>cmd/db</th>
+<th>mariadb</th>
+<th>postgres</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>backup</td>
+<td>mysqldump</td>
+<td>pg_dump</td>
+</tr>
+<tr class="even">
+<td>restore</td>
+<td>mysql</td>
+<td>psql</td>
+</tr>
+</tbody>
+</table>
 <p>Both database systems support the use of non-blocking backups. This
 means that you can create a complete and consistent snapshot of your
 database during ongoing operation without any downtime or waiting
@@ -185,42 +242,56 @@ href="https://www.postgresql.org/docs/current/backup-dump.html">https://www.post
 href="https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction">https://dev.mysql.com/doc/refman/8.0/en/mysqldump.html#option_mysqldump_single-transaction</a></li>
 </ul>
 <p>The times taken:</p>
-<pre><code>| type    | mariadb   | postgres |
-|---------|-----------|----------|
-| backup  | 1:11min   | 1:04min  |
-| restore | 10:02min  | 2:10min  |</code></pre>
-<p>The mariadb backup .sql file was 3.6GB in size.<br />
-After using gzip to compress it the size went down to 772MB.<br />
-Just for clarification: Those are 45 million database rows in those
-backups.</p>
-<h2 id="objective-conclusion">Objective conclusion</h2>
-<p>Postgres is faster with GROUP BY statements but not faster with
-DATE() calculation of column values.<br />
-The backup process with mariadb is more clean (because it creates only
-one .sql file) but not faster than postgres.<br />
-The restore of backups with postgres is way faster than with
-mariadb.</p>
-<h2 id="subjective-conclusion">Subjective conclusion</h2>
-<p>Postgres is faster than mariadb but also a bit more complex.</p>
-<p>All the basic mysql logic you learned back in school doesn’t apply to
-postgres. For example: You have to use to list databases. My colleagues
-always say “postgres is the free oracle”, and I think they are right.
-MariaDB should be used for smaller projects but if it gets big and
-complex then PostgreSQL is my go-to pick.</p>
-<h2 id="experience-fter-1-year-of-using-mariadb-server">Experience fter
-1 year of using MariaDB server</h2>
-<p>I have been using a MariaDB server for storing any and all data of my
-now 5 self hosted applications.</p>
-<p>According to grafana I have 3qps/night and 7qps/day on average and I
-peak with up to 13 queries per second, saving up to 50.000 chat messages
-and a few thousand log/statistic lines per day.</p>
-<p>There has never been any performance or delay problem with
-mariadb.</p>
-<p>Even calculating the sum and count of a 500.000 row table with 2
-WHERE’s (and a few other queries added) does not take more than 400ms on
-average to return all the data.</p>
-<p>The fact that mariadb holds up with these loads made me not switch to
-postgres yet as it would take time to migrate all applications even
-though they all work flawlessly right now.</p>
+<table>
+<thead>
+<tr class="header">
+<th>type</th>
+<th>mariadb</th>
+<th>postgres</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dump</td>
+<td>2m36.195s</td>
+<td>2m8.843s</td>
+</tr>
+<tr class="even">
+<td>restore</td>
+<td>18m57.465s</td>
+<td>7m21.162s</td>
+</tr>
+</tbody>
+</table>
+<p>Commands used:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">mariadb-dump</span> <span class="at">--databases</span> chat <span class="op">&gt;</span> mariadb.sql</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">mysql</span> chat <span class="op">&lt;</span> mariadb.sql</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">pg_dump</span> chat <span class="op">&gt;</span> postgres.sql</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">psql</span> <span class="at">-d</span> chat <span class="at">-f</span> postgres.sql</span></code></pre></div>
+<p>The mariadb.sql file was 14GB in size, the postgres.sql file was 12GB
+in size.</p>
+<p>Old test with 45 million database rows years prior:</p>
+<table>
+<thead>
+<tr class="header">
+<th>type</th>
+<th>mariadb</th>
+<th>postgres</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>backup</td>
+<td>1:11min</td>
+<td>1:04min</td>
+</tr>
+<tr class="even">
+<td>restore</td>
+<td>10:02min</td>
+<td>2:10min</td>
+</tr>
+</tbody>
+</table>
 </body>
 </html>
