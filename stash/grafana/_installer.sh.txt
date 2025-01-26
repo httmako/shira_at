@@ -8,9 +8,9 @@ echo "Minimalistic installer for grafana stack v3.0";
 echo "New: service files";
 echo "";
 
-grafana=10.4.2
-node=1.8.0
-prometheus=2.51.2
+grafana=11.4.0
+node=1.8.2
+prometheus=3.1.0
 loki=3.0.0
 mysqlv=0.15.1
 
@@ -115,7 +115,5 @@ echo "Please change the config of promtail and mysqld_exporter"
 echo "Then start them with systemctl start <name>"
 
 cd /srv
-wget -q https://shira.at/stash/grafana/_create_default_datasources.sh.txt -O _create_datasources.sh
-chmod +x _create_datasources.sh
-echo "To create the loki/prometheus datasources use ./_create_datasources.sh"
+curl -s -X POST -H "Accept: application/json" -H "Content-Type: application/json" -H "X-Disable-Provenance: true" http://admin:admin@localhost:3000/api/datasources -d '{"name":"Prometheus","type":"prometheus","url":"http://127.0.0.1:9090","access":"proxy","basicAuth":false,"isDefault":true}'
 echo "To import a basic node_exporter dashboard import the ID 1860"
