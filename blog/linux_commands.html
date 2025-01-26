@@ -42,11 +42,18 @@ href="#find---all-files-recursively-from-called-passwd-case-insensitive"
 id="toc-find---all-files-recursively-from-called-passwd-case-insensitive">find
 - all files recursively from / called passwd case insensitive</a></li>
 </ul></li>
-<li><a href="#compression" id="toc-compression">Compression</a>
+<li><a href="#media-and-compression"
+id="toc-media-and-compression">Media and Compression</a>
 <ul>
 <li><a href="#mat2---recursively-remove-metadata-of-files"
 id="toc-mat2---recursively-remove-metadata-of-files">mat2 - recursively
 remove metadata of files</a></li>
+<li><a href="#ffmpeg---convert-png-to-jpeg"
+id="toc-ffmpeg---convert-png-to-jpeg">ffmpeg - convert png to
+jpeg</a></li>
+<li><a href="#ffmpeg---convert-music-files-from-webm-to-m4a"
+id="toc-ffmpeg---convert-music-files-from-webm-to-m4a">ffmpeg - convert
+music files from webm to m4a</a></li>
 <li><a href="#imagemagick---convert-png-to-jpg-file-recursively"
 id="toc-imagemagick---convert-png-to-jpg-file-recursively">imagemagick -
 convert png to jpg file recursively</a></li>
@@ -101,6 +108,9 @@ download a playlist as music files</a></li>
 <li><a href="#youtube-dl---resume-download-a-playlist-from-song-8"
 id="toc-youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
 - resume download a playlist from song 8</a></li>
+<li><a href="#yt-dlp---download-music-in-best-quality-to-m4a-format"
+id="toc-yt-dlp---download-music-in-best-quality-to-m4a-format">yt-dlp -
+download music in best quality to m4a format</a></li>
 <li><a href="#yt-dlp---download-playlist-without-getting-blocked"
 id="toc-yt-dlp---download-playlist-without-getting-blocked">yt-dlp -
 download playlist without getting blocked</a></li>
@@ -242,10 +252,15 @@ file name and line number:</p>
 id="find---all-files-recursively-from-called-passwd-case-insensitive">find
 - all files recursively from / called passwd case insensitive</h2>
 <pre><code>find / -type f -iname &quot;passwd&quot;</code></pre>
-<h1 id="compression">Compression</h1>
+<h1 id="media-and-compression">Media and Compression</h1>
 <h2 id="mat2---recursively-remove-metadata-of-files">mat2 - recursively
 remove metadata of files</h2>
 <pre><code>mat2 --inplace *</code></pre>
+<h2 id="ffmpeg---convert-png-to-jpeg">ffmpeg - convert png to jpeg</h2>
+<pre><code>ffmpeg -i &quot;image.png&quot; &quot;image.jpg&quot;</code></pre>
+<h2 id="ffmpeg---convert-music-files-from-webm-to-m4a">ffmpeg - convert
+music files from webm to m4a</h2>
+<pre><code>for i in *.webm; do bn=$(basename &quot;$i&quot; &quot;.webm&quot;); ffmpeg -i &quot;$i&quot; -c:a aac -q:a 0 &quot;$bn.m4a&quot;; rm &quot;$i&quot;; done</code></pre>
 <h2 id="imagemagick---convert-png-to-jpg-file-recursively">imagemagick -
 convert png to jpg file recursively</h2>
 <pre><code>find . -type f -iname &quot;*.png&quot; -exec mogrify -verbose -format jpg {} \;</code></pre>
@@ -316,6 +331,9 @@ download a playlist as music files</h3>
 <h3 id="youtube-dl---resume-download-a-playlist-from-song-8">youtube-dl
 - resume download a playlist from song 8</h3>
 <pre><code>youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx --playlist-start 8 --rm-cache-dir</code></pre>
+<h3 id="yt-dlp---download-music-in-best-quality-to-m4a-format">yt-dlp -
+download music in best quality to m4a format</h3>
+<pre><code>yt-dlp -f bestaudio -x --audio-format m4a &quot;https://www.youtube.com/watch?v=xxxx&quot;</code></pre>
 <h3 id="yt-dlp---download-playlist-without-getting-blocked">yt-dlp -
 download playlist without getting blocked</h3>
 <pre><code>yt-dlp -f bestaudio --abort-on-error -4 --rate-limit &quot;1M&quot; --sleep-interval 5 --sleep-requests 5 --no-cookies --user-agent &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36&quot; &quot;https://www.youtube.com/playlist?list=XXXXXXX&quot;</code></pre>

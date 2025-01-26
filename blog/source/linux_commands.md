@@ -31,11 +31,19 @@ r = recursive, i = case insensitive, n = display line numbers
 
 
 
-# Compression
+# Media and Compression
 
 ## mat2 - recursively remove metadata of files
 
     mat2 --inplace *
+
+## ffmpeg - convert png to jpeg
+
+    ffmpeg -i "image.png" "image.jpg"
+
+## ffmpeg - convert music files from webm to m4a
+
+    for i in *.webm; do bn=$(basename "$i" ".webm"); ffmpeg -i "$i" -c:a aac -q:a 0 "$bn.m4a"; rm "$i"; done
 
 ## imagemagick - convert png to jpg file recursively
 
@@ -131,6 +139,10 @@ Then use the following command to download a youtube video
 ### youtube-dl - resume download a playlist from song 8
 
     youtube-dl -f bestaudio --extract-audio --audio-format aac https://www.youtube.com/playlist?list=xxxxxxxxxxxxxxxxxxx --playlist-start 8 --rm-cache-dir
+
+### yt-dlp - download music in best quality to m4a format
+
+    yt-dlp -f bestaudio -x --audio-format m4a "https://www.youtube.com/watch?v=xxxx"
 
 ### yt-dlp - download playlist without getting blocked
 
