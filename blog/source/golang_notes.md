@@ -64,7 +64,7 @@ export PATH=$PATH:/home/$(whoami)/go/bin
 
 Go has, by default, many tools for testing and linting already inbuilt.
 
- - To execute your test cases in `_test.go` files use `go test .`
+ - To execute your test cases in `*_test.go` files use `go test .`
  - To lint your code you can use `go vet .`
  - To check for race conditions you can use -race like `go run -race .`
 
@@ -111,6 +111,67 @@ To minify your executable use the following command (after building it with go b
 ```bash
 upx --best myapp
 ```
+
+
+# About golang
+
+## Random facts
+
+ - net/http (default http server) is multithreaded by default ; [https://pkg.go.dev/net/http#Server.Serve](https://pkg.go.dev/net/http#Server.Serve)
+ - database/sql (and any database module that uses the same interface) is connection-pooling and thread-safe by default ; [https://pkg.go.dev/database/sql#DB](https://pkg.go.dev/database/sql#DB)
+ - defer will be called even if a panic occurs and is "last in -> first out" ; [https://go.dev/blog/defer-panic-and-recover](https://go.dev/blog/defer-panic-and-recover)
+ - sync.Map is a thread-safe alternative to a "default map[int]int", which is not thread-safe ; [https://pkg.go.dev/sync#Map](https://pkg.go.dev/sync#Map)
+
+
+## Benchmarks
+
+Documentation: [https://pkg.go.dev/testing#hdr-Benchmarks](https://pkg.go.dev/testing#hdr-Benchmarks)
+
+You can easily do benchmarks in go. This is done via _test.go files.  
+Example: You have a file named `main_test.go` and it contains the following lines:
+
+```go
+package main
+
+import (
+    "testing"
+	"sync"
+)
+
+func BenchmarkMap(b *testing.B) {
+    for b.Loop() {
+        _ = map[string]string{}
+    }
+}
+
+func BenchmarkSyncMap(b *testing.B) {
+    for b.Loop() {
+        _ = sync.Map{}
+    }
+}
+```
+
+The above `main_test.go` file has 2 benchmarks that compare the creation of a sync map and a default map.
+
+To run this benchmark you can use the following command:
+
+```bash
+go test -benchmem -bench=.
+```
+
+The output is (on my machine):
+
+```
+goos: windows
+goarch: amd64
+pkg: a
+cpu: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
+BenchmarkMap-16         180920814                6.582 ns/op           0 B/op          0 allocs/op
+BenchmarkSyncMap-16     1000000000               1.000 ns/op           0 B/op          0 allocs/op
+PASS
+ok      a       5.862s
+```
+
 
 
 
@@ -206,7 +267,3 @@ pipeline {
 }
 ```
 
-
-# Other information
-
- - Golang calls the "defer" function even after a panic occurs in the current function. By calling "recover" you can stop it from "bubbling up", but you could also not call recover and let the panic crash your application.

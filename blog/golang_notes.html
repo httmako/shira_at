@@ -108,6 +108,11 @@ tools</a></li>
 <li><a href="#building" id="toc-building">Building</a></li>
 <li><a href="#post-build" id="toc-post-build">Post-Build</a></li>
 </ul></li>
+<li><a href="#about-golang" id="toc-about-golang">About golang</a>
+<ul>
+<li><a href="#random-facts" id="toc-random-facts">Random facts</a></li>
+<li><a href="#benchmarks" id="toc-benchmarks">Benchmarks</a></li>
+</ul></li>
 <li><a href="#favorite-packages" id="toc-favorite-packages">Favorite
 packages</a>
 <ul>
@@ -158,7 +163,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="
 <p>Go has, by default, many tools for testing and linting already
 inbuilt.</p>
 <ul>
-<li>To execute your test cases in <code>_test.go</code> files use
+<li>To execute your test cases in <code>*_test.go</code> files use
 <code>go test .</code></li>
 <li>To lint your code you can use <code>go vet .</code></li>
 <li>To check for race conditions you can use -race like
@@ -203,6 +208,61 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="
 it with go build):</p>
 <div class="sourceCode" id="cb9"><pre
 class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">upx</span> <span class="at">--best</span> myapp</span></code></pre></div>
+<h1 id="about-golang">About golang</h1>
+<h2 id="random-facts">Random facts</h2>
+<ul>
+<li>net/http (default http server) is multithreaded by default ; <a
+href="https://pkg.go.dev/net/http#Server.Serve">https://pkg.go.dev/net/http#Server.Serve</a></li>
+<li>database/sql (and any database module that uses the same interface)
+is connection-pooling and thread-safe by default ; <a
+href="https://pkg.go.dev/database/sql#DB">https://pkg.go.dev/database/sql#DB</a></li>
+<li>defer will be called even if a panic occurs and is “last in -&gt;
+first out” ; <a
+href="https://go.dev/blog/defer-panic-and-recover">https://go.dev/blog/defer-panic-and-recover</a></li>
+<li>sync.Map is a thread-safe alternative to a “default map[int]int”,
+which is not thread-safe ; <a
+href="https://pkg.go.dev/sync#Map">https://pkg.go.dev/sync#Map</a></li>
+</ul>
+<h2 id="benchmarks">Benchmarks</h2>
+<p>Documentation: <a
+href="https://pkg.go.dev/testing#hdr-Benchmarks">https://pkg.go.dev/testing#hdr-Benchmarks</a></p>
+<p>You can easily do benchmarks in go. This is done via _test.go
+files.<br />
+Example: You have a file named <code>main_test.go</code> and it contains
+the following lines:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> main</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="op">(</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sync&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> BenchmarkMap<span class="op">(</span>b <span class="op">*</span>testing<span class="op">.</span>B<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> b<span class="op">.</span>Loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        _ <span class="op">=</span> <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="dt">string</span><span class="op">{}</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> BenchmarkSyncMap<span class="op">(</span>b <span class="op">*</span>testing<span class="op">.</span>B<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> b<span class="op">.</span>Loop<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        _ <span class="op">=</span> sync<span class="op">.</span>Map<span class="op">{}</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The above <code>main_test.go</code> file has 2 benchmarks that
+compare the creation of a sync map and a default map.</p>
+<p>To run this benchmark you can use the following command:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> test <span class="at">-benchmem</span> <span class="at">-bench</span><span class="op">=</span>.</span></code></pre></div>
+<p>The output is (on my machine):</p>
+<pre><code>goos: windows
+goarch: amd64
+pkg: a
+cpu: 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
+BenchmarkMap-16         180920814                6.582 ns/op           0 B/op          0 allocs/op
+BenchmarkSyncMap-16     1000000000               1.000 ns/op           0 B/op          0 allocs/op
+PASS
+ok      a       5.862s</code></pre>
 <h1 id="favorite-packages">Favorite packages</h1>
 <p>After programming with go for years I have come to like a few
 specific packages or solutions to problems.<br />
@@ -258,6 +318,12 @@ levels (info,error,etc.) and can log to different formats
 prints could be enough aswell, e.g. for commandline applications I
 prefer to just print information in plaintext instead of using a
 logger.</p>
+<p>In a cloud environment you should always log to stdout. Containers do
+not keep data when being restarted, which means your logs would get lost
+afterwards. Docker and Kubernetes manage your stdout prints of your
+containers and log them to a more persistent place themselves, so the
+only thing you have to do is log to stdout and let them take care of the
+rest.</p>
 <h1 id="jenkins-pipeline">Jenkins pipeline</h1>
 <p>With the above tools combined, my current jenkins pipeline looks like
 this:</p>
