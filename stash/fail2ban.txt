@@ -4,10 +4,11 @@
 
 //For Debian
 [DEFAULT]
-bantime = 900
+bantime = 1h
 maxretry = 3
 [sshd]
-enabled = true
+enabled=true
+backend=systemd
 
 
 
