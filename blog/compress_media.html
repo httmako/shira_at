@@ -24,6 +24,7 @@ table, th, td {
 <li><a href="#videos">Compressing videos</a></li>
 <li><a href="#videocodecs">Different video codecs</a></li>
 <li><a href="#gpuencoding">About GPU encoding</a></li>
+<li><a href="#iso">ISO images and 7zip</a></li>
 <li><a href="#converting">Converting images</a></li>
 <li><a href="#externals">About external websites</a></li>
 </ul>
@@ -224,6 +225,57 @@ Normally you want to convert from 264 to 265 for the better compression ratio (m
 This compression is, atleast for me, absent when encoding with GPU. There is no reason to use this because the only reason I would want to convert these videos is for the better storage ratio.<br>
 <br>
 Maybe other tools do it better, or AMD GPUs are better at this. But atleast for me and the RTX4060 it is not worthwhile to encode with a GPU instead of a CPU.
+</p>
+
+<h3 id="iso">ISO images and 7zip</h3>
+<p>
+I found an old game in ISO format. It is 757MB in size. I used 7zip to compress it with various settings and algorithms.<br>
+All these flags are in the form of: <span>time 7za a -mmt=1 -mx=9 -ms=on &lt;other_flags&gt; file.7z file.iso</span>
+<table>
+<tr><th>Flags</th><th>size</th><th>time</th><th>sizeB</th></tr>
+<tr><td>//input</td><td>757M</td><td>0s</td><td>793280512</td></tr>
+<tr><td>//debian zip -r9</td><td>596M</td><td>24s</td><td>624238889</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=32m</td><td>255M</td><td>1m55s</td><td>266892288</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=64m</td><td>219M</td><td>2m3s</td><td>229587549</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=128m</td><td>188M</td><td>1m52s</td><td>196299252</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=256m</td><td>168M</td><td>1m42s</td><td>175248679</td></tr>
+<tr><td>-m0=lzma2 -mfb=64 -md=256m</td><td>168M</td><td>1m50s</td><td>175233526</td></tr>
+<tr><td>-m0=lzma2 -mfb=128 -md=256m</td><td>168M</td><td>2m11s</td><td>175238844</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=256m</td><td>168M</td><td>2m49s</td><td>175239475</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=512m</td><td>137M</td><td>2m45s</td><td>143334478</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=1024m</td><td>137M</td><td>2m40s</td><td>142998286</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=512m -mmt=4</td><td>168M</td><td>1m28s</td><td>175723953</td></tr>
+<tr><td>-m0=PPMd -mmem=2g</td><td>311M</td><td>3m28s</td><td>325407675</td></tr>
+<tr><td>-m0=bzip2 -md=256m -mpass=2</td><td>609M</td><td>5m45s</td><td>637839116</td></tr>
+</table>
+
+These tests were repeated with a 3.6G ISO file aswell.<br>
+<table>
+<tr><th>Flags</th><th>size</th><th>time</th><th>sizeB</th></tr>
+<tr><td>//input</td><td>3.6G</td><td>0s</td><td>3777429504</td></tr>
+<tr><td>//debian zip -r9</td><td>2.2G</td><td>3m36s</td><td>2306095871</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=32m</td><td>1853M</td><td>15m43s</td><td>1942683037</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=64m</td><td>1839M</td><td>18m9s</td><td>1928047100</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=128m</td><td>1821M</td><td>19m51s</td><td>1908844802</td></tr>
+<tr><td>-m0=lzma2 -mfb=32 -md=256m</td><td>1776M</td><td>20m18s</td><td>1861263263</td></tr>
+<tr><td>-m0=lzma2 -mfb=64 -md=256m</td><td>1773M</td><td>20m21s</td><td>1858951170</td></tr>
+<tr><td>-m0=lzma2 -mfb=128 -md=256m</td><td>1773M</td><td>21m33s</td><td>1858420775</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=256m</td><td>1773M</td><td>23m21s</td><td>1858579948</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=512m</td><td>1758M</td><td>25m41s</td><td>1843016904</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=1024m</td><td>1689M</td><td>26m50s</td><td>1770739093</td></tr>
+<tr><td>-m0=lzma2 -mfb=256 -md=512m -mmt=4</td><td>1788M</td><td>7m56.997s</td><td>1873921573</td></tr>
+<tr><td>-m0=PPMd -mmem=2g</td><td>2014M</td><td>18m53s</td><td>2110911339</td></tr>
+<tr><td>-m0=bzip2 -md=256m -mpass=2</td><td>2172M</td><td>22m37s</td><td>2276946270</td></tr>
+</table>
+
+I noticed the following things from these statistics:
+<ul>
+<li>Using multiple cores makes the process faster but the compression worse</li>
+<li>lzma2 is very good for ISOs in both compression and speed</li>
+<li>The dictionary size increases compression but also makes the process slower</li>
+</ul>
+
+This means that the default settings (on windows) of 64/64m is a good tradeoff between time taken and compression ratio.
 </p>
 
 <h3 id="converting">Converting images</h3>
