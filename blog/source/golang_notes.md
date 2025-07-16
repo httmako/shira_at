@@ -26,13 +26,19 @@ This page has all my knowledge that I wished I had in the beginning already.
 To install it run
 
 ```bash
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.58.1
+curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.2.2
 ```
 
 To analyze your go project run
 
 ```bash
 golangci-lint run
+```
+
+To see every recommendation you can enable all linters with:
+
+```bash
+golangci-lint run --default=all .
 ```
 
 
@@ -194,11 +200,12 @@ It is very easy to use, fast and has a lot functions inbuilt that you would need
 My current database system is a `mariadb`, which means I can only use and recommend [https://github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql).  
 It has never failed me and works perfectly, auto reconnecting and pooling of connections has never created any problems for me.
 
-For postgres I tested multiple frameworks but I enjoy the one from uptrace/bun the most: [github.com/uptrace/bun/driver/pgdriver](github.com/uptrace/bun/driver/pgdriver).  
-It uses the database/sql interface, which means everything is the same as always and no code needs to be changed if you do a mysql->postgres switch.
+For postgres I use [github.com/lib/pq](github.com/lib/pq).  
+It uses the database/sql interface, which means everything is the same as always and no code needs to be changed if you do a mysql->postgres switch.  
+(I can not recommend "github.com/uptrace/bun/driver/pgdriver" anymore because it had problems with parsing multiline sql from files.)
 
 If you need more functions than the default `database/sql` package can provide then I can recommend `sqlx`: [https://github.com/jmoiron/sqlx](https://github.com/jmoiron/sqlx).  
-You can easily read sql into structs and write structs into sql.
+You can easily read sql into structs and write structs into sql and you can use it with any database driver.
 
 
 ## Configuration
