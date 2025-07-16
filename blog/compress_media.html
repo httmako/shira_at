@@ -40,7 +40,7 @@ To install the tools mentioned here:
 <li><a target="_blank" href="https://github.com/tjko/jpegoptim">jpegoptim</a> - via <span>sudo apt-get install jpegoptim</span></li>
 <li><a target="_blank" href="https://pngquant.org/">pngquant</a> - via <span>sudo apt-get install pngquant</span></li>
 <li><a target="_blank" href="https://ffmpeg.org/">ffmpeg</a> - via <span>sudo apt-get install ffmpeg</span></li>
-<li><a target="_blank" href="https://imagemagick.org/">convert</a> - via <span>sudo apt-get install imagemagick</span></li>
+<li><a target="_blank" href="https://imagemagick.org/">convert</a> (optional) - via <span>sudo apt-get install imagemagick</span></li>
 </ul>
 </p>
 
@@ -98,10 +98,34 @@ A comparison of both of these files (the first / left file is the unoptimized on
 <img style="float:left;width:380px;max-width:95%;margin-right:5px;" src="files/arknights.png">
 <img style="float:left;width:380px;max-width:95%;" src="files/arknights-fs8.png">
 </div>
-
 <br>
-
-Barely any noticeable difference between the two, while the filesize is more than halfed.
+Barely any noticeable difference between the two, while the filesize is more than halfed.<br>
+<br>
+<b>BUT</b> there is another way to minimize filesize: Converting the image to a .jpg file.<br>
+You can convert a png to jpg easily with ffmpeg with:
+<pre>
+ffmpeg -i "input.png" "output.jpg"
+</pre>
+If you convert the above 728KB source image into jpg with the above command the size will go down to 70.6KB, less than half the compressed png size.<br>
+The main problem with this approach is the possible quality loss in the image (jpg is a lossy format) and the missing alpha/transparency. If you convert the above image to jpg you will see a black background and not a transparent one, because jpg does not support transparency.<br>
+<br>
+If you now convert a whole folder of images from png to jpg it can save you a lot of disk space, in my case freeing multiple GB of storage.<br>
+An example of converting my folder of 36 png images to jpg:
+<pre>
+user@debian:~/temp$ du -sh .
+13M     .
+user@debian:~/temp$ ls -l | wc -l
+36
+user@debian:~/temp$ for i in *.png; do ffmpeg -loglevel error -hide_banner -i "$i" "$i.jpg"; done
+user@debian:~/temp$ rm *.png
+user@debian:~/temp$ ls -l | wc -l
+36
+user@debian:~/temp$ du -sh .
+4.9M    .
+</pre>
+<br>
+As you can see in the output above, I went from 13MB to 4.9MB without much quality lost.<br>
+If you decide to accept the possibility of quality loss then this is a great way of saving a lot of storage space.
 </p>
 
 <h3 id="videos">Compressing videos</h3>
@@ -281,6 +305,8 @@ This means that the default settings (on windows) of 64/64m is a good tradeoff b
 <h3 id="converting">Converting images</h3>
 <p>
 There are many filetypes for images. The most common ones nowadays are: jpg,png,webp,gif<br>
+<br>
+To easily convert images between different formats you can use ffmpeg or imagemagick's convert.<br>
 <br>
 A small feature comparison:
 <ul>
