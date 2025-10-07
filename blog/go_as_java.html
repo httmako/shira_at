@@ -34,7 +34,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -87,9 +87,6 @@
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="/style.css">
-  <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
-  <![endif]-->
 </head>
 <body>
 <header id="title-block-header">
@@ -114,15 +111,12 @@ Usage</a></li>
 <ul>
 <li><a href="#docker-container" id="toc-docker-container">Docker
 Container</a></li>
-<li><a href="#cloud-ram-ressources" id="toc-cloud-ram-ressources">Cloud
-RAM ressources</a></li>
 </ul></li>
 <li><a href="#benefits-of-using-golang"
 id="toc-benefits-of-using-golang">Benefits of using Golang</a>
 <ul>
-<li><a href="#enables-users-to-write-good-code"
-id="toc-enables-users-to-write-good-code">Enables users to write good
-code</a></li>
+<li><a href="#stricter-compiling" id="toc-stricter-compiling">Stricter
+compiling</a></li>
 <li><a href="#race-condition-detector"
 id="toc-race-condition-detector">Race Condition Detector</a></li>
 <li><a href="#defer-replaces-finally"
@@ -135,38 +129,30 @@ language</a></li>
 <li><a href="#easy-concurrency-and-synced-methods"
 id="toc-easy-concurrency-and-synced-methods">Easy Concurrency and Synced
 methods</a></li>
-<li><a href="#inbuilt-http-server" id="toc-inbuilt-http-server">Inbuilt
-HTTP server</a></li>
-<li><a href="#complexity-and-speed-of-implementation"
-id="toc-complexity-and-speed-of-implementation">Complexity and Speed of
-Implementation</a></li>
 </ul></li>
 </ul>
 </nav>
 <h2 id="intro">Intro</h2>
-<p><u><strong><strong>Warning: This is based in favor of
-Golang.</strong></strong></u><br />
+<p><u><strong><strong>Warning: I am biased and enjoy Golang more, but
+the article should be objective nonetheless.</strong></strong></u><br />
 This is supposed to be a powerpoint-like presentation on why I
 personally think that Go can be the future of Java in cloud
-environment.<br />
-This isn’t a full comparison yet as im missing the time to do lots of
-benchmarks and feature comparisons.</p>
+environment.</p>
 <h2 id="environment-setup-differences">Environment setup
 differences</h2>
 <p>With Java you have a lot to setup.<br />
-First the IDE: Would you rather use Eclipse, IntelliJ or NetBeans?<br />
-Then decide on a Java version: Stuck with Java8/11 (due to legacy code)
-or choose Java16?<br />
-Then the package manager: Ant, Maven or Gradle? And which version of the
-choosen one?<br />
-Last but not least: Wildfly or Tomcat for websites? Or Spring Boot? JSP
-or Angular?</p>
+You have to decide which IDE to use, maybe Eclipse, IntelliJ or
+NetBeans?<br />
+Then decide on a Java version: Stuck with Java8?<br />
+Then the package manager: Ant, Maven or Gradle?<br />
+Wildfly or Tomcat for websites? Or Spring Boot? JSP or Angular?</p>
 <p>Comparing that to Golang it’s very complicated.<br />
-With Go you only have the Go version to worry about.<br />
+With Go you do not have to worry about the version upgrade, as each
+version is backwards compatible.<br />
 You can program with VisualStudioCode or even vim.<br />
 The package manager is built into the go commandline with
-<code>go get</code>. Go features, by default, linting, race condition
-detecting and version management.<br />
+<code>go get</code>. Golang features, by default, linting, race
+condition detecting and version management.<br />
 The webserver is built into the default golang packages and doesn’t need
 anything like a tomcat to run.</p>
 <p>This environment setup process can be explained really easily with an
@@ -178,65 +164,49 @@ IDE+PackageManager+Tomcat.<br />
 With Golang you only need a text file in combination with 3 commands:
 <code>go mod init example.com/app &amp;&amp; go get . &amp;&amp; go run .</code></p>
 <h2 id="performance">Performance</h2>
-<p>I always hear that Java is the best performing language. Many people,
-who are not based upon the historic legacy of Java in their company, see
-this different nowadays.</p>
-<p>I have 3 benchmarks that show my point pretty well. Java is not the
-only one at the top anymore.</p>
 <h3 id="web-framework-benchmark">Web Framework Benchmark</h3>
 <p>An example of the performance of common web frameworks we learned at
 University:</p>
 <p><a
 href="https://web-frameworks-benchmark.netlify.app/compare?f=laravel,rails,flask,express,spring,gin">https://web-frameworks-benchmark.netlify.app/compare?f=laravel,rails,flask,express,spring,gin</a></p>
 <p>In these examples “spring boot” is used for Java and “gin-gonic” for
-Golang. (With Java11 and Go11.7)<br />
-These 2 are the most common frameworks I found when working with
-them.<br />
-As you can see, gin destroys the other frameworks in performance.</p>
-<p>Here are all the frameworks that this website has compared:<br />
-<a
-href="https://web-frameworks-benchmark.netlify.app/result?l=go,java">https://web-frameworks-benchmark.netlify.app/result?l=go,java</a></p>
-<p>The only thing this comparison doesn’t show is the popularity. The
-framework that is the fastest could be buggy and missing a lot of
-features, but is still the fastest because of it.</p>
-<p>Summary: Gin wins over Spring, but use this comparison with
-caution.</p>
+Golang.<br />
+These 2 are the most common frameworks I found when working with both
+languages.<br />
+As you can see, gin has better performance than the other
+frameworks.</p>
 <h3 id="julias-benchmark">Julia’s Benchmark</h3>
 <p>The programming language Julia made a benchmark of specific
-algorithms using many different languages. It uses Golang1.9 and
-Java8.</p>
+algorithms using many different languages. It uses outdated Golang1.9
+and Java8.</p>
 <p><a
 href="https://julialang.org/benchmarks/">https://julialang.org/benchmarks/</a></p>
-<p>Here you can see that Go wins over Java in performance. The only
-category Golang doesn’t work better than Java is with “Matrix
-Statistics”, where it is a bit worse than Java.</p>
-<p>This benchmark is, ofcourse, to be used with caution. The date and
-specific execution of it is unknown.</p>
+<p>In the above link you can see that Golang has, on average, better
+performance than Java.</p>
 <h3 id="ram-cpu-usage">RAM &amp; CPU Usage</h3>
-<p>It is common knowledge that Java is a RAM eating monster.</p>
-<p>I created 2 webservers: One with Go’s “gin” and one with Java’s
-“Spring-Boot” web framework.</p>
+<p>Java uses a lot of RAM.<br />
+To compare both languages we create 2 webservers with the most popular
+web frameworks: Golang’s “gin-gonic” and Java’s “spring-boot”.</p>
 <p>For Spring I used their “REST Api” example: <a
 href="https://spring.io/guides/tutorials/rest/">https://spring.io/guides/tutorials/rest/</a><br />
 For Go I used the gin example from here with an added struct for
 greeting: <a
 href="https://github.com/gin-gonic/gin/blob/master/README.md#quick-start">https://github.com/gin-gonic/gin/blob/master/README.md#quick-start</a></p>
-<p>Both applications have the same speed on my machine (1100 req/s) and
-the same average response time (44ms) when I load tested them with
-apache benchmark (50 concurrent clients with 10000 requests).</p>
-<p>The main difference: <strong>Java used 262.1MB of RAM and Go only
-used 8.7MB of RAM!</strong><br />
-Another small difference: Go’s RAM usage was 2.9MB before the load test,
-while Java’s RAM usage was always at 262.1MB.</p>
-<p>Another benchmark I found for this is the following medium
-article:</p>
+<p>Both applications have the same speed (1100 req/s) and the same
+average response time (44ms) when load-tested with apache benchmark (50
+concurrent clients with 10000 requests).</p>
+<p>The main difference that can be observed: <strong>Java used 262.1MB
+of RAM and Go only used 8.7MB of RAM!</strong><br />
+(Golang’s RAM usage was 2.9MB before the load test, while Java’s RAM
+usage was always at 262.1MB)</p>
+<p>Another benchmark, from medium:</p>
 <p><a
 href="https://medium.com/@dexterdarwich/comparison-between-java-go-and-rust-fdb21bd5fb7c">https://medium.com/<span
 class="citation"
 data-cites="dexterdarwich/comparison-between-java-go-and-rust-fdb21bd5fb7c">@dexterdarwich/comparison-between-java-go-and-rust-fdb21bd5fb7c</span></a></p>
 <p>Ofcourse, never trust a random benchmark you found on the internet,
 but I tested these myself and got similar results.</p>
-<p>Some key points I want to point out from the article:</p>
+<p>Some key points from the article:</p>
 <ul>
 <li>While running idle, Java used a massive 162MB of RAM, while Go only
 used 0.86MB of RAM.<br />
@@ -246,47 +216,37 @@ last one it has a 1% lower usage than Go.</li>
 <li>The /hello endpoint, which simply replies with “Hello World”, made
 Java use 1.5GB of RAM, while Go only used 18.38MB of RAM.</li>
 <li>Java was, with the /fibonacci endpoint, able to answer more
-requests, but is that really worth the immense RAM usage in a cloud
-environment?</li>
+requests</li>
 </ul>
-<p>Some people may say “I have the RAM, so i don’t care”, but that’s the
-wrong approach for the cloud.<br />
-Java uses 22.5 times more RAM then Go for around 20% better
+<p>Java uses 22.5 times more RAM then Go for around 20% better
 performance.<br />
-You could deploy a second Go application, which is quite easy in the
-cloud, and get a way better performance out of it, with still less RAM
-usage than the Java application.</p>
+You could deploy a second Go application, which is quite easy in
+containerized cloud environments, and get way better performance with
+less RAM usage than the Java application.</p>
 <h2 id="cloud">Cloud</h2>
 <h3 id="docker-container">Docker Container</h3>
 <p>A comparison between moving Java and moving Go applications into a
 container.</p>
-<p>With Java you have to create a custom “run.sh” start script which
-adds the classpath and all the other configuration to the start
-command.<br />
-You also need a base FROM image like
+<p>With Java you have to add the classpath and all the other
+configuration to the start command.<br />
+You also need a base image like
 <code>openjdk:8u332-jre-slim-bullseye</code> which bloats up the
 container size.</p>
 <p>Example Dockerfile for Java:</p>
 <pre><code>FROM openjdk:8-jre-slim-bullseye
-MAINTAINER Me Myself &lt;me@example.com&gt;
-
 WORKDIR /srv/myapp
-
 COPY myapp-1.0.0.jar myapp-1.0.0.jar
 COPY jars jars/
 COPY lib lib/
 COPY run.sh run.sh
-
 ENTRYPOINT [&quot;/srv/myapp/run.sh&quot;]</code></pre>
-<p>With Go you can simply move the binary file into an empty container
-and run it, no special FROM image needed. This makes the container 90%
-more lightweight.</p>
+<p>With Golang you can simply move the statically-compiled binary file
+into an empty container and run it, no special FROM image needed. This
+makes the container 90% more lightweight (in filesize).</p>
 <p>Example Dockerfile for Go:</p>
 <pre><code>FROM scratch
 COPY myapp /myapp
 CMD [&quot;/myapp&quot;]</code></pre>
-<p>If you need to have config files or web resources then you have to
-ofcourse COPY them into it too.</p>
 <p>To show the difference in size I compared my minimalistic NodeJS REST
 API container to my Go REST API container (the first 2 in the list):</p>
 <pre><code>REPOSITORY    TAG            IMAGE ID        CREATED         SIZE
@@ -297,44 +257,22 @@ mariadb       latest         6e0162b44a5f    5 weeks ago     414MB
 node          17.6-alpine    eb56d56623e5    2 months ago    168MB
 nginx         latest         c316d5a335a5    3 months ago    142MB
 hello-world   latest         feb5d9fea6a5    7 months ago    13.3kB</code></pre>
-<p>The gotest image is way smaller than the nodetest image, even though
-they do practically the same.</p>
-<p>Ofcourse, the size itself is not much of a “game breaker”, nobody
-would choose a programming language over another just because the
-application filesize is smaller. But it shows that Go is more the “one
-final package” solution which is easier to deploy in the cloud.</p>
-<h3 id="cloud-ram-ressources">Cloud RAM ressources</h3>
-<p>I have 3 different namespaces: myapp-dev, myapp-int and myapp-prod.
-This means my application is running ATLEAST 3 times at once.</p>
-<p>The current java application needs ~500MB of RAM to run. (-Xmx is set
-to 512MB)<br />
-This means that im currently using atleast 2GB of RAM (1dev, 1int and
-2prod if not more) of my 12GB in total. This is quite a lot, because the
-CPU usage is really low compared to my RAM usage.</p>
-<p>If I compare that to my Go application, which needs around 30MB of
-RAM, I could run a lot more instances while only having to worry about
-CPU pretty much. (My 4 Go instances would use less RAM than one Java
-instance)</p>
+<p>My “gotest” container uses only 3MB more than the base alpine:3.13
+image and is over 150MB smaller than the nodetest image.</p>
 <h2 id="benefits-of-using-golang">Benefits of using Golang</h2>
-<h3 id="enables-users-to-write-good-code">Enables users to write good
-code</h3>
-<p>Go has multiple features built in that prohibits you from building
-bad or unoptimized code. For example:</p>
+<h3 id="stricter-compiling">Stricter compiling</h3>
+<p>Golang does not let you compile if you define a variable and never
+use it. Example:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>result<span class="op">,</span> err <span class="op">:=</span> myFunction<span class="op">(</span>input<span class="op">)</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> err <span class="op">!=</span> <span class="ot">nil</span> <span class="op">{</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ot">false</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="cf">return</span> <span class="ot">true</span></span></code></pre></div>
-<p>This function would not compile because go would see the variable
-result as never used and thus fail during building. If you import a
-package but never use it go will also fail to build.</p>
-<p>This enables you to build predictable and high quality code. For
-another feature for predictable code see the next paragraph about Race
-Conditions.</p>
+<p>The above example defines “result” but never uses it, thus it would
+not compile or run and print out an error.</p>
 <h3 id="race-condition-detector">Race Condition Detector</h3>
 <p>You can run your code with a “race condition detector”, which is
-build into the go commandline tool.</p>
-<p>An example file would be:</p>
+build into the main go toolchain.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> main</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="st">&quot;fmt&quot;</span></span>
@@ -426,23 +364,20 @@ you don’t have to worry about closing anything anymore.</p>
 href="https://go.dev/tour/flowcontrol/12">https://go.dev/tour/flowcontrol/12</a></p>
 <h3 id="amazing-standard-library">Amazing Standard Library</h3>
 <p>For example: In Go you don’t need any special logging library.<br />
-The built in “log” library is working really well and can be enhanced
-with special features if necessary. This makes your code less dependant
-on other people’s code and thus can also help you against exploits found
-there (e.g. log4j exploit in dec 2021).</p>
+The built in “log” (or slog) library is working really well and can be
+enhanced with special features if necessary. This makes your code less
+dependant on other people’s code and thus can also help you against
+exploits found there (e.g. log4j exploit in dec 2021).</p>
 <p>To browse the standard Go packages visit <a
 href="https://pkg.go.dev/std">https://pkg.go.dev/std</a></p>
 <h3 id="a-grown-and-battle-tested-language">A grown and battle-tested
 language</h3>
-<p>If you google “Golang” you will often find the statement that it’s
+<p>If you search “Golang” you will often find the statement that it’s
 “Too young to be used in production” or “Still an underdog in the
 enterprise area”.</p>
-<p>This is wrong.</p>
-<p>These posts are very old and thus obsolete. It may have been so 5
-years ago, but now, in 2022, Go is a very popular language.</p>
-<p>If you visit the official Go website (<a
-href="https://go.dev/">https://go.dev/</a>) You can see the companies
-that use Go, including:</p>
+<p>These posts can be quite old. If you visit the official Go website
+(<a href="https://go.dev/">https://go.dev/</a>) You can see the
+companies that use Go, including:</p>
 <ul>
 <li>Microsoft</li>
 <li>Meta</li>
@@ -454,12 +389,18 @@ that use Go, including:</p>
 <li>Cloudflare</li>
 <li>Dropbox</li>
 </ul>
-<p>To add to it: Docker, Kubernetes and kubectl have also been written
-in Go. It is not a young and barely-known language anymore.</p>
+<p>Also, some of the most popular container tools are written in Golang,
+including:</p>
+<ul>
+<li>Docker</li>
+<li>cri-o</li>
+<li>containerd</li>
+<li>kubectl</li>
+<li>Rook (storage k8s)</li>
+<li>podman</li>
+</ul>
 <h3 id="easy-concurrency-and-synced-methods">Easy Concurrency and Synced
 methods</h3>
-<p>Go uses so called “goroutines” for multithreading. It is a
-“lightweight thread” and can work in parallel to the main thread.</p>
 <p>To run a function in a goroutine simply call</p>
 <pre><code>go myFunction()</code></pre>
 <p>in your code. This will run myFunction() parallel to the execution of
@@ -501,33 +442,5 @@ class="sourceCode go"><code class="sourceCode go"><span id="cb10-1"><a href="#cb
 <span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Wait for all HTTP fetches to complete.</span></span>
 <span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    wg<span class="op">.</span>Wait<span class="op">()</span></span>
 <span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<h3 id="inbuilt-http-server">Inbuilt HTTP server</h3>
-<p>Compared to Java most modern languages have the web server directly
-built into the language. No need for a Tomcat or Wildfly server to host
-your application on the web.</p>
-<p>Go has its own HTTP library which automatically creates a goroutine
-(lightweight thread for parallel processing) when a request comes in,
-enabling it to automatically use multiple cores on a machine without any
-extra configuration.</p>
-<p>A very popular framework for web applications is gin
-(https://github.com/gin-gonic/gin/blob/master/README.md). It enables
-quick and production ready code that can serve a thousand requests per
-second easily.</p>
-<h3 id="complexity-and-speed-of-implementation">Complexity and Speed of
-Implementation</h3>
-<p>A colleague of mine wanted to implement a mock web server that simply
-verifies the structure of a json you POST to it.<br />
-With Go I have finished this task in 10 minutes. The outcome is a single
-.go file written in vim which can be run anywhere without the need of an
-IDE. (In total there are 3 files, but none of them are needed except the
-main.go file to run somewhere else)</p>
-<p>With java (according to the Spring Boot REST API example I did above
-in the comparison of RAM usage) I would first need to decide which IDE I
-use. Then decide between maven or gradle and if I use spring boot or
-Tomcat standalone. In the end (of the example rest api) I had 25 files
-in the project folder.</p>
-<p>What I mean with this comparison: A Java project needs to be setup
-first while a Go project can immediately start with “vim main.go” and
-work on a solution that is immediately ready to run.</p>
 </body>
 </html>
