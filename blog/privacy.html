@@ -118,60 +118,30 @@ Finding alternatives for commonly used software is not difficult these days.<br>
 The following list will show what software is recommended and which software should be avoided. This may be a bit subjective and consists of mainly Windows Software.<br>
 <br>
 
-<h4>OS</h4>
-Any Linux distribution, for example Kubuntu. If you have to use Windows you can look into privacy-enhancing software like privacy.sexy and SimpleWall.<br>
-
-<h4>Voice over IP</h4>
-<a target="_blank" href="https://www.mumble.com/mumble-download.php">Mumble</a> is the best choice here. Teamspeak is proprietary, same with Discord.
-
-<h4>Zipping Tool</h4>
-<a target="_blank" href="https://www.7-zip.org/download.html">7zip</a> is a solid choice here. It works faster and is more simple than Winrar, not to mention it's completely free.
-
-<h4>Text Editor / Programming IDE</h4>
-<a target="_blank" href="https://notepad-plus-plus.org/downloads">Notepad++</a> for text editing and light programming.<br>
-For programming use <a target="_blank" href="https://vscodium.com/#install">vscodium</a> , a fully open source build of visual studio code without telemetry or tracking.
-
-<h4>Office Suite</h4>
-<a target="_blank" href="https://www.libreoffice.org/">LibreOffice</a> is the best replacement for Microsoft Word, Powerpoint and others.
-
-<h4>Antivirus</h4>
-You don't need an antivirus if you don't install suspicious applications. Common sense should you get you through nearly everything (plus some browser addons like noscript)
-
-<h4>SSH / FTP</h4>
-<a target="_blank" href="https://www.putty.org/">Putty</a> for SSH, and <a target="_blank" href="https://winscp.net/eng/download.php">WinSCP</a> for FTP. (I recommended WinSCP to friends and everyone liked it more than Filezilla)
-
-<h4>PDF Reader</h4>
-<a target="_blank" href="https://www.sumatrapdfreader.org/free-pdf-reader.html">Sumatra PDF</a>. Simple, Lightweight and really fast. Adobe Reader is proprietary.
-
-<h4>Browser</h4>
-Currently <a target="_blank" href="https://www.mozilla.org/de/firefox/new/">Firefox</a> is the best choice. Try to avoid google chrome and derivates that are not focused on security.<br>
-
-<h4>Firefox Browser Addons</h4>
 <ul>
-<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/noscript/">NoScript</a> - to protect yourself from evil javascript on sites you don't trust</li>
-<li><a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/">uBlock Origin</a> - the best and only adblock you need</li>
+<li>Linux as your OS, for example Kubuntu or Fedora KDE</li>
+<li>If using Windows, I <b>HIGHLY</b> suggest using SimpleWall (as a firewall) and privacy.sexy</li>
+<li>Mumble, for voice chat. Teamspeak and Discord are proprietary.</li>
+<li>7zip for compressing files, it is free compared to winrar.</li>
+<li>Notepad++ for editing files quickly, Vscodium as an IDE for programming</li>
+<li>LibreOffice instead of Microsoft Word, etc.</li>
+<li>You do not need an antivirus, common sense is enough. If needed, scan files with virustotal</li>
+<li>Putty for SSH on windows, WinSCP for file transfer instead of Filezilla</li>
+<li>SumatraPDF to read PDFs, more lightweight and faster than adobe reader</li>
+<li>Firefox or Librewolf as privacy-supporting browsers instead of chrome based ones</li>
+<li>Helpful firefox addons: NoScript, uBlock Origin, Multi-Account Containers</li>
+<li>Instead of Google Drive you could host Nextcloud or use a provider like disroot</li>
+<li>MPV to watch videos anywhere</li>
+<li>Shotcut or kdenlive to edit videos, or ffmpeg for more raw video editing</li>
+<li>gimp or inkscape for 2d drawing, blender for 3d drawing</li>
+<li>MakeMKV and Handbrake for converting DvDs</li>
+<li>Use "shred" on linux or "BleachBit" on windows to delete files securely</li>
+<li>Signal instead of WhatsApp for more secure communications</li>
+<li>BetterBird for reading emails (Thunderbird but more updates)</li>
+<li>A different email provider than google, for example disroot, mailcow, mailinabox</li>
 </ul>
-These are all "must haves" in my opinion. NoScript disables all javascript, which makes websites not able to load anything except HTML and CSS. From malicious code to cookie scripts, nothing runs without your allowance.<br>
-ublock Origin is the better, non-biased version of adblock plus and thus preferred.<br>
-If you need multiple identities in one browser then use <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/">Firefox Multi-Account Containers</a>, which let's you (for example) have multiple twitter accounts logged-in in the same browser window.<br>
-If you want maximum security you should use "uMatrix", but it has a steep learning curve when getting started.
-
-<h4>File Hosting (Cloud Drive)</h4>
-The best solution to google drive, dropbox and co. is self-hosting. You can selfhost TinyFileManager or NextCloud on a raspberry pi at home.<br>
-If you can't host your own then you could use the disroot instance at <a target="_blank" href="https://disroot.org/de/services/nextcloud">https://disroot.org/de/services/nextcloud</a>
-
-<h4>File deleting</h4>
-To safely delete files (so that no one can recover them) use <a target="_blank" href="https://www.bleachbit.org/download">BleachBit</a> on windows or the "shred" command on Linux.<br>
-<b>Warning</b>: The "shred" command doesn't fully delete the file from the hard drive if (for example) swap files have been created of it from editors like vim or nano, because the .swap file could be somewhere else on the hard drive and thus still be retrievable.
-
-<h4>Instant Messaging</h4>
-<a target="_blank" href="https://signal.org/en/">Signal</a> is very good and privacy-focused.
-
-<h4>Emails</h4>
-<a target="_blank" href="https://www.betterbird.eu/faq/index.html">Betterbird</a> is the a soft fork of Mozilla's Thunderbird and my current recommendation. It is like Microsoft's Outlook but free and open source.<br>
-It is highly recommended to not use google's mail (gmail) for your mailing provider. Google tracks everything you do and has a "contract" with the NSA to hand over any data they have of you, including ALL your emails. Instead it is recommended to use an email provider that is not residing in the USA.<br>
-An example would be: <a target="_blank" href="https://disroot.org">disroot.org</a> (which needs a manual registration for an email account, but is free forever) - disroot uses disk encryption and is working on an end-2-end inbox encryption.<br>
-Other providers from different guides:<br>
+<br>
+Other mail providers from different guides:<br>
 <ul>
 <li><a target="_blank" href="https://privacyguides.org/providers/email/">https://privacyguides.org/providers/email/</a></li>
 <li><a target="_blank" href="https://thenewoil.org/email.html">https://thenewoil.org/email.html</a></li>
@@ -180,20 +150,6 @@ Other providers from different guides:<br>
 <li><a target="_blank" href="https://mailcow.email/">Hosting your own on with mailcow</a></li>
 <li><a target="_blank" href="https://mailinabox.email/">Hosting your own on with mail-in-a-box</a></li>
 </ul>
-<br>
-
-<h4>Multimedia</h4>
-For watching videos and listening to music you can use <a target="_blank" href="https://www.videolan.org/vlc/index.html">VLC</a> or <a target="_blank" href="https://github.com/mpvnet-player/mpv.net">mpv.net</a>.<br>
-For ripping and converting DVDs <a target="_blank" href="https://www.makemkv.com/">MakeMKV</a> and <a target="_blank" href="https://handbrake.fr/">Handbrake</a>.<br>
-For cutting videos <a target="_blank" href="https://shotcut.org/">Shotcut</a> or <a target="_blank" href="https://kdenlive.org/">kdenlive</a>.<br>
-For graphic related work <a target="_blank" href="https://www.gimp.org/">Gimp</a> or <a target="_blank" href="https://inkscape.org/">InkScape</a>.<br>
-For 3D Modeling <a target="_blank" href="https://www.blender.org/">Blender</a>.
-
-<h4>Data Recovery</h4>
-<a target="_blank" href="https://www.cgsecurity.org/wiki/TestDisk_Download">TestDisk</a> or <a target="_blank" href="https://www.ccleaner.com/recuva">Recuva</a> are recommended. A friend of mine recently tried Recuva and was successful in recovering old data.
-
-<h4>Torrent</h4>
-<a target="_blank" href="https://www.qbittorrent.org/">qBittorrent</a>
 
 </p>
 
