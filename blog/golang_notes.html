@@ -23,9 +23,8 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
     /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span { line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -36,7 +35,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -96,9 +95,6 @@
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#golang-development-made-easy"
-id="toc-golang-development-made-easy">Golang development made
-easy</a></li>
 <li><a href="#tools" id="toc-tools">Tools</a>
 <ul>
 <li><a href="#lint" id="toc-lint">Lint</a></li>
@@ -128,11 +124,6 @@ id="toc-configuration">Configuration</a></li>
 pipeline</a></li>
 </ul>
 </nav>
-<h1 id="golang-development-made-easy">Golang development made easy</h1>
-<p>This is a collection of golang commands, improvements, information
-and other stuff.<br />
-This page has all my knowledge that I wished I had in the beginning
-already.</p>
 <h1 id="tools">Tools</h1>
 <h2 id="lint">Lint</h2>
 <p><a href="https://golangci-lint.run">https://golangci-lint.run</a></p>
@@ -226,6 +217,8 @@ href="https://go.dev/blog/defer-panic-and-recover">https://go.dev/blog/defer-pan
 <li>sync.Map is a thread-safe alternative to a “default map[int]int”,
 which is not thread-safe ; <a
 href="https://pkg.go.dev/sync#Map">https://pkg.go.dev/sync#Map</a></li>
+<li>using a mutex with a default map is faster than using a
+sync.Map</li>
 </ul>
 <h2 id="benchmarks">Benchmarks</h2>
 <p>Documentation: <a

@@ -7,14 +7,6 @@ header-includes:
     <link rel="stylesheet" href="/style.css">
 ---
 
-
-# Golang development made easy
-
-This is a collection of golang commands, improvements, information and other stuff.  
-This page has all my knowledge that I wished I had in the beginning already.
-
-
-
 # Tools
 
 
@@ -127,6 +119,7 @@ upx --best myapp
  - database/sql (and any database module that uses the same interface) is connection-pooling and thread-safe by default ; [https://pkg.go.dev/database/sql#DB](https://pkg.go.dev/database/sql#DB)
  - defer will be called even if a panic occurs and is "last in -> first out" ; [https://go.dev/blog/defer-panic-and-recover](https://go.dev/blog/defer-panic-and-recover)
  - sync.Map is a thread-safe alternative to a "default map[int]int", which is not thread-safe ; [https://pkg.go.dev/sync#Map](https://pkg.go.dev/sync#Map)
+ - using a mutex with a default map is faster than using a sync.Map
 
 
 ## Benchmarks
