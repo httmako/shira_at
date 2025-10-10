@@ -21,14 +21,14 @@
 
 <h3 id="about">About</h3>
 <p>
-This guide is made mainly for linux as I don't trust windows. Most tools are closed source and I don't know what else windows does under the hood during formating.<br>
+This guide is made mainly for linux as windows is not trustworthy because one can not be sure what windows does in the background with your data.<br>
 All of these tools should be preinstalled on a typical linux desktop (example Fedora, MX Linux, Manjaro).<br>
 WARNING: Please use the correct method for your Drive. Do not overwrite a new SSDs with zeros via dd.
 </p>
 
 <h3 id="problem">The problem with formating</h3>
 <p>
-Flash Based (SSD, maybe USB) save data multiple times / move it without deleting the old version.<br>
+Flash-based media (SSD, maybe USB) save data multiple times and move it without deleting the old version.<br>
 <br>
 This is thanks to Wear Leveling (<a href="https://en.wikipedia.org/wiki/Wear_leveling" target="_blank">https://en.wikipedia.org/wiki/Wear_leveling</a>) and Write Amplification (<a href="https://en.wikipedia.org/wiki/Write_amplification" target="_blank">https://en.wikipedia.org/wiki/Write_amplification</a>).<br>
 This also means that, if you overwrite your SSD with all 0, you are going to write way more data inside of the SSD than only 1 time the size of it. This makes the SSD die more quickly. This is also the reason why "Defragmentation" is not recommended for SSDs.<br>
@@ -42,7 +42,7 @@ The easiest way to safely delete a single file is the <span>shred</span> command
 By default it overwrites the file 3 times. To also delete the file after overwriting it run the command like this: <span>shred -vu file.txt</span><br>
 -v makes it verbose, -u makes it deallocate and remove the file after overwriting.<br>
 <br>
-BUT: It is recommended to, if you modified the file defragmented your drive, format the whole drive instead. The internal wear leveling could've copied the file multiple times, which makes it recoverable with special tools.
+BUT: It is recommended to, if you modified the file on your drive, to format the whole drive instead. The internal wear leveling could've copied the file multiple times, which makes it recoverable with special tools.
 </p>
 
 <h3 id="hddusb">Format HDD / USB</h3>
@@ -88,9 +88,9 @@ As you can read in the archlinux article from above it is no easy task to fully 
 <br>
 That's why my tip is: Encrypt your drive itself (with for example veracrypt or cryptsetup).<br>
 <br>
-The recovery tools for deleted files search data that is still on the disk. If you encrypt your data though it is basically unrecoverable as they would need the key to decrypt it aswell. Without the key they don't know if the data is garbage or actually an encrypted file.<br>
+The recovery tools for deleted files search data that is still on the disk. If you encrypt your data it is basically unrecoverable as they would need the key to decrypt it aswell. Without the key they don't know if the data is garbage or actually an encrypted file.<br>
 <br>
-This protects you from someone finding your USB in the trash and checking whats on it: Without the key they can't read the data anyways. This removes the need for thorough erasure and cleaning of old drives as one single wipe is enough to ruin everything.<br>
+This protects you from someone finding your USB in the trash and checking whats on it: Without the decryption key they can't read the data. This removes the need for thorough erasure and cleaning of old drives as one single wipe is enough to ruin everything.<br>
 Then you just have to delete / forget the key and your data is forever gone.
 </p>
 
