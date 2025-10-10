@@ -115,8 +115,11 @@ docker build . -t localhost:5000/vomitlogs
 Push it to your local registry with:
 
 ```bash
-docker push localhost:5000/vomitlogs
+docker push --tls-verify=false localhost:5000/vomitlogs
 ```
+
+The tls-verify flag is needed because docker push defaults to HTTPS, which is not enabled here. (Thanks Malik!)
+
 
 
 Now you can create a `deployment.yaml` file with the following inside:
